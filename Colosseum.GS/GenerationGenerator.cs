@@ -8,6 +8,26 @@ namespace Colosseum.GS
     {
         private const double PartToLive = 0.5;
         private const double rangeOfMutaion = 0.05;
+        
+        
+        public List<Gene> randomGeneration ()
+        {
+            Random random = new Random();
+            List<Gene> adamAndEveAndFriends = new List<Gene>(10);
+            
+            for (int j = 0; j < 20000; j++)
+            {
+                var tmp = new Gene();
+                for (int i = 0; i < Gene.LengthOfGene; i++)
+                {
+                    tmp.GenomesList.Add(random.NextDouble());
+                    tmp.Score = random.NextDouble();
+                }
+                adamAndEveAndFriends.Add(tmp);
+            }
+            var nextGen = Genetic(adamAndEveAndFriends);
+            return nextGen;
+        }
 
         //Generates a new Generation based on the last Generation
         //Last Generation should be evaluted beforehead
@@ -76,6 +96,6 @@ namespace Colosseum.GS
             double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) *
                                    Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
             return Math.Abs(mean + randStdNormal * stdDrivation);
-        }s
+        }
     }
 }
