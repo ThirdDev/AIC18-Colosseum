@@ -78,7 +78,7 @@ namespace Colosseum.Services
                 {
                     if (data.Data.IsNullOrWhiteSpace().Not())
                     {
-                        await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now}: {data.Data}", cancellationToken);
+                        await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now:s}: {data.Data}", cancellationToken);
                     }
                 }
                 finally
@@ -98,7 +98,7 @@ namespace Colosseum.Services
                 {
                     if (data.Data.IsNullOrWhiteSpace().Not())
                     {
-                        await writeCommandLogAsync((await logFilePathAsync()).stdErr, $"{DateTime.Now}: {data.Data}", cancellationToken);
+                        await writeCommandLogAsync((await logFilePathAsync()).stdErr, $"{DateTime.Now:s}: {data.Data}", cancellationToken);
                     }
                 }
                 finally
@@ -117,7 +117,7 @@ namespace Colosseum.Services
                 processEndLocks.AddThreadSafe(endLock);
                 try
                 {
-                    await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now}: exited.", cancellationToken);
+                    await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now:s}: exited.", cancellationToken);
                 }
                 finally
                 {
@@ -144,7 +144,7 @@ namespace Colosseum.Services
             if (process.Start())
             {
                 processPayload.ProcessId = process.Id;
-                await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now}: started.", cancellationToken);
+                await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now:s}: started.", cancellationToken);
                 process.BeginErrorReadLine();
                 process.BeginOutputReadLine();
                 if (commandInfo.RequiresBash)
