@@ -81,5 +81,10 @@ namespace Colosseum.App.Client
             }
             return payload;
         }
+
+        public static string GetClientOutputPath(DirectoryInfo directory)
+        {
+            return Path.Combine(directory.FullName, _clientOutput);
+        }
     }
 }
