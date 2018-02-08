@@ -8,6 +8,7 @@ namespace Colosseum.GS
     {
         private const double PartToLive = 0.5;
         private const double rangeOfMutaion = 0.05;
+        public const int generationPopulation = 500;
         
         
         public List<Gene> randomGeneration ()
@@ -15,7 +16,7 @@ namespace Colosseum.GS
             Random random = new Random();
             List<Gene> adamAndEveAndFriends = new List<Gene>(10);
             
-            for (int j = 0; j < 20000; j++)
+            for (int j = 0; j < generationPopulation; j++)
             {
                 var tmp = new Gene();
                 for (int i = 0; i < Gene.LengthOfGene; i++)
