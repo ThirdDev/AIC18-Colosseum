@@ -18,7 +18,7 @@ namespace Colosseum.App.Server
         public string UIConnectionTimeout { get; private set; } = "2147483647";
         public string OCSendToUI { get; private set; } = "false";
         public string OCSendToFile { get; private set; } = "false";
-        public string OCFilePath { get; set; }
+        public string OCFilePath { get; private set; } = "./game.log";
 
         public string Serialize()
         {
