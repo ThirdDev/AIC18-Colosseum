@@ -19,7 +19,7 @@ namespace Colosseum.App
 
         public static async Task RunCompetitions(string mapPath, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var lastGeneration = new List<Gene>();
+            List<Gene> lastGeneration = null;
             int generationNumber = 1;
 
             var arenaDir = new DirectoryInfo("arena");
