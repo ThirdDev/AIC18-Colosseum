@@ -14,17 +14,17 @@ namespace Colosseum.GS
             return string.Join(Environment.NewLine, GenomesList.Count, string.Join(Environment.NewLine, GenomesList.ToArray()));
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hash = 19;
-                foreach (var genome in GenomesList)
-                {
-                    hash = hash * 31 + genome.GetHashCode();
-                }
-                return hash;
-            }
-        }
+        //public override int GetHashCode()
+        //{
+        //    unchecked
+        //    {
+        //        int hash = 19;
+        //        foreach (var genome in GenomesList)
+        //        {
+        //            hash = hash * 31 + genome.GetHashCode();
+        //        }
+        //        return hash;
+        //    }
+        //}
     }
 }
