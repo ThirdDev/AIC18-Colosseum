@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,15 +14,10 @@ namespace Colosseum.Services
 
     public class OperationSystemServices : IDisposable
     {
-        private readonly int initTime = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-        private readonly List<Process> _processes = new List<Process>();
+        private static readonly int initTime = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+        private static readonly List<Process> _processes = new List<Process>();
 
-        public OperationSystemServices(ILoggerFactory loggerFactory)
-        {
-            _logger = loggerFactory.CreateLogger(nameof(OperationSystemServices));
-        }
-
-        public async Task RunCommandAsync(CommandInfo commandInfo,
+        public static async Task RunCommandAsync(CommandInfo commandInfo,
             CancellationToken cancellationToken,
             ProcessPayload processPayload = null,
             Action<string> outputReceived = null,
@@ -91,14 +85,7 @@ namespace Colosseum.Services
             process.OutputDataReceived += async (sender, data) =>
             {
                 var endLock = new object();
-                if (processEndLocks != null)
-                {
-                    processEndLocks.AddThreadSafe(endLock);
-                }
-                else
-                {
-                    _logger.LogError($"processEndLocks for process {process.Id} has been disposed but output event is still firing. command: {commandInfo.OneLineCommand}");
-                }
+                processEndLocks.AddThreadSafe(endLock);
                 try
                 {
                     if (data.Data.IsNullOrWhiteSpace().Not())
@@ -122,14 +109,7 @@ namespace Colosseum.Services
             process.ErrorDataReceived += async (sender, data) =>
             {
                 var endLock = new object();
-                if (processEndLocks != null)
-                {
-                    processEndLocks.AddThreadSafe(endLock);
-                }
-                else
-                {
-                    _logger.LogError($"processEndLocks for process {process.Id} has been disposed but error event is still firing. command: {commandInfo.OneLineCommand}");
-                }
+                processEndLocks.AddThreadSafe(endLock);
                 try
                 {
                     if (data.Data.IsNullOrWhiteSpace().Not())
@@ -154,14 +134,7 @@ namespace Colosseum.Services
             process.Exited += async (_, __) =>
             {
                 var endLock = new object();
-                if (processEndLocks != null)
-                {
-                    processEndLocks.AddThreadSafe(endLock);
-                }
-                else
-                {
-                    _logger.LogError($"processEndLocks for process {process.Id} has been disposed but exit event is still firing. command: {commandInfo.OneLineCommand}");
-                }
+                processEndLocks.AddThreadSafe(endLock);
                 try
                 {
                     if (log)
@@ -236,9 +209,9 @@ namespace Colosseum.Services
 
         }
 
-        private readonly SemaphoreSlim writeCommandLogSemaphore = new SemaphoreSlim(1, 1);
+        private static readonly SemaphoreSlim writeCommandLogSemaphore = new SemaphoreSlim(1, 1);
 
-        private async Task writeCommandLogAsync(string filePath, string log, CancellationToken cancellationToken)
+        private static async Task writeCommandLogAsync(string filePath, string log, CancellationToken cancellationToken)
         {
             await writeCommandLogSemaphore.WaitAsync();
             try
@@ -253,7 +226,6 @@ namespace Colosseum.Services
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
-        private readonly ILogger _logger;
 
         protected virtual void Dispose(bool disposing)
         {
