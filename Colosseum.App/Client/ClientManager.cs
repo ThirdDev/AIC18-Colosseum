@@ -56,6 +56,8 @@ namespace Colosseum.App.Client
 
         public static async Task InitializeClientFiles(DirectoryInfo directory, Gene gene, CancellationToken cancellationToken = default(CancellationToken))
         {
+            Debug.WriteLine($"initalizing client file for gene id {gene.GetHashCode()} in directory {directory.FullName}");
+
             var clientJarFile = new FileInfo(_clientName);
             if (!clientJarFile.Exists)
             {
@@ -69,10 +71,14 @@ namespace Colosseum.App.Client
                 clientConfigFile.Delete();
             }
             await File.WriteAllTextAsync(clientConfigFile.FullName, getConfig(gene), cancellationToken);
+
+            Debug.WriteLine($"end of initalizing client file for gene id {gene.GetHashCode()} in directory {directory.FullName}");
         }
 
         public static async Task<ProcessPayload> RunClient(DirectoryInfo directory, int port, ClientMode mode, int clientTimeout = 1000, CancellationToken cancellationToken = default(CancellationToken))
         {
+            Debug.WriteLine($"running client file in directory {directory.FullName} in mode {mode}");
+
             ProcessPayload payload = new ProcessPayload();
             var serverCommand = getCommandInfo(directory, port, mode, clientTimeout);
             var logDir = directory.CreateSubdirectory("process-info");
@@ -85,6 +91,8 @@ namespace Colosseum.App.Client
             {
                 await Task.Delay(100);
             }
+
+            Debug.WriteLine($"returning payload of client file in directory {directory.FullName} in mode {mode}");
             return payload;
         }
 
