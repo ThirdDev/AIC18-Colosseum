@@ -31,7 +31,7 @@ namespace Colosseum.App.Server
             return new CommandInfo
             {
                 FileName = "java",
-                Args = $"-jar {jarPath} --config={configPath}",
+                Args = $"-jar \"{jarPath}\" --config=\"{configPath}\"",
                 RequiresBash = true,
                 HasStandardInput = false
             };
@@ -46,7 +46,7 @@ namespace Colosseum.App.Server
             }.Serialize();
         }
 
-        public static async Task InitializeServerFiles(DirectoryInfo directory, string mapPath, int port, CancellationToken cancellationToken)
+        public static async Task InitializeServerFiles(DirectoryInfo directory, string mapPath, int port, CancellationToken cancellationToken = default(CancellationToken))
         {
             var serverJarFile = new FileInfo(_serverJarFileName);
             if (!serverJarFile.Exists)
@@ -68,11 +68,11 @@ namespace Colosseum.App.Server
             return Path.Combine(directory.FullName, _gameLogFileName);
         }
 
-        public static ProcessPayload RunServer(DirectoryInfo directory, CancellationToken cancellationToken)
+        public static ProcessPayload RunServer(DirectoryInfo directory, CancellationToken cancellationToken = default(CancellationToken))
         {
             ProcessPayload payload = null;
             var serverCommand = getCommandInfo(directory);
-            var task = Task.Run(async () => await OperationSystemService.RunCommandAsync(serverCommand, cancellationToken, payload));
+            var task = Task.Run(async () => await OperationSystemService.RunCommandAsync(serverCommand, cancellationToken, payload), cancellationToken);
             return payload;
         }
     }
