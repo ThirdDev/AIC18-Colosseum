@@ -68,11 +68,15 @@ namespace Colosseum.App.Server
             return Path.Combine(directory.FullName, _gameLogFileName);
         }
 
-        public static ProcessPayload RunServer(DirectoryInfo directory, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<ProcessPayload> RunServer(DirectoryInfo directory, CancellationToken cancellationToken = default(CancellationToken))
         {
             ProcessPayload payload = null;
             var serverCommand = getCommandInfo(directory);
             var task = Task.Run(async () => await OperationSystemService.RunCommandAsync(serverCommand, cancellationToken, payload), cancellationToken);
+            while (!payload.IsRunning())
+            {
+                await Task.Delay(100);
+            }
             return payload;
         }
     }
