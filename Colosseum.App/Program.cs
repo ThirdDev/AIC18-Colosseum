@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Colosseum.App
@@ -7,8 +8,8 @@ namespace Colosseum.App
     {
         static async Task Main(string[] args)
         {
-            var mapPath = "map.map";
-            await ArenaManager.RunCompetitions(mapPath);
+            var mapFile = new FileInfo("map.map");
+            await ArenaManager.RunCompetitions(mapFile.FullName);
         }
     }
 }
