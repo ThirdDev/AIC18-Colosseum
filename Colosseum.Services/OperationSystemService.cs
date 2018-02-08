@@ -153,9 +153,9 @@ namespace Colosseum.Services
 
             cancellationToken.Register(() =>
             {
-                if (!process.HasExited)
+                if (processPayload.IsRunning())
                 {
-                    process.Kill();
+                    processPayload.Kill();
                 }
             });
 
