@@ -25,7 +25,7 @@ namespace Colosseum.App
             var arenaDir = new DirectoryInfo("arena");
             arenaDir.Create();
 
-            var currentRunDir = arenaDir.CreateSubdirectory(DateTime.Now.ToString().Replace(" ", "-"));
+            var currentRunDir = arenaDir.CreateSubdirectory(DateTime.Now.ToString().Replace(" ", "-").ToValidFileName());
             currentRunDir.Create();
 
             int port = _startPort;
