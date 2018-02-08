@@ -43,12 +43,17 @@ namespace Colosseum.App
 
                 var competitionTasks = new List<Task>();
 
+                Console.WriteLine($"running generation {generationNumber}");
+
                 foreach (var gene in newGeneration)
                 {
                     competitionTasks.Add(processGene(gene, mapPath, lastGeneration, port, generationDir, cancellationToken));
+                    port++;
                 }
 
                 await Task.WhenAll(competitionTasks).CancelOnFaulted(cts);
+
+                generationNumber++;
             }
         }
 
@@ -61,6 +66,7 @@ namespace Colosseum.App
             var defenseOutputPath = ClientManager.GetClientOutputPath(defenseDir);
             gene.Score = double.Parse((await File.ReadAllLinesAsync(defenseOutputPath, cancellationToken)).Last());
             lastGeneration.AddThreadSafe(gene);
+            Console.WriteLine($"hash: {gene.GetHashCode()}, score: {gene.Score}");
         }
 
         private static DirectoryInfo getGeneServerDirectory(DirectoryInfo rootDirectory)
