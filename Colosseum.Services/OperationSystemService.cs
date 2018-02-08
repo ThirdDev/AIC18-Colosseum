@@ -15,19 +15,13 @@ namespace Colosseum.Services
         private static readonly int initTime = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
         private static readonly List<Process> _processes = new List<Process>();
 
-        public static async Task RunCommandAsync(CommandInfo commandInfo,
-            CancellationToken cancellationToken,
-            ProcessPayload processPayload = null,
-            Action<string> outputReceived = null,
-            Action<string> errorReveived = null,
-            Action exited = null,
-            bool log = false)
+        public static async Task RunCommandAsync(
+            CommandInfo commandInfo,
+            ProcessPayload processPayload,
+            DirectoryInfo logDir,
+            CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-
-            outputReceived = outputReceived ?? (x => { });
-            errorReveived = errorReveived ?? (x => { });
-            exited = exited ?? (() => { });
 
             processPayload = processPayload ?? new ProcessPayload();
 
@@ -41,8 +35,8 @@ namespace Colosseum.Services
             process.StartInfo.UseShellExecute = false;
             if (commandInfo.RequiresBash)
             {
-                process.StartInfo.FileName = Environment.GetEnvironmentVariable("SHELL");
-                process.StartInfo.Arguments = "-s";
+                process.StartInfo.FileName = "powershell";
+                process.StartInfo.Arguments = "-NoLogo -s";
             }
             else
             {
@@ -53,11 +47,7 @@ namespace Colosseum.Services
             var logCommandInfoSemaphore = new SemaphoreSlim(1, 1);
             async Task<(string stdOut, string stdErr)> logFilePathAsync()
             {
-                var commandsLogDir = new DirectoryInfo($"logs/commands/{initTime}");
-                commandsLogDir.Create();
-                var commandLogDir = commandsLogDir.CreateSubdirectory($"{process.Id}_{commandInfo.OneLineCommand.ToValidFileName().Substring(0, 10)}");
-                commandLogDir.Create();
-                var commandInfoFilePath = Path.Combine(commandLogDir.FullName, "command.info");
+                var commandInfoFilePath = Path.Combine(logDir.FullName, "command.info");
                 await logCommandInfoSemaphore.WaitAsync();
                 try
                 {
@@ -71,8 +61,8 @@ namespace Colosseum.Services
                     logCommandInfoSemaphore.Release();
                 }
 
-                var stdOutFile = Path.Combine(commandLogDir.FullName, "out.txt");
-                var stdErrFile = Path.Combine(commandLogDir.FullName, "err.txt");
+                var stdOutFile = Path.Combine(logDir.FullName, "out.txt");
+                var stdErrFile = Path.Combine(logDir.FullName, "err.txt");
 
                 return (stdOutFile, stdErrFile);
             }
@@ -88,11 +78,7 @@ namespace Colosseum.Services
                 {
                     if (data.Data.IsNullOrWhiteSpace().Not())
                     {
-                        if (log)
-                        {
-                            await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now}: {data.Data}", cancellationToken);
-                        }
-                        outputReceived(data.Data);
+                        await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now}: {data.Data}", cancellationToken);
                     }
                 }
                 finally
@@ -112,11 +98,7 @@ namespace Colosseum.Services
                 {
                     if (data.Data.IsNullOrWhiteSpace().Not())
                     {
-                        if (log)
-                        {
-                            await writeCommandLogAsync((await logFilePathAsync()).stdErr, $"{DateTime.Now}: {data.Data}", cancellationToken);
-                        }
-                        errorReveived(data.Data);
+                        await writeCommandLogAsync((await logFilePathAsync()).stdErr, $"{DateTime.Now}: {data.Data}", cancellationToken);
                     }
                 }
                 finally
@@ -135,11 +117,7 @@ namespace Colosseum.Services
                 processEndLocks.AddThreadSafe(endLock);
                 try
                 {
-                    if (log)
-                    {
-                        await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now}: exited.", cancellationToken);
-                    }
-                    exited();
+                    await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now}: exited.", cancellationToken);
                 }
                 finally
                 {
@@ -166,10 +144,7 @@ namespace Colosseum.Services
             if (process.Start())
             {
                 processPayload.ProcessId = process.Id;
-                if (log)
-                {
-                    await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now}: started.", cancellationToken);
-                }
+                await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now}: started.", cancellationToken);
                 process.BeginErrorReadLine();
                 process.BeginOutputReadLine();
                 if (commandInfo.RequiresBash)
@@ -179,7 +154,6 @@ namespace Colosseum.Services
                     {
                         await process.StandardInput.WriteLineAsync(commandInfo.GetStandardInput());
                     }
-                    await process.StandardInput.WriteLineAsync("exit");
                 }
                 else
                 {
