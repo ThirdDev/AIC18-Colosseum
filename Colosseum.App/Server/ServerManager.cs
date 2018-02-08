@@ -43,7 +43,7 @@ namespace Colosseum.App.Server
             {
                 Map = mapPath,
                 ClientsPort = port.ToString()
-            }.ToString();
+            }.Serialize();
         }
 
         public static async Task InitializeServerFiles(DirectoryInfo directory, string mapPath, int port, CancellationToken cancellationToken)
