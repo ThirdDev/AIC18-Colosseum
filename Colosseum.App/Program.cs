@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Colosseum.App
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var mapPath = "map.map";
+            await ArenaManager.RunCompetitions(mapPath);
         }
     }
 }
