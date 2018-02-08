@@ -113,7 +113,7 @@ namespace Colosseum.App
                 throw new Exception("attack client is not running");
             }
 
-            var defendClientPayload = await ClientManager.RunClient(attackClientDir, port, ClientMode.defend, cancellationToken: cancellationToken);
+            var defendClientPayload = await ClientManager.RunClient(defendClientDir, port, ClientMode.defend, cancellationToken: cancellationToken);
             if (!defendClientPayload.IsRunning())
             {
                 throw new Exception("defend client is not running");
