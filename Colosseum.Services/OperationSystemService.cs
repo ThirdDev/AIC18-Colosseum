@@ -261,7 +261,9 @@ namespace Colosseum.Services
             }
             try
             {
-                Process.GetProcessById(ProcessId.Value);
+                var x = Process.GetProcessById(ProcessId.Value);
+                if (x.HasExited)
+                    return false;
             }
             catch (InvalidOperationException)
             {
