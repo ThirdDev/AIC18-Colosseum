@@ -9,15 +9,15 @@ namespace Colosseum.App.Server
     class Config
     {
         public string Map { get; set; }
-        public string Deploy { get; set; } = "false";
+        public string Deploy { get; private set; } = "false";
         public string ClientsPort { get; set; }
-        public string ClientsConnectionTimeout { get; set; }
-        public string UIEnable { get; set; }
-        public string UIToken { get; set; }
-        public string UIPort { get; set; }
-        public string UIConnectionTimeout { get; set; }
-        public string OCSendToUI { get; set; }
-        public string OCSendToFile { get; set; }
+        public string ClientsConnectionTimeout { get; private set; } = "2147483647";
+        public string UIEnable { get; private set; } = "false";
+        public string UIToken { get; private set; } = "00000000000000000000000000000000";
+        public string UIPort { get; private set; } = "7000";
+        public string UIConnectionTimeout { get; private set; } = "2147483647";
+        public string OCSendToUI { get; private set; } = "false";
+        public string OCSendToFile { get; private set; } = "false";
         public string OCFilePath { get; set; }
 
         public string Serialize()
