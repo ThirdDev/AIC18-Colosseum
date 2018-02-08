@@ -23,8 +23,6 @@ namespace Colosseum.Services
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            processPayload = processPayload ?? new ProcessPayload();
-
             var process = new Process();
 
             process = new Process();

@@ -3,6 +3,7 @@ using Colosseum.GS;
 using Colosseum.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -72,7 +73,7 @@ namespace Colosseum.App.Client
 
         public static async Task<ProcessPayload> RunClient(DirectoryInfo directory, int port, ClientMode mode, int clientTimeout = 1000, CancellationToken cancellationToken = default(CancellationToken))
         {
-            ProcessPayload payload = null;
+            ProcessPayload payload = new ProcessPayload();
             var serverCommand = getCommandInfo(directory, port, mode, clientTimeout);
             var logDir = directory.CreateSubdirectory("process-info");
             var task = Task.Run(async () => await OperationSystemService.RunCommandAsync(serverCommand, payload, logDir, cancellationToken), cancellationToken);
