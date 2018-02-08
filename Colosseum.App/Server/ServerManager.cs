@@ -56,9 +56,9 @@ namespace Colosseum.App.Server
             serverJarFile.CopyTo(getJarPath(directory));
 
             var serverConfigFile = new FileInfo(Path.Combine(directory.FullName, _serverConfigsFileName));
-            if (!serverConfigFile.Exists)
+            if (serverConfigFile.Exists)
             {
-                serverConfigFile.Create();
+                serverConfigFile.Delete();
             }
             await File.WriteAllTextAsync(serverConfigFile.FullName, getServerConfig(mapPath, port), cancellationToken);
         }
@@ -73,6 +73,10 @@ namespace Colosseum.App.Server
             ProcessPayload payload = null;
             var serverCommand = getCommandInfo(directory);
             var task = Task.Run(async () => await OperationSystemService.RunCommandAsync(serverCommand, cancellationToken, payload), cancellationToken);
+            while (payload == null)
+            {
+                await Task.Delay(100);
+            }
             while (!payload.IsRunning())
             {
                 await Task.Delay(100);
