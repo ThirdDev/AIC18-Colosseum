@@ -85,6 +85,7 @@ namespace Colosseum.Services
                 return (stdOutFile, stdErrFile);
             }
 
+            #region EventListeners
             HashSet<object> processEndLocks = new HashSet<object>();
 
             process.OutputDataReceived += async (sender, data) =>
@@ -177,6 +178,7 @@ namespace Colosseum.Services
                     }
                 }
             };
+            #endregion
 
             cancellationToken.Register(() =>
             {
