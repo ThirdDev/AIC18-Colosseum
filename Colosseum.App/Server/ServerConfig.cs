@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Colosseum.App.Server
 {
-    class Config
+    class ServerConfig
     {
         public string Map { get; set; }
         public string Deploy { get; private set; } = "false";
