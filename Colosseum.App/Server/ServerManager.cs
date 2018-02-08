@@ -30,9 +30,9 @@ namespace Colosseum.App.Server
             var configPath = getConfigPath(directory);
             return new CommandInfo
             {
-                FileName = "java",
+                FileName = @"C:\ProgramData\Oracle\Java\javapath\java.EXE",
                 Args = $"-jar \"{jarPath}\" --config=\"{configPath}\"",
-                RequiresBash = true,
+                RequiresBash = false,
                 HasStandardInput = false
             };
         }

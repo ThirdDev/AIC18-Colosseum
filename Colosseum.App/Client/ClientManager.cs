@@ -41,9 +41,9 @@ namespace Colosseum.App.Client
 
             return new CommandInfo
             {
-                FileName = "java",
+                FileName = @"C:\ProgramData\Oracle\Java\javapath\java.EXE",
                 Args = $"-jar \"{jarPath}\" localhost {port} {serverConfig.UIToken} {clientTimeout} {mode} \"{configPath}\"",
-                RequiresBash = true,
+                RequiresBash = false,
                 HasStandardInput = false
             };
         }
