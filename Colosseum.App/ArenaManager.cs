@@ -25,7 +25,7 @@ namespace Colosseum.App
             var arenaDir = new DirectoryInfo("arena");
             arenaDir.Create();
 
-            var currentRunDir = arenaDir.CreateSubdirectory(DateTime.Now.ToString().Replace(" ", "-").ToValidFileName());
+            var currentRunDir = arenaDir.CreateSubdirectory(DateTime.Now.ToString("s").Replace(" ", "-").ToValidFileName());
             currentRunDir.Create();
 
             int port = _startPort;
@@ -101,7 +101,7 @@ namespace Colosseum.App
             await ClientManager.InitializeClientFiles(attackClientDir, gene, cancellationToken);
             await ClientManager.InitializeClientFiles(defendClientDir, gene, cancellationToken);
 
-            var serverProcessPayload = await ServerManager.RunServer(rootDirectory, cancellationToken);
+            var serverProcessPayload = await ServerManager.RunServer(serverDir, cancellationToken);
             if (!serverProcessPayload.IsRunning())
             {
                 throw new Exception("server is not running");
