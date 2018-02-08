@@ -119,13 +119,12 @@ namespace Colosseum.App
                 throw new Exception("defend client is not running");
             }
 
-            while (serverProcessPayload.IsRunning())
+            while (defendClientPayload.IsRunning() || attackClientPayload.IsRunning())
             {
                 await Task.Delay(1000);
             }
 
-            attackClientPayload.Kill();
-            defendClientPayload.Kill();
+            serverProcessPayload.Kill();
         }
     }
 }
