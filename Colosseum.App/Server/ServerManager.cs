@@ -72,7 +72,8 @@ namespace Colosseum.App.Server
         {
             ProcessPayload payload = null;
             var serverCommand = getCommandInfo(directory);
-            var task = Task.Run(async () => await OperationSystemService.RunCommandAsync(serverCommand, cancellationToken, payload), cancellationToken);
+            var logDir = directory.CreateSubdirectory("process-info");
+            var task = Task.Run(async () => await OperationSystemService.RunCommandAsync(serverCommand, payload, logDir, cancellationToken), cancellationToken);
             while (payload == null)
             {
                 await Task.Delay(100);
