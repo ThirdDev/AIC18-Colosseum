@@ -34,6 +34,10 @@ namespace Colosseum.GS
         //Last Generation should be evaluted beforehead
         public List<Gene> Genetic(List<Gene> lastGeneration)
         {
+            if(lastGeneration==null)
+            {
+                lastGeneration = randomGeneration();
+            }
             lastGeneration = lastGeneration.OrderByDescending(x => x.Score).ToList();
             List<Gene> newGeneration = lastGeneration.GetRange(0, (int)(lastGeneration.Count * PartToLive));
             newGeneration.AddRange(ChildrenMaker(lastGeneration,(int)(lastGeneration.Count * (1-PartToLive))));
