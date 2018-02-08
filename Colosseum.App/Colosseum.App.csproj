@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Colosseum.GS\Colosseum.GS.csproj" />
     <ProjectReference Include="..\Colosseum.Services\Colosseum.Services.csproj" />
   </ItemGroup>
 
