@@ -19,6 +19,7 @@ namespace Colosseum.Services
             CommandInfo commandInfo,
             ProcessPayload processPayload,
             DirectoryInfo logDir,
+            string workingDirectory,
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -31,6 +32,7 @@ namespace Colosseum.Services
             process.StartInfo.RedirectStandardInput = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.UseShellExecute = false;
+            process.StartInfo.WorkingDirectory = workingDirectory;
             if (commandInfo.RequiresBash)
             {
                 process.StartInfo.FileName = "powershell";
