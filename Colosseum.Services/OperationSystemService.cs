@@ -10,9 +10,7 @@ using System.Threading.Tasks;
 
 namespace Colosseum.Services
 {
-
-
-    public class OperationSystemServices : IDisposable
+    public class OperationSystemService : IDisposable
     {
         private static readonly int initTime = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
         private static readonly List<Process> _processes = new List<Process>();
