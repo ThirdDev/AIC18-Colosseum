@@ -18,12 +18,15 @@ namespace Colosseum.App
     {
         static int _startPort => 8000;
         private static int geneProcessLimit => 4;
+        static DateTime _arenaStartTime = DateTime.Now;
 
 
         static readonly GenerationGenerator _generationGenerator = new GenerationGenerator();
 
         public static async Task RunCompetitions(string mapPath, CancellationToken cancellationToken = default(CancellationToken))
         {
+            _arenaStartTime = DateTime.Now;
+
             Console.WriteLine($"welcome to Colosseum. we have {GenerationGenerator.generationPopulation} cells per generation and we process {geneProcessLimit} competitions each moment. enjoy the show :)");
 
             List<Gene> lastGeneration = null;
@@ -91,7 +94,7 @@ namespace Colosseum.App
 
                 processStopwatch.Stop();
                 _geneProcessTimes.AddThreadSafe(processStopwatch.Elapsed);
-                Console.WriteLine($"hash: {gene.Id},\tscore: {gene.Score};\tfinished in {processStopwatch.Elapsed}, min/avg/max: {_geneProcessTimes.Min()}/{calculateAverag(_geneProcessTimes)}/{_geneProcessTimes.Max()} in {_geneProcessTimes.Count} processes");
+                Console.WriteLine($"hash: {gene.Id},\tscore: {gene.Score};\tfinished in {processStopwatch.Elapsed}, min/avg/max: {_geneProcessTimes.Min()}/{calculateAverag(_geneProcessTimes)}/{_geneProcessTimes.Max()} in {_geneProcessTimes.Count} processes in total elapsed time of {DateTime.Now - _arenaStartTime}");
             }
             catch (Exception ex)
             {
