@@ -25,7 +25,7 @@ namespace Colosseum.App.Server
             return new CommandInfo
             {
                 FileName = @"C:\ProgramData\Oracle\Java\javapath\java.EXE",
-                Args = $"-jar \"{_serverJarFileName.FullName}\" --config=\"{configPath}\"",
+                Args = $"-Xms100m -Xmx1g -jar \"{_serverJarFileName.FullName}\" --config=\"{configPath}\"",
                 RequiresBash = false,
                 HasStandardInput = false
             };

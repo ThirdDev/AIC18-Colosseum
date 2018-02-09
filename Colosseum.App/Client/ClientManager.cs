@@ -37,7 +37,7 @@ namespace Colosseum.App.Client
             return new CommandInfo
             {
                 FileName = @"C:\ProgramData\Oracle\Java\javapath\java.EXE",
-                Args = $"-jar \"{_clientName.FullName}\" 127.0.0.1 {port} {serverConfig.UIToken} {clientTimeout} {mode} \"{configPath}\"",
+                Args = $"-Xms100m -Xmx1g -jar \"{_clientName.FullName}\" 127.0.0.1 {port} {serverConfig.UIToken} {clientTimeout} {mode} \"{configPath}\"",
                 RequiresBash = false,
                 HasStandardInput = false
             };
