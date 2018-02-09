@@ -73,6 +73,12 @@ namespace Colosseum.App.Client
             Debug.WriteLine($"running client file in directory {directory.FullName} in mode {mode}");
 
             ProcessPayload payload = new ProcessPayload();
+
+            void errorReceived(string line)
+            {
+                payload.Kill();
+            }
+
             var serverCommand = getCommandInfo(directory, port, mode, clientTimeout);
             var logDir = directory.CreateSubdirectory("process-info");
             var task = Task.Run(async () => await OperationSystemService.RunCommandAsync(
@@ -80,7 +86,7 @@ namespace Colosseum.App.Client
                 payload,
                 logDir,
                 directory.FullName,
-                errorReveived: line => payload.Kill(),
+                errorReveived: errorReceived,
                 cancellationToken: cancellationToken), cancellationToken);
             while (payload == null)
             {
