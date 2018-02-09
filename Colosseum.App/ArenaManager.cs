@@ -73,7 +73,7 @@ namespace Colosseum.App
                 var generationInfoFilePath = Path.Combine(generationDir.FullName, "generationInfo.json");
                 await File.WriteAllTextAsync(generationInfoFilePath, JsonConvert.SerializeObject(newGeneration, Formatting.Indented), cancellationToken);
 
-                var generationScoreAverage = newGeneration.Sum(x => x.Score) / newGeneration.Count;
+                var generationScoreAverage = newGeneration.Average(x => x.Score);
                 Console.WriteLine($"generation score average: {generationScoreAverage}, generation elapsed time: {DateTime.Now - generationProcessStartTime}");
 
                 generationNumber++;
@@ -103,7 +103,7 @@ namespace Colosseum.App
                 }
                 else
                 {
-                    gene.Score = double.MinValue;
+                    gene.Score = null;
                 }
                 lastGeneration.AddThreadSafe(gene);
 
@@ -113,7 +113,7 @@ namespace Colosseum.App
                 {
                     _geneProcessTimes.AddThreadSafe(processStopwatch.Elapsed);
                     Console.WriteLine($"id: {gene.Id}");
-                    double score = gene.Score;
+                    var score = gene.Score;
                     Console.Write($"{score}\t");
                     TimeSpan processElapsed = processStopwatch.Elapsed;
                     Console.Write($"{processElapsed}\t");

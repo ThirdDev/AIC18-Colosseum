@@ -25,7 +25,6 @@ namespace Colosseum.GS
                 {
                     double weight = (random.NextDouble() - 0.5) * 20;
                     tmp.GenomesList.Add(weight);
-                    tmp.Score = -1;
                 }
                 adamAndEveAndFriends.Add(tmp);
             }
