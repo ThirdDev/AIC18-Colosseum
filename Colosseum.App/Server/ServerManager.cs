@@ -10,13 +10,13 @@ namespace Colosseum.App.Server
 {
     public static class ServerManager
     {
-        static string _serverJarFileName => "AIC18-Server.jar";
-        static string _serverConfigsFileName => "server.cfg";
-        static string _gameLogFileName => "game.log";
+        static FileInfo _serverJarFileName => new FileInfo("AIC18-Server.jar");
+        static FileInfo _serverConfigsFileName => new FileInfo("server.cfg");
+        static FileInfo _gameLogFileName => new FileInfo("game.log");
 
         private static string getConfigPath(DirectoryInfo directory)
         {
-            return Path.Combine(directory.FullName, _serverConfigsFileName);
+            return Path.Combine(directory.FullName, _serverConfigsFileName.Name);
         }
 
         private static CommandInfo getCommandInfo(DirectoryInfo directory)
@@ -25,7 +25,7 @@ namespace Colosseum.App.Server
             return new CommandInfo
             {
                 FileName = @"C:\ProgramData\Oracle\Java\javapath\java.EXE",
-                Args = $"-jar \"{_serverJarFileName}\" --config=\"{configPath}\"",
+                Args = $"-jar \"{_serverJarFileName.FullName}\" --config=\"{configPath}\"",
                 RequiresBash = false,
                 HasStandardInput = false
             };
@@ -42,13 +42,13 @@ namespace Colosseum.App.Server
 
         public static async Task InitializeServerFiles(DirectoryInfo directory, string mapPath, int port, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var serverJarFile = new FileInfo(_serverJarFileName);
+            var serverJarFile = new FileInfo(_serverJarFileName.FullName);
             if (!serverJarFile.Exists)
             {
                 throw new FileNotFoundException($"server file doesn't exist at {serverJarFile.FullName}");
             }
 
-            var serverConfigFile = new FileInfo(Path.Combine(directory.FullName, _serverConfigsFileName));
+            var serverConfigFile = new FileInfo(Path.Combine(directory.FullName, _serverConfigsFileName.Name));
             if (serverConfigFile.Exists)
             {
                 serverConfigFile.Delete();
@@ -58,7 +58,7 @@ namespace Colosseum.App.Server
 
         public static string GetGameLogPath(DirectoryInfo directory)
         {
-            return Path.Combine(directory.FullName, _gameLogFileName);
+            return Path.Combine(directory.FullName, _gameLogFileName.Name);
         }
 
         public static async Task<ProcessPayload> RunServer(DirectoryInfo directory, CancellationToken cancellationToken = default(CancellationToken))

@@ -19,13 +19,13 @@ namespace Colosseum.App.Client
 
     public static class ClientManager
     {
-        static string _clientName => "Client.jar";
-        static string _clientConfigName => "clientConfig.cfg";
-        static string _clientOutput => $"{_clientConfigName}.out";
+        static FileInfo _clientName => new FileInfo("Client.jar");
+        static FileInfo _clientConfigName => new FileInfo("clientConfig.cfg");
+        static FileInfo _clientOutput => new FileInfo($"{_clientConfigName}.out");
 
         private static string getConfigPath(DirectoryInfo directory)
         {
-            return Path.Combine(directory.FullName, _clientConfigName);
+            return Path.Combine(directory.FullName, _clientConfigName.Name);
         }
 
         private static CommandInfo getCommandInfo(DirectoryInfo directory, int port, ClientMode mode, int clientTimeout = 1000)
@@ -37,7 +37,7 @@ namespace Colosseum.App.Client
             return new CommandInfo
             {
                 FileName = @"C:\ProgramData\Oracle\Java\javapath\java.EXE",
-                Args = $"-jar \"{_clientName}\" 127.0.0.1 {port} {serverConfig.UIToken} {clientTimeout} {mode} \"{configPath}\"",
+                Args = $"-jar \"{_clientName.FullName}\" 127.0.0.1 {port} {serverConfig.UIToken} {clientTimeout} {mode} \"{configPath}\"",
                 RequiresBash = false,
                 HasStandardInput = false
             };
@@ -52,13 +52,13 @@ namespace Colosseum.App.Client
         {
             Debug.WriteLine($"initalizing client file for gene id {gene.GetHashCode()} in directory {directory.FullName}");
 
-            var clientJarFile = new FileInfo(_clientName);
+            var clientJarFile = new FileInfo(_clientName.FullName);
             if (!clientJarFile.Exists)
             {
                 throw new FileNotFoundException($"client file doesn't exist at {clientJarFile.FullName}");
             }
 
-            var clientConfigFile = new FileInfo(Path.Combine(directory.FullName, _clientConfigName));
+            var clientConfigFile = new FileInfo(Path.Combine(directory.FullName, _clientConfigName.Name));
             if (clientConfigFile.Exists)
             {
                 clientConfigFile.Delete();
@@ -91,7 +91,7 @@ namespace Colosseum.App.Client
 
         public static string GetClientOutputPath(DirectoryInfo directory)
         {
-            return Path.Combine(directory.FullName, _clientOutput);
+            return Path.Combine(directory.FullName, _clientOutput.Name);
         }
     }
 }
