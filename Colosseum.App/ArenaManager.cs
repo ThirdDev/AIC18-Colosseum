@@ -17,7 +17,7 @@ namespace Colosseum.App
     public static class ArenaManager
     {
         static int _startPort => 8000;
-        private static int geneProcessLimit => 5;
+        private static int geneProcessLimit => 100;
 
 
         static readonly GenerationGenerator _generationGenerator = new GenerationGenerator();
@@ -54,7 +54,7 @@ namespace Colosseum.App
 
                 foreach (var gene in newGeneration)
                 {
-                    competitionTasks.Add(processGene(gene, mapPath, lastGeneration, port, generationDir, cancellationToken));
+                    competitionTasks.AddThreadSafe(processGene(gene, mapPath, lastGeneration, port, generationDir, cancellationToken));
 
                     port++;
                 }
@@ -88,7 +88,7 @@ namespace Colosseum.App
                 lastGeneration.AddThreadSafe(gene);
 
                 processStopwatch.Stop();
-                _geneProcessTimes.Add(processStopwatch.Elapsed);
+                _geneProcessTimes.AddThreadSafe(processStopwatch.Elapsed);
                 Console.WriteLine($"hash: {gene.GetHashCode()},\tscore: {gene.Score};\tfinished in {processStopwatch.Elapsed}, min/avg/max: {_geneProcessTimes.Min()}/{calculateAverag(_geneProcessTimes)}/{_geneProcessTimes.Max()} in {_geneProcessTimes.Count} processes");
             }
             finally
