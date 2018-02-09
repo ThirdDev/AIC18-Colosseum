@@ -8,7 +8,7 @@ namespace Colosseum.GS
     {
         private const double PartToLive = 0.5;
         private const double rangeOfMutaion = 0.05;
-        public const int generationPopulation = 100;
+        public const int generationPopulation = 50;
         
         
         public List<Gene> randomGeneration ()

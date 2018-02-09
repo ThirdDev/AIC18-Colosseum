@@ -17,13 +17,16 @@ namespace Colosseum.App
     public static class ArenaManager
     {
         static int _startPort => 8000;
-        private static int geneProcessLimit => 10;
+        private static int geneProcessLimit => 4;
+        static DateTime _arenaStartTime = DateTime.Now;
 
 
         static readonly GenerationGenerator _generationGenerator = new GenerationGenerator();
 
         public static async Task RunCompetitions(string mapPath, CancellationToken cancellationToken = default(CancellationToken))
         {
+            _arenaStartTime = DateTime.Now;
+
             Console.WriteLine($"welcome to Colosseum. we have {GenerationGenerator.generationPopulation} cells per generation and we process {geneProcessLimit} competitions each moment. enjoy the show :)");
 
             List<Gene> lastGeneration = null;
@@ -42,6 +45,8 @@ namespace Colosseum.App
 
             while (true)
             {
+                var generationProcessStartTime = DateTime.Now;
+
                 var generationDir = currentRunDir.CreateSubdirectory(generationNumber.ToString());
                 generationDir.Create();
 
@@ -53,6 +58,8 @@ namespace Colosseum.App
                 await cleanSystem(cancellationToken);
 
                 Console.WriteLine($"running generation #{generationNumber}");
+                Console.WriteLine("-----------");
+                Console.WriteLine("score\telapsed\t\t\tmin avg max\t\t\t\t\t\tcount\ttotal elapsed\t\ttime per process");
 
                 foreach (var gene in newGeneration)
                 {
@@ -66,11 +73,15 @@ namespace Colosseum.App
                 var generationInfoFilePath = Path.Combine(generationDir.FullName, "generationInfo.json");
                 await File.WriteAllTextAsync(generationInfoFilePath, JsonConvert.SerializeObject(newGeneration, Formatting.Indented), cancellationToken);
 
+                var generationScoreAverage = newGeneration.Sum(x => x.Score) / newGeneration.Count;
+                Console.WriteLine($"generation score average: {generationScoreAverage}, generation elapsed time: {DateTime.Now - generationProcessStartTime}");
+
                 generationNumber++;
             }
         }
 
         static SemaphoreSlim _geneProcessSemaphoreSlim = new SemaphoreSlim(geneProcessLimit);
+        static SemaphoreSlim _geneProcessLogSemaphoreSlim = new SemaphoreSlim(1);
         static List<TimeSpan> _geneProcessTimes = new List<TimeSpan>();
 
         private static async Task processGene(Gene gene, string mapPath, List<Gene> lastGeneration, int port, DirectoryInfo generationDir, CancellationToken cancellationToken)
@@ -81,17 +92,53 @@ namespace Colosseum.App
                 var processStopwatch = new Stopwatch();
                 processStopwatch.Start();
 
-                var geneDir = generationDir.CreateSubdirectory(gene.GetHashCode().ToString());
+                var geneDir = generationDir.CreateSubdirectory(gene.Id.ToString());
                 geneDir.Create();
                 await runCompetition(geneDir, gene, port, mapPath, cancellationToken);
                 var defenseDir = getGeneDefendClientDirectory(geneDir);
                 var defenseOutputPath = ClientManager.GetClientOutputPath(defenseDir);
-                gene.Score = double.Parse((await File.ReadAllTextAsync(defenseOutputPath, cancellationToken)).Split(Environment.NewLine)[2]);
+                if (File.Exists(defenseOutputPath))
+                {
+                    gene.Score = double.Parse((await File.ReadAllLinesAsync(defenseOutputPath, cancellationToken)).Last(x => double.TryParse(x, out _)));
+                }
+                else
+                {
+                    gene.Score = double.MinValue;
+                }
                 lastGeneration.AddThreadSafe(gene);
 
                 processStopwatch.Stop();
-                _geneProcessTimes.AddThreadSafe(processStopwatch.Elapsed);
-                Console.WriteLine($"hash: {gene.GetHashCode()},\tscore: {gene.Score};\tfinished in {processStopwatch.Elapsed}, min/avg/max: {_geneProcessTimes.Min()}/{calculateAverag(_geneProcessTimes)}/{_geneProcessTimes.Max()} in {_geneProcessTimes.Count} processes");
+                await _geneProcessLogSemaphoreSlim.WaitAsync();
+                try
+                {
+                    _geneProcessTimes.AddThreadSafe(processStopwatch.Elapsed);
+                    Console.WriteLine($"id: {gene.Id}");
+                    double score = gene.Score;
+                    Console.Write($"{score}\t");
+                    TimeSpan processElapsed = processStopwatch.Elapsed;
+                    Console.Write($"{processElapsed}\t");
+                    TimeSpan min = _geneProcessTimes.Min();
+                    Console.Write($"{min} ");
+                    TimeSpan avg = calculateAverag(_geneProcessTimes);
+                    Console.Write($"{avg} ");
+                    TimeSpan max = _geneProcessTimes.Max();
+                    Console.Write($"{max}\t");
+                    int processCount = _geneProcessTimes.Count;
+                    Console.Write($"{processCount}\t");
+                    TimeSpan arenaElapse = DateTime.Now - _arenaStartTime;
+                    Console.Write($"{arenaElapse}\t");
+                    TimeSpan allProcessAverage = arenaElapse / processCount;
+                    Console.Write($"{allProcessAverage}");
+                }
+                finally
+                {
+                    _geneProcessLogSemaphoreSlim.Release();
+                    Console.WriteLine();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"an error occured while running task for gene hash {gene.Id}{Environment.NewLine}{ex}");
             }
             finally
             {

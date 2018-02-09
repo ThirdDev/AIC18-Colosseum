@@ -36,7 +36,8 @@ namespace Colosseum.App.Server
             return new ServerConfig
             {
                 Map = mapPath,
-                ClientsPort = port.ToString()
+                ClientsPort = port.ToString(),
+                UIPort = (port - 1000).ToString()
             }.Serialize();
         }
 
