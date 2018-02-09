@@ -157,12 +157,25 @@ namespace Colosseum.App
                 throw new Exception("defend client is not running");
             }
 
-            while (defendClientPayload.IsRunning() || attackClientPayload.IsRunning())
+            while (defendClientPayload.IsRunning() && attackClientPayload.IsRunning())
             {
                 await Task.Delay(1000);
             }
 
-            serverProcessPayload.Kill();
+            if (attackClientPayload.IsRunning())
+            {
+                attackClientPayload.Kill();
+            }
+
+            if (defendClientPayload.IsRunning())
+            {
+                defendClientPayload.Kill();
+            }
+
+            if (serverProcessPayload.IsRunning())
+            {
+                serverProcessPayload.Kill();
+            }
         }
 
         static CommandInfo _cleanSystemCommand =>
