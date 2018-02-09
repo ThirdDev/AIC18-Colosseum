@@ -17,7 +17,7 @@ namespace Colosseum.App
     public static class ArenaManager
     {
         static int _startPort => 8000;
-        private static int geneProcessLimit => 4;
+        private static int geneProcessLimit => 10;
         static DateTime _arenaStartTime = DateTime.Now;
 
 
@@ -99,7 +99,7 @@ namespace Colosseum.App
                 var defenseOutputPath = ClientManager.GetClientOutputPath(defenseDir);
                 if (File.Exists(defenseOutputPath))
                 {
-                    gene.Score = double.Parse((await File.ReadAllTextAsync(defenseOutputPath, cancellationToken)).Split(Environment.NewLine)[2]);
+                    gene.Score = double.Parse((await File.ReadAllLinesAsync(defenseOutputPath, cancellationToken)).Last(x => double.TryParse(x, out _)));
                 }
                 else
                 {
