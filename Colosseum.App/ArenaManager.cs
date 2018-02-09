@@ -99,7 +99,7 @@ namespace Colosseum.App
                 var defenseOutputPath = ClientManager.GetClientOutputPath(defenseDir);
                 if (File.Exists(defenseOutputPath))
                 {
-                    gene.Score = double.Parse((await File.ReadAllLinesAsync(defenseOutputPath, cancellationToken)).Last(x => double.TryParse(x, out _)));
+                    gene.Score = double.Parse((await File.ReadAllTextAsync(defenseOutputPath, cancellationToken)).Split(Environment.NewLine)[2]);
                 }
                 else
                 {
