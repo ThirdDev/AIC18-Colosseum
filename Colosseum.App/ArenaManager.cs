@@ -1,6 +1,7 @@
 ﻿using Colosseum.App.Client;
 using Colosseum.App.Server;
 using Colosseum.GS;
+using Colosseum.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -43,6 +44,8 @@ namespace Colosseum.App
                 lastGeneration = new List<Gene>();
 
                 var competitionTasks = new List<Task>();
+
+                await cleanSystem(cancellationToken);
 
                 Console.WriteLine($"running generation {generationNumber}");
 
@@ -132,6 +135,24 @@ namespace Colosseum.App
             }
 
             serverProcessPayload.Kill();
+        }
+
+        static CommandInfo _cleanSystemCommand =>
+            new CommandInfo
+            {
+                FileName = @"C:\WINDOWS\system32\taskkill.EXE",
+                Args = "/f /im java.exe",
+                RequiresBash = false
+            };
+
+        private static async Task cleanSystem(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var arenaDir = new DirectoryInfo("arena");
+            arenaDir.Create();
+
+            var logDir = arenaDir.CreateSubdirectory("tmp");
+
+            await OperationSystemService.RunCommandAsync(_cleanSystemCommand, new ProcessPayload(), logDir, null, cancellationToken);
         }
     }
 }

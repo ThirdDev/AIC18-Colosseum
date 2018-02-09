@@ -20,7 +20,7 @@ namespace Colosseum.Services
             ProcessPayload processPayload,
             DirectoryInfo logDir,
             string workingDirectory,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
 
