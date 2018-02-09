@@ -6,9 +6,11 @@ namespace Colosseum.GS
 {
     public class GenerationGenerator
     {
-        private const double PartToLive = 0.5;
+        private const double PartToLive = 0.15;
         private const double rangeOfMutaion = 0.05;
         public const int generationPopulation = 50;
+
+        private const double stdDrivationForLives = PartToLive*2/3;
         
         
         public List<Gene> randomGeneration ()
@@ -56,10 +58,10 @@ namespace Colosseum.GS
             {
                 //int indexDad = (int)(random.NextDouble() * generation.Count);
                 //int indexMom = (int)(random.NextDouble() * generation.Count);
-                double randomIndex = GaussianRandom(random , 0 , 0.3);
-                while (randomIndex >= 1) randomIndex = GaussianRandom(random, 0 , 0.3);
+                double randomIndex = GaussianRandom(random , 0 , stdDrivationForLives);
+                while (randomIndex >= 1) randomIndex = GaussianRandom(random, 0 , stdDrivationForLives);
                 int indexDad = (int)(randomIndex * generation.Count);
-                while (randomIndex >= 1) randomIndex = GaussianRandom(random, 0 , 0.3);
+                while (randomIndex >= 1) randomIndex = GaussianRandom(random, 0 , stdDrivationForLives);
                 int indexMom = (int)(randomIndex * generation.Count);
                 var tmp = new Gene();
                 for (int i = 0; i < Gene.LengthOfGene; i++)
