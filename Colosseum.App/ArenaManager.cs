@@ -17,13 +17,15 @@ namespace Colosseum.App
     public static class ArenaManager
     {
         static int _startPort => 8000;
-        private static int geneProcessLimit => 100;
+        private static int geneProcessLimit => 10;
 
 
         static readonly GenerationGenerator _generationGenerator = new GenerationGenerator();
 
         public static async Task RunCompetitions(string mapPath, CancellationToken cancellationToken = default(CancellationToken))
         {
+            Console.WriteLine($"welcome to Colosseum. we have {GenerationGenerator.generationPopulation} cells per generation and we process {geneProcessLimit} competitions each moment. enjoy the show :)");
+
             List<Gene> lastGeneration = null;
             int generationNumber = 1;
 
