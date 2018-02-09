@@ -45,6 +45,8 @@ namespace Colosseum.App
 
             while (true)
             {
+                var generationProcessStartTime = DateTime.Now;
+
                 var generationDir = currentRunDir.CreateSubdirectory(generationNumber.ToString());
                 generationDir.Create();
 
@@ -72,7 +74,7 @@ namespace Colosseum.App
                 await File.WriteAllTextAsync(generationInfoFilePath, JsonConvert.SerializeObject(newGeneration, Formatting.Indented), cancellationToken);
 
                 var generationScoreAverage = newGeneration.Sum(x => x.Score) / newGeneration.Count;
-                Console.WriteLine($"Generation Score Average: {generationScoreAverage}");
+                Console.WriteLine($"generation score average: {generationScoreAverage}, generation elapsed time: {DateTime.Now - generationProcessStartTime}");
 
                 generationNumber++;
             }
