@@ -3,6 +3,7 @@ using Colosseum.App.Server;
 using Colosseum.GS;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -48,6 +49,7 @@ namespace Colosseum.App
                 foreach (var gene in newGeneration)
                 {
                     competitionTasks.Add(processGene(gene, mapPath, lastGeneration, port, generationDir, cancellationToken));
+
                     port++;
                 }
 
@@ -59,14 +61,19 @@ namespace Colosseum.App
 
         private static async Task processGene(Gene gene, string mapPath, List<Gene> lastGeneration, int port, DirectoryInfo generationDir, CancellationToken cancellationToken)
         {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             var geneDir = generationDir.CreateSubdirectory(gene.GetHashCode().ToString());
             geneDir.Create();
             await runCompetition(geneDir, gene, port, mapPath, cancellationToken);
             var defenseDir = getGeneDefendClientDirectory(geneDir);
             var defenseOutputPath = ClientManager.GetClientOutputPath(defenseDir);
-            gene.Score = double.Parse((await File.ReadAllLinesAsync(defenseOutputPath, cancellationToken)).Last());
+            gene.Score = double.Parse((await File.ReadAllTextAsync(defenseOutputPath, cancellationToken)).Split(Environment.NewLine)[2]);
             lastGeneration.AddThreadSafe(gene);
-            Console.WriteLine($"hash: {gene.GetHashCode()}, score: {gene.Score}");
+
+            stopwatch.Stop();
+            Console.WriteLine($"hash: {gene.GetHashCode()}, score: {gene.Score} ; Finished in {stopwatch.ElapsedMilliseconds} ms");
         }
 
         private static DirectoryInfo getGeneServerDirectory(DirectoryInfo rootDirectory)
