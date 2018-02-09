@@ -17,7 +17,7 @@ namespace Colosseum.App
     public static class ArenaManager
     {
         static int _startPort => 8000;
-        private static int geneProcessLimit => 10;
+        private static int geneProcessLimit => 4;
 
 
         static readonly GenerationGenerator _generationGenerator = new GenerationGenerator();
@@ -81,7 +81,7 @@ namespace Colosseum.App
                 var processStopwatch = new Stopwatch();
                 processStopwatch.Start();
 
-                var geneDir = generationDir.CreateSubdirectory(gene.GetHashCode().ToString());
+                var geneDir = generationDir.CreateSubdirectory(gene.Id.ToString());
                 geneDir.Create();
                 await runCompetition(geneDir, gene, port, mapPath, cancellationToken);
                 var defenseDir = getGeneDefendClientDirectory(geneDir);
@@ -91,11 +91,11 @@ namespace Colosseum.App
 
                 processStopwatch.Stop();
                 _geneProcessTimes.AddThreadSafe(processStopwatch.Elapsed);
-                Console.WriteLine($"hash: {gene.GetHashCode()},\tscore: {gene.Score};\tfinished in {processStopwatch.Elapsed}, min/avg/max: {_geneProcessTimes.Min()}/{calculateAverag(_geneProcessTimes)}/{_geneProcessTimes.Max()} in {_geneProcessTimes.Count} processes");
+                Console.WriteLine($"hash: {gene.Id},\tscore: {gene.Score};\tfinished in {processStopwatch.Elapsed}, min/avg/max: {_geneProcessTimes.Min()}/{calculateAverag(_geneProcessTimes)}/{_geneProcessTimes.Max()} in {_geneProcessTimes.Count} processes");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"an error occured while running task for gene hash {gene.GetHashCode()}{Environment.NewLine}{ex}");
+                Console.WriteLine($"an error occured while running task for gene hash {gene.Id}{Environment.NewLine}{ex}");
             }
             finally
             {
