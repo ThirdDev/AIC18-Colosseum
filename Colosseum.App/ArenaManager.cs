@@ -50,7 +50,7 @@ namespace Colosseum.App
 
                 await cleanSystem(cancellationToken);
 
-                Console.WriteLine($"running generation {generationNumber}");
+                Console.WriteLine($"running generation #{generationNumber}");
 
                 foreach (var gene in newGeneration)
                 {
@@ -89,7 +89,7 @@ namespace Colosseum.App
 
                 processStopwatch.Stop();
                 _geneProcessTimes.Add(processStopwatch.Elapsed);
-                Console.WriteLine($"hash: {gene.GetHashCode()}, score: {gene.Score} ; Finished in {processStopwatch.Elapsed}. min/avg/max: {_geneProcessTimes.Min()}/{calculateAverag(_geneProcessTimes)}/{_geneProcessTimes.Max()} in {_geneProcessTimes.Count} processes");
+                Console.WriteLine($"hash: {gene.GetHashCode()},\tscore: {gene.Score};\tfinished in {processStopwatch.Elapsed}, min/avg/max: {_geneProcessTimes.Min()}/{calculateAverag(_geneProcessTimes)}/{_geneProcessTimes.Max()} in {_geneProcessTimes.Count} processes");
             }
             finally
             {
