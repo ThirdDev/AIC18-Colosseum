@@ -65,14 +65,15 @@ namespace Colosseum.App
         }
 
         static SemaphoreSlim _geneProcessSemaphoreSlim = new SemaphoreSlim(geneProcessLimit);
+        static List<TimeSpan> _geneProcessTimes = new List<TimeSpan>();
 
         private static async Task processGene(Gene gene, string mapPath, List<Gene> lastGeneration, int port, DirectoryInfo generationDir, CancellationToken cancellationToken)
         {
             await _geneProcessSemaphoreSlim.WaitAsync(cancellationToken);
             try
             {
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
+                var processStopwatch = new Stopwatch();
+                processStopwatch.Start();
 
                 var geneDir = generationDir.CreateSubdirectory(gene.GetHashCode().ToString());
                 geneDir.Create();
@@ -82,13 +83,24 @@ namespace Colosseum.App
                 gene.Score = double.Parse((await File.ReadAllTextAsync(defenseOutputPath, cancellationToken)).Split(Environment.NewLine)[2]);
                 lastGeneration.AddThreadSafe(gene);
 
-                stopwatch.Stop();
-                Console.WriteLine($"hash: {gene.GetHashCode()}, score: {gene.Score} ; Finished in {stopwatch.ElapsedMilliseconds} ms");
+                processStopwatch.Stop();
+                _geneProcessTimes.Add(processStopwatch.Elapsed);
+                Console.WriteLine($"hash: {gene.GetHashCode()}, score: {gene.Score} ; Finished in {processStopwatch.Elapsed}. min/avg/max: {_geneProcessTimes.Min()}/{calculateAverag(_geneProcessTimes)}/{_geneProcessTimes.Max()} in {_geneProcessTimes.Count} processes");
             }
             finally
             {
                 _geneProcessSemaphoreSlim.Release();
             }
+        }
+
+        private static TimeSpan calculateAverag(List<TimeSpan> list)
+        {
+            var sum = TimeSpan.FromSeconds(0);
+            foreach (var item in list)
+            {
+                sum += item;
+            }
+            return sum / list.Count;
         }
 
         private static DirectoryInfo getGeneServerDirectory(DirectoryInfo rootDirectory)
