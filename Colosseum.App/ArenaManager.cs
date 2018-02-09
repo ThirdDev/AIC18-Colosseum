@@ -17,7 +17,7 @@ namespace Colosseum.App
     public static class ArenaManager
     {
         static int _startPort => 8000;
-        private static int geneProcessLimit => 10;
+        private static int geneProcessLimit => 4;
         static DateTime _arenaStartTime = DateTime.Now;
 
 
