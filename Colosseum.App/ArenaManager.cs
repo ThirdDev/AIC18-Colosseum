@@ -95,7 +95,14 @@ namespace Colosseum.App
                 await runCompetition(geneDir, gene, port, mapPath, cancellationToken);
                 var defenseDir = getGeneDefendClientDirectory(geneDir);
                 var defenseOutputPath = ClientManager.GetClientOutputPath(defenseDir);
-                gene.Score = double.Parse((await File.ReadAllTextAsync(defenseOutputPath, cancellationToken)).Split(Environment.NewLine)[2]);
+                if (File.Exists(defenseOutputPath))
+                {
+                    gene.Score = double.Parse((await File.ReadAllTextAsync(defenseOutputPath, cancellationToken)).Split(Environment.NewLine)[2]);
+                }
+                else
+                {
+                    gene.Score = double.MinValue;
+                }
                 lastGeneration.AddThreadSafe(gene);
 
                 processStopwatch.Stop();
