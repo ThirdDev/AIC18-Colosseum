@@ -23,11 +23,6 @@ namespace Colosseum.App.Client
         static string _clientConfigName => "clientConfig.cfg";
         static string _clientOutput => $"{_clientConfigName}.out";
 
-        private static string getJarPath(DirectoryInfo directory)
-        {
-            return Path.Combine(directory.FullName, _clientName);
-        }
-
         private static string getConfigPath(DirectoryInfo directory)
         {
             return Path.Combine(directory.FullName, _clientConfigName);
@@ -35,7 +30,6 @@ namespace Colosseum.App.Client
 
         private static CommandInfo getCommandInfo(DirectoryInfo directory, int port, ClientMode mode, int clientTimeout = 1000)
         {
-            var jarPath = getJarPath(directory);
             var configPath = getConfigPath(directory);
 
             var serverConfig = new ServerConfig();
@@ -43,7 +37,7 @@ namespace Colosseum.App.Client
             return new CommandInfo
             {
                 FileName = @"C:\ProgramData\Oracle\Java\javapath\java.EXE",
-                Args = $"-jar \"{jarPath}\" localhost {port} {serverConfig.UIToken} {clientTimeout} {mode} \"{configPath}\"",
+                Args = $"-jar \"{_clientName}\" localhost {port} {serverConfig.UIToken} {clientTimeout} {mode} \"{configPath}\"",
                 RequiresBash = false,
                 HasStandardInput = false
             };
@@ -63,7 +57,6 @@ namespace Colosseum.App.Client
             {
                 throw new FileNotFoundException($"client file doesn't exist at {clientJarFile.FullName}");
             }
-            clientJarFile.CopyTo(getJarPath(directory));
 
             var clientConfigFile = new FileInfo(Path.Combine(directory.FullName, _clientConfigName));
             if (clientConfigFile.Exists)

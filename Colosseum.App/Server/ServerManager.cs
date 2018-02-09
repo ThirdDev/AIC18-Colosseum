@@ -14,11 +14,6 @@ namespace Colosseum.App.Server
         static string _serverConfigsFileName => "server.cfg";
         static string _gameLogFileName => "game.log";
 
-        private static string getJarPath(DirectoryInfo directory)
-        {
-            return Path.Combine(directory.FullName, _serverJarFileName);
-        }
-
         private static string getConfigPath(DirectoryInfo directory)
         {
             return Path.Combine(directory.FullName, _serverConfigsFileName);
@@ -26,12 +21,11 @@ namespace Colosseum.App.Server
 
         private static CommandInfo getCommandInfo(DirectoryInfo directory)
         {
-            var jarPath = getJarPath(directory);
             var configPath = getConfigPath(directory);
             return new CommandInfo
             {
                 FileName = @"C:\ProgramData\Oracle\Java\javapath\java.EXE",
-                Args = $"-jar \"{jarPath}\" --config=\"{configPath}\"",
+                Args = $"-jar \"{_serverJarFileName}\" --config=\"{configPath}\"",
                 RequiresBash = false,
                 HasStandardInput = false
             };
@@ -53,7 +47,6 @@ namespace Colosseum.App.Server
             {
                 throw new FileNotFoundException($"server file doesn't exist at {serverJarFile.FullName}");
             }
-            serverJarFile.CopyTo(getJarPath(directory));
 
             var serverConfigFile = new FileInfo(Path.Combine(directory.FullName, _serverConfigsFileName));
             if (serverConfigFile.Exists)
