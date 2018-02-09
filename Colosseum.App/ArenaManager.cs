@@ -16,6 +16,8 @@ namespace Colosseum.App
     public static class ArenaManager
     {
         static int _startPort => 8000;
+        private static int geneProcessLimit => 5;
+
 
         static readonly GenerationGenerator _generationGenerator = new GenerationGenerator();
 
@@ -62,21 +64,31 @@ namespace Colosseum.App
             }
         }
 
+        static SemaphoreSlim _geneProcessSemaphoreSlim = new SemaphoreSlim(geneProcessLimit);
+
         private static async Task processGene(Gene gene, string mapPath, List<Gene> lastGeneration, int port, DirectoryInfo generationDir, CancellationToken cancellationToken)
         {
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
+            await _geneProcessSemaphoreSlim.WaitAsync(cancellationToken);
+            try
+            {
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
 
-            var geneDir = generationDir.CreateSubdirectory(gene.GetHashCode().ToString());
-            geneDir.Create();
-            await runCompetition(geneDir, gene, port, mapPath, cancellationToken);
-            var defenseDir = getGeneDefendClientDirectory(geneDir);
-            var defenseOutputPath = ClientManager.GetClientOutputPath(defenseDir);
-            gene.Score = double.Parse((await File.ReadAllTextAsync(defenseOutputPath, cancellationToken)).Split(Environment.NewLine)[2]);
-            lastGeneration.AddThreadSafe(gene);
+                var geneDir = generationDir.CreateSubdirectory(gene.GetHashCode().ToString());
+                geneDir.Create();
+                await runCompetition(geneDir, gene, port, mapPath, cancellationToken);
+                var defenseDir = getGeneDefendClientDirectory(geneDir);
+                var defenseOutputPath = ClientManager.GetClientOutputPath(defenseDir);
+                gene.Score = double.Parse((await File.ReadAllTextAsync(defenseOutputPath, cancellationToken)).Split(Environment.NewLine)[2]);
+                lastGeneration.AddThreadSafe(gene);
 
-            stopwatch.Stop();
-            Console.WriteLine($"hash: {gene.GetHashCode()}, score: {gene.Score} ; Finished in {stopwatch.ElapsedMilliseconds} ms");
+                stopwatch.Stop();
+                Console.WriteLine($"hash: {gene.GetHashCode()}, score: {gene.Score} ; Finished in {stopwatch.ElapsedMilliseconds} ms");
+            }
+            finally
+            {
+                _geneProcessSemaphoreSlim.Release();
+            }
         }
 
         private static DirectoryInfo getGeneServerDirectory(DirectoryInfo rootDirectory)
