@@ -2,6 +2,7 @@
 using Colosseum.App.Server;
 using Colosseum.GS;
 using Colosseum.Services;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -59,6 +60,9 @@ namespace Colosseum.App
                 }
 
                 await Task.WhenAll(competitionTasks).CancelOnFaulted(cts);
+
+                var generationInfoFilePath = Path.Combine(generationDir.FullName, "generationInfo.json");
+                await File.WriteAllTextAsync(generationInfoFilePath, JsonConvert.SerializeObject(newGeneration, Formatting.Indented), cancellationToken);
 
                 generationNumber++;
             }
