@@ -93,6 +93,10 @@ namespace Colosseum.App
                 _geneProcessTimes.AddThreadSafe(processStopwatch.Elapsed);
                 Console.WriteLine($"hash: {gene.GetHashCode()},\tscore: {gene.Score};\tfinished in {processStopwatch.Elapsed}, min/avg/max: {_geneProcessTimes.Min()}/{calculateAverag(_geneProcessTimes)}/{_geneProcessTimes.Max()} in {_geneProcessTimes.Count} processes");
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"an error occured while running task for gene hash {gene.GetHashCode()}{Environment.NewLine}{ex}");
+            }
             finally
             {
                 _geneProcessSemaphoreSlim.Release();
