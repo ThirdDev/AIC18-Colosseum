@@ -1,12 +1,12 @@
-﻿using Colosseum.App.Server;
-using Colosseum.GS;
-using Colosseum.Services;
+﻿using Colosseum.GS;
+using Colosseum.Services.Server;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Colosseum.App.Client
+namespace Colosseum.Services.Client
 {
     public enum ClientMode
     {
@@ -45,7 +45,7 @@ namespace Colosseum.App.Client
             return gene.ToString();
         }
 
-        public static async Task InitializeClientFiles(DirectoryInfo directory, Gene gene, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task InitializeClientFiles(DirectoryInfo directory, Gene gene, CancellationToken cancellationToken = default)
         {
             Debug.WriteLine($"initalizing client file for gene id {gene.Id} in directory {directory.FullName}");
 
@@ -65,7 +65,7 @@ namespace Colosseum.App.Client
             Debug.WriteLine($"end of initalizing client file for gene id {gene.Id} in directory {directory.FullName}");
         }
 
-        public static async Task<ProcessPayload> RunClient(DirectoryInfo directory, int port, ClientMode mode, int clientTimeout = 1000, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<ProcessPayload> RunClient(DirectoryInfo directory, int port, ClientMode mode, int clientTimeout = 1000, CancellationToken cancellationToken = default)
         {
             Debug.WriteLine($"running client file in directory {directory.FullName} in mode {mode}");
 
@@ -73,7 +73,14 @@ namespace Colosseum.App.Client
 
             void errorReceived(string line)
             {
-                payload.Kill();
+                try
+                {
+                    payload.Kill();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"failed to kill process of the client located in {directory.FullName}. error:{Environment.NewLine}{ex}{Environment.NewLine}");
+                }
             }
 
             var serverCommand = getCommandInfo(directory, port, mode, clientTimeout);
