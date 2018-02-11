@@ -55,23 +55,8 @@ namespace Colosseum.GS
             Random random = new Random();
             for(int j = 0 ; j < count ; j++)
             {
-                //int indexDad = (int)(random.NextDouble() * generation.Count);
-                //int indexMom = (int)(random.NextDouble() * generation.Count);
-                double randomIndex;
-                do
-                {
-                    randomIndex = GaussianRandom(random, 0, stdDrivationForLives);
-                } while (randomIndex >= 1);
-                int indexDad = (int)(randomIndex * generation.Count);
-
-                do
-                {
-                    randomIndex = GaussianRandom(random, 0, stdDrivationForLives);
-                } while (randomIndex >= 1);
-                int indexMom = (int)(randomIndex * generation.Count);
-
-
-                Console.WriteLine($"{indexDad} ({generation[indexDad].Score}) and {indexMom} ({generation[indexDad].Score}) are having sex.");
+                int indexDad = GetRandomParentIndex(random, generation.Count);
+                int indexMom = GetRandomParentIndex(random, generation.Count);
 
                 var tmp = new Gene();
                 for (int i = 0; i < Gene.LengthOfGene; i++)
@@ -104,8 +89,19 @@ namespace Colosseum.GS
             return children;
 
         }
-        
-        
+
+        private int GetRandomParentIndex(Random random, int count)
+        {
+            double randomIndex;
+            do
+            {
+                randomIndex = GaussianRandom(random, 0, stdDrivationForLives);
+            } while (randomIndex >= 1);
+
+            return (int)(randomIndex * count);
+        }
+
+
         //returns a normal random in range of (0,1)
         private double GaussianRandom(Random random , double mean , double stdDrivation)
         {
