@@ -19,6 +19,7 @@ namespace Colosseum.App
         static int _startPort => 8000;
         private static int geneProcessLimit => 4;
         static DateTime _arenaStartTime = DateTime.Now;
+        static readonly TimeSpan maximumAllowedRunTime = TimeSpan.FromSeconds(40);
 
 
         static readonly GenerationGenerator _generationGenerator = new GenerationGenerator();
@@ -206,9 +207,12 @@ namespace Colosseum.App
                 throw new Exception("defend client is not running");
             }
 
+            DateTime startTime = DateTime.Now;
             while (defendClientPayload.IsRunning() && attackClientPayload.IsRunning())
             {
                 await Task.Delay(1000);
+                if ((DateTime.Now - startTime) > maximumAllowedRunTime)
+                    break;
             }
 
             if (attackClientPayload.IsRunning())
