@@ -57,11 +57,22 @@ namespace Colosseum.GS
             {
                 //int indexDad = (int)(random.NextDouble() * generation.Count);
                 //int indexMom = (int)(random.NextDouble() * generation.Count);
-                double randomIndex = GaussianRandom(random , 0 , stdDrivationForLives);
-                while (randomIndex >= 1) randomIndex = GaussianRandom(random, 0 , stdDrivationForLives);
+                double randomIndex;
+                do
+                {
+                    randomIndex = GaussianRandom(random, 0, stdDrivationForLives);
+                } while (randomIndex >= 1);
                 int indexDad = (int)(randomIndex * generation.Count);
-                while (randomIndex >= 1) randomIndex = GaussianRandom(random, 0 , stdDrivationForLives);
+
+                do
+                {
+                    randomIndex = GaussianRandom(random, 0, stdDrivationForLives);
+                } while (randomIndex >= 1);
                 int indexMom = (int)(randomIndex * generation.Count);
+
+
+                Console.WriteLine($"{indexDad} ({generation[indexDad].Score}) and {indexMom} ({generation[indexDad].Score}) are having sex.");
+
                 var tmp = new Gene();
                 for (int i = 0; i < Gene.LengthOfGene; i++)
                 {
