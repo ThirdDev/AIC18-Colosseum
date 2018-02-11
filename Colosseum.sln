@@ -9,7 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Colosseum.GS", "Colosseum.G
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Colosseum.Services", "Colosseum.Services\Colosseum.Services.csproj", "{993A9C3F-3E01-44C7-9690-62516D5B3E97}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Colosseum.Tools", "Colosseum.Tools\Colosseum.Tools.csproj", "{9EBD1238-329C-4EE3-B736-14DECCB58F02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Colosseum.Tools", "Colosseum.Tools\Colosseum.Tools.csproj", "{9EBD1238-329C-4EE3-B736-14DECCB58F02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Colosseum.OnTheOcean", "Colosseum.OnTheOcean\Colosseum.OnTheOcean.csproj", "{334302C3-D352-4666-B4F8-0000404D2494}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{A5AB2EAC-D07B-4BD2-AC20-3FA1A04E0AA7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,14 @@ Global
 		{9EBD1238-329C-4EE3-B736-14DECCB58F02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EBD1238-329C-4EE3-B736-14DECCB58F02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EBD1238-329C-4EE3-B736-14DECCB58F02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{334302C3-D352-4666-B4F8-0000404D2494}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{334302C3-D352-4666-B4F8-0000404D2494}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{334302C3-D352-4666-B4F8-0000404D2494}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{334302C3-D352-4666-B4F8-0000404D2494}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5AB2EAC-D07B-4BD2-AC20-3FA1A04E0AA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5AB2EAC-D07B-4BD2-AC20-3FA1A04E0AA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5AB2EAC-D07B-4BD2-AC20-3FA1A04E0AA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5AB2EAC-D07B-4BD2-AC20-3FA1A04E0AA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

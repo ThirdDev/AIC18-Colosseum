@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  colosseum.ontheocean:
+    image: colosseum.ontheocean
+    build:
+      context: .
+      dockerfile: Colosseum.OnTheOcean/Dockerfile
