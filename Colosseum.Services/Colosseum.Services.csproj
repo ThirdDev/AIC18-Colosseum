@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Colosseum.GS\Colosseum.GS.csproj" />
     <ProjectReference Include="..\Colosseum.Tools\Colosseum.Tools.csproj" />
   </ItemGroup>
 

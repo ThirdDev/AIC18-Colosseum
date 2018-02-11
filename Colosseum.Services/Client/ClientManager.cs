@@ -1,13 +1,12 @@
-﻿using Colosseum.App.Server;
-using Colosseum.GS;
-using Colosseum.Services;
+﻿using Colosseum.GS;
+using Colosseum.Services.Server;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Colosseum.App.Client
+namespace Colosseum.Services.Client
 {
     public enum ClientMode
     {

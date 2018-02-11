@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Colosseum.App.Server
+namespace Colosseum.Services.Server
 {
     public static class ServerManager
     {

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Colosseum.App.Server
+namespace Colosseum.Services.Server
 {
     class ServerConfig
     {

@@ -1,7 +1,7 @@
-﻿using Colosseum.App.Client;
-using Colosseum.App.Server;
-using Colosseum.GS;
+﻿using Colosseum.GS;
 using Colosseum.Services;
+using Colosseum.Services.Client;
+using Colosseum.Services.Server;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
