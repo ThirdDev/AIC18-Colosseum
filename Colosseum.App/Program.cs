@@ -8,7 +8,7 @@ namespace Colosseum.App
     {
         static async Task Main(string[] args)
         {
-            var mapFile = new FileInfo("map.map");
+            var mapFile = new FileInfo("maps/map.map");
             await ArenaManager.RunCompetitions(mapFile.FullName);
         }
     }
