@@ -1,6 +1,7 @@
 ﻿using Colosseum.App.Server;
 using Colosseum.GS;
 using Colosseum.Services;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -73,7 +74,14 @@ namespace Colosseum.App.Client
 
             void errorReceived(string line)
             {
-                payload.Kill();
+                try
+                {
+                    payload.Kill();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"failed to kill process of the client located in {directory.FullName}. error:{Environment.NewLine}{ex}{Environment.NewLine}");
+                }
             }
 
             var serverCommand = getCommandInfo(directory, port, mode, clientTimeout);
