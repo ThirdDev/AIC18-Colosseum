@@ -70,7 +70,8 @@ namespace Colosseum.GS
                     {
                         double mean = (generation[indexDad].GenomesList[i] + generation[indexMom].GenomesList[i]) / 2;
                         double derivation = Math.Abs(generation[indexDad].GenomesList[i] - mean);
-                        tmp.GenomesList.Add(GaussianRandom(random, mean , derivation));
+                        double momDadAverage = ((generation[indexDad].GenomesList[i] + generation[indexMom].GenomesList[i]) / 2.0);
+                        tmp.GenomesList.Add(momDadAverage + GaussianRandom(random, mean , derivation));
                     }
                     else
                     {
