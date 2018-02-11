@@ -38,7 +38,7 @@ namespace Colosseum.Services.Server
             }.Serialize();
         }
 
-        public static async Task InitializeServerFiles(DirectoryInfo directory, string mapPath, int port, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task InitializeServerFiles(DirectoryInfo directory, string mapPath, int port, CancellationToken cancellationToken = default)
         {
             var serverJarFile = new FileInfo(_serverJarFileName.FullName);
             if (!serverJarFile.Exists)
@@ -59,7 +59,7 @@ namespace Colosseum.Services.Server
             return Path.Combine(directory.FullName, _gameLogFileName.Name);
         }
 
-        public static async Task<ProcessPayload> RunServer(DirectoryInfo directory, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<ProcessPayload> RunServer(DirectoryInfo directory, CancellationToken cancellationToken = default)
         {
             ProcessPayload payload = new ProcessPayload();
             var serverCommand = getCommandInfo(directory);

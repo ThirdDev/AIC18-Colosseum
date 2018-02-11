@@ -23,7 +23,7 @@ namespace Colosseum.App
 
         static readonly GenerationGenerator _generationGenerator = new GenerationGenerator();
 
-        public static async Task RunCompetitions(string mapPath, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task RunCompetitions(string mapPath, CancellationToken cancellationToken = default)
         {
             _arenaStartTime = DateTime.Now;
 
@@ -177,7 +177,7 @@ namespace Colosseum.App
             return dir;
         }
 
-        private static async Task runCompetition(DirectoryInfo rootDirectory, Gene gene, int port, string mapPath, CancellationToken cancellationToken = default(CancellationToken))
+        private static async Task runCompetition(DirectoryInfo rootDirectory, Gene gene, int port, string mapPath, CancellationToken cancellationToken = default)
         {
             var serverDir = getGeneServerDirectory(rootDirectory);
             var attackClientDir = getGeneAttackClientDirectory(rootDirectory);
@@ -235,7 +235,7 @@ namespace Colosseum.App
                 RequiresBash = false
             };
 
-        private static async Task cleanSystem(CancellationToken cancellationToken = default(CancellationToken))
+        private static async Task cleanSystem(CancellationToken cancellationToken = default)
         {
             var arenaDir = new DirectoryInfo("arena");
             arenaDir.Create();

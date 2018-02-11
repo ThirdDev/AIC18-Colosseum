@@ -45,7 +45,7 @@ namespace Colosseum.Services.Client
             return gene.ToString();
         }
 
-        public static async Task InitializeClientFiles(DirectoryInfo directory, Gene gene, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task InitializeClientFiles(DirectoryInfo directory, Gene gene, CancellationToken cancellationToken = default)
         {
             Debug.WriteLine($"initalizing client file for gene id {gene.Id} in directory {directory.FullName}");
 
@@ -65,7 +65,7 @@ namespace Colosseum.Services.Client
             Debug.WriteLine($"end of initalizing client file for gene id {gene.Id} in directory {directory.FullName}");
         }
 
-        public static async Task<ProcessPayload> RunClient(DirectoryInfo directory, int port, ClientMode mode, int clientTimeout = 1000, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<ProcessPayload> RunClient(DirectoryInfo directory, int port, ClientMode mode, int clientTimeout = 1000, CancellationToken cancellationToken = default)
         {
             Debug.WriteLine($"running client file in directory {directory.FullName} in mode {mode}");
 

@@ -23,7 +23,7 @@ namespace Colosseum.Services
             Action<string> outputReceived = null,
             Action<string> errorReveived = null,
             Action exited = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
