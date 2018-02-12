@@ -45,7 +45,7 @@ namespace Colosseum.Services
 
         public static async Task StopAndRemoveContainerAsync(string containerId, CancellationToken cancellationToken = default)
         {
-            await runDockerCommandAsync($"stop {containerId}", cancellationToken);
+            await runDockerCommandAsync($"kill {containerId}", cancellationToken);
             await runDockerCommandAsync($"rm {containerId}", cancellationToken);
 
         }
