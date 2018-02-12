@@ -11,7 +11,7 @@ namespace Colosseum.App
         static async Task Main(string[] args)
         {
             var mapFile = new FileInfo("maps/map.map");
-            await ArenaManager.RunCompetitions(mapFile.FullName, useContainer: true);
+            await ArenaManager.RunCompetitions(mapFile.FullName, useContainer: false);
         }
     }
 }
