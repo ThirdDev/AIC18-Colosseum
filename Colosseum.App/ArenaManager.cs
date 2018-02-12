@@ -101,7 +101,15 @@ namespace Colosseum.App
                 var defenseOutputPath = ClientManager.GetClientOutputPath(defenseDir, ClientMode.defend);
                 if (File.Exists(defenseOutputPath))
                 {
-                    gene.Score = double.Parse((await File.ReadAllLinesAsync(defenseOutputPath, cancellationToken)).First());
+                    var scoreString = (await File.ReadAllLinesAsync(defenseOutputPath, cancellationToken)).First();
+                    if (double.TryParse(scoreString, out double score))
+                    {
+                        gene.Score = score;
+                    }
+                    else
+                    {
+                        gene.Score = null;
+                    }
                 }
                 else
                 {
