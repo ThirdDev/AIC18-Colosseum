@@ -28,8 +28,7 @@ namespace Colosseum.GS
                 }
                 adamAndEveAndFriends.Add(tmp);
             }
-            var nextGen = Genetic(adamAndEveAndFriends);
-            return nextGen;
+            return adamAndEveAndFriends;
         }
 
         //Generates a new Generation based on the last Generation
