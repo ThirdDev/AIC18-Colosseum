@@ -22,7 +22,7 @@ namespace Colosseum.Services
             string workingDirectory,
             bool log = true,
             Action<string> outputReceived = null,
-            Action<string> errorReveived = null,
+            Action<string> errorReceived = null,
             Action exited = null,
             CancellationToken cancellationToken = default)
         {
@@ -73,7 +73,7 @@ namespace Colosseum.Services
 
             #region EventListeners
             outputReceived = outputReceived ?? (x => { });
-            errorReveived = errorReveived ?? (x => { });
+            errorReceived = errorReceived ?? (x => { });
             exited = exited ?? (() => { });
 
             HashSet<object> processEndLocks = new HashSet<object>();
@@ -108,7 +108,7 @@ namespace Colosseum.Services
                     if (data.Data.IsNullOrWhiteSpace().Not())
                     {
                         await writeCommandLogAsync((await logFilePathAsync()).stdErr, $"{DateTime.Now:s}: {data.Data}", log, cancellationToken);
-                        errorReveived(data.Data);
+                        errorReceived(data.Data);
                     }
                 }
                 finally

@@ -90,7 +90,7 @@ namespace Colosseum.Services.Client
                 payload,
                 logDir,
                 directory.FullName,
-                errorReveived: errorReceived,
+                errorReceived: errorReceived,
                 cancellationToken: cancellationToken), cancellationToken);
             while (payload == null)
             {
