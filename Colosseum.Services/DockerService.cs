@@ -12,7 +12,7 @@ namespace Colosseum.Services
     {
         public static Task BuildImageAsync(string path, string name, CancellationToken cancellationToken = default)
         {
-            return runDockerCommandAsync($"build -t {name} {path}", cancellationToken);
+            return runDockerCommandAsync($"build -t {name} \"{path}\"", cancellationToken);
         }
 
         /// <summary>
