@@ -252,11 +252,19 @@ namespace Colosseum.Services
         public string Args { get; set; } = "";
         public int WaitAfter { get; set; } = 0;
         public bool RequiresBash { get; set; } = false;
-        public bool HasStandardInput { get; set; }
+        public bool HasStandardInput { get; set; } = false;
         [JsonIgnore]
         public Func<string> GetStandardInput { get; set; }
 
         public string OneLineCommand => $"{FileName} {Args}";
+
+        public static CommandInfo DockerCommand(string args) =>
+            new CommandInfo
+            {
+                FileName = @"C:\Program Files\Docker\Docker\Resources\bin\docker.EXE",
+                RequiresBash = false,
+                Args = args
+            };
     }
 
     public class ProcessPayload
