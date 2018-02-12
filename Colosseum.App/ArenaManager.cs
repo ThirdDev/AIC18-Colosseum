@@ -223,7 +223,7 @@ namespace Colosseum.App
             }
 
             var containerLogPath = Path.Combine(rootDirectory.FullName, "container.log");
-            File.WriteAllText(containerLogPath, await DockerService.ContainerLogAsync(containerLogPath));
+            File.WriteAllText(containerLogPath, await DockerService.ContainerLogAsync(containerId));
 
             await DockerService.StopAndRemoveContainerAsync(containerId);
         }
