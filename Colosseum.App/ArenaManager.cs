@@ -151,7 +151,7 @@ namespace Colosseum.App
                     TimeSpan arenaElapse = DateTime.Now - _arenaStartTime;
                     Console.Write($"{arenaElapse}\t");
                     TimeSpan allProcessAverage = arenaElapse / processCount;
-					double taskPerMinute = TimeSpan.FromSeconds(60) / allProcessAverage;
+                    double taskPerMinute = TimeSpan.FromSeconds(60) / allProcessAverage;
                     Console.Write($"{taskPerMinute}");
                 }
                 finally
@@ -212,28 +212,24 @@ namespace Colosseum.App
             }
             else
             {
-                await runCompetitionInsideHost(port, serverDir, attackClientDir, defendClientDir, cancellationToken);
+                await runCompetitionInsideHost(gene.Id, port, serverDir, attackClientDir, defendClientDir, cancellationToken);
             }
         }
 
         private static async Task runCompetitionInsideContainer(int geneId, DirectoryInfo rootDirectory, CancellationToken cancellationToken = default)
         {
             var containerId = await DockerService.RunArenaAsync(Program.DockerImageName, rootDirectory.FullName);
+            var startTime = DateTime.Now;
+            Console.WriteLine($"container for gene {geneId} is {containerId}");
 
-            async Task checkContainer()
+            while (await DockerService.IsContainerRunningAsync(containerId))
             {
-                while (await DockerService.IsContainerRunningAsync(containerId))
+                if ((DateTime.Now - startTime) > maximumAllowedRunTime)
                 {
-                    await Task.Delay(1000);
+                    Console.WriteLine($"gene {geneId} didn't finish");
+                    break;
                 }
-            }
-
-            var timeoutCheck = Task.Delay(maximumAllowedRunTime.Milliseconds);
-            var finalTask = Task.WhenAny(checkContainer(), timeoutCheck);
-
-            if (finalTask == timeoutCheck)
-            {
-                Console.WriteLine($"gene {geneId} didn't finish");
+                await Task.Delay(1000);
             }
 
             var containerLogPath = Path.Combine(rootDirectory.FullName, "container.log");
@@ -242,7 +238,7 @@ namespace Colosseum.App
             await DockerService.StopAndRemoveContainerAsync(containerId);
         }
 
-        private static async Task runCompetitionInsideHost(int port, DirectoryInfo serverDir, DirectoryInfo attackClientDir, DirectoryInfo defendClientDir, CancellationToken cancellationToken)
+        private static async Task runCompetitionInsideHost(int geneId, int port, DirectoryInfo serverDir, DirectoryInfo attackClientDir, DirectoryInfo defendClientDir, CancellationToken cancellationToken)
         {
             var serverProcessPayload = await ServerManager.RunServer(serverDir, cancellationToken);
             if (!serverProcessPayload.IsRunning())
@@ -265,9 +261,13 @@ namespace Colosseum.App
             DateTime startTime = DateTime.Now;
             while (defendClientPayload.IsRunning() && attackClientPayload.IsRunning())
             {
-                await Task.Delay(1000);
                 if ((DateTime.Now - startTime) > maximumAllowedRunTime)
+                {
+                    Console.WriteLine($"gene {geneId} didn't finish");
                     break;
+                }
+                await Task.Delay(1000);
+
             }
 
             if (attackClientPayload.IsRunning())
