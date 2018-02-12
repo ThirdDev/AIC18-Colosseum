@@ -28,7 +28,7 @@ namespace Colosseum.App
         {
             _arenaStartTime = DateTime.Now;
 
-            Console.WriteLine($"welcome to Colosseum. we have {GenerationGenerator.generationPopulation} cells per generation and we process {geneProcessLimit} competitions each moment. enjoy the show :)");
+            Console.WriteLine($"welcome to Colosseum. enjoy the show :)");
 
             List<Gene> lastGeneration = null;
             int generationNumber = 1;
@@ -59,6 +59,7 @@ namespace Colosseum.App
                 await cleanSystem(cancellationToken);
 
                 Console.WriteLine($"running generation #{generationNumber}");
+                Console.WriteLine($"this generation will have {newGeneration.Count} genes and we'll process up to {geneProcessLimit} genes at each moment");
                 Console.WriteLine("-----------");
                 Console.WriteLine("score\telapsed\t\t\tmin avg max\t\t\t\t\t\tcount\ttotal elapsed\t\ttime per process");
 
