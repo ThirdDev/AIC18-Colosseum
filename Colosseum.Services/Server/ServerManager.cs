@@ -32,7 +32,7 @@ namespace Colosseum.Services.Server
         {
             return new ServerConfig
             {
-                Map = mapPath,
+                Map = Path.GetFileName(mapPath),
                 ClientsPort = port.ToString(),
                 UIPort = (port - 1000).ToString()
             }.Serialize();
@@ -45,6 +45,13 @@ namespace Colosseum.Services.Server
             {
                 throw new FileNotFoundException($"server file doesn't exist at {serverJarFile.FullName}");
             }
+
+            var mapFile = new FileInfo(mapPath);
+            if (!mapFile.Exists)
+            {
+                throw new FileNotFoundException($"map file doesn't exist at {mapFile.FullName}");
+            }
+            mapFile.CopyTo(Path.Combine(directory.FullName, mapFile.Name));
 
             var serverConfigFile = new FileInfo(Path.Combine(directory.FullName, _serverConfigsFileName.Name));
             if (serverConfigFile.Exists)
@@ -63,7 +70,7 @@ namespace Colosseum.Services.Server
         {
             ProcessPayload payload = new ProcessPayload();
             var serverCommand = getCommandInfo(directory);
-            var logDir = directory.CreateSubdirectory("process-info");
+            var logDir = directory.CreateSubdirectory("server-process-info");
             var task = Task.Run(async () => await OperationSystemService.RunCommandAsync(serverCommand, payload, logDir, directory.FullName, cancellationToken: cancellationToken), cancellationToken);
             while (payload == null)
             {

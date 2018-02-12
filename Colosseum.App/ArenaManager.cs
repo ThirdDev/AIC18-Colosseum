@@ -98,7 +98,7 @@ namespace Colosseum.App
                 geneDir.Create();
                 await runCompetition(geneDir, gene, port, mapPath, cancellationToken);
                 var defenseDir = getGeneDefendClientDirectory(geneDir);
-                var defenseOutputPath = ClientManager.GetClientOutputPath(defenseDir);
+                var defenseOutputPath = ClientManager.GetClientOutputPath(defenseDir, ClientMode.defend);
                 if (File.Exists(defenseOutputPath))
                 {
                     gene.Score = double.Parse((await File.ReadAllLinesAsync(defenseOutputPath, cancellationToken)).First());
@@ -160,23 +160,17 @@ namespace Colosseum.App
 
         private static DirectoryInfo getGeneServerDirectory(DirectoryInfo rootDirectory)
         {
-            var dir = rootDirectory.CreateSubdirectory("server");
-            dir.Create();
-            return dir;
+            return rootDirectory;
         }
 
         private static DirectoryInfo getGeneAttackClientDirectory(DirectoryInfo rootDirectory)
         {
-            var dir = rootDirectory.CreateSubdirectory("attack-client");
-            dir.Create();
-            return dir;
+            return rootDirectory;
         }
 
         private static DirectoryInfo getGeneDefendClientDirectory(DirectoryInfo rootDirectory)
         {
-            var dir = rootDirectory.CreateSubdirectory("defend-client");
-            dir.Create();
-            return dir;
+            return rootDirectory;
         }
 
         private static async Task runCompetition(DirectoryInfo rootDirectory, Gene gene, int port, string mapPath, CancellationToken cancellationToken = default)
@@ -187,8 +181,8 @@ namespace Colosseum.App
 
             await ServerManager.InitializeServerFiles(serverDir, mapPath, port, cancellationToken);
 
-            await ClientManager.InitializeClientFiles(attackClientDir, gene, cancellationToken);
-            await ClientManager.InitializeClientFiles(defendClientDir, gene, cancellationToken);
+            await ClientManager.InitializeClientFiles(attackClientDir, gene, ClientMode.attack, cancellationToken);
+            await ClientManager.InitializeClientFiles(defendClientDir, gene, ClientMode.defend, cancellationToken);
 
             await runCompetitionInsideHost(port, serverDir, attackClientDir, defendClientDir, cancellationToken);
         }
