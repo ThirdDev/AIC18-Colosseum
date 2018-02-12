@@ -89,7 +89,7 @@ namespace Colosseum.Services
 
             processPayload.Kill();
 
-            return final;
+            return final.ToListThreadSafe();
         }
 
         private static DirectoryInfo tempLogDir()
