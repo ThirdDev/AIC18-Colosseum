@@ -156,7 +156,7 @@ namespace Colosseum.App
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"an error occured while running task for gene hash {gene.Id}{Environment.NewLine}{ex}");
+                Console.WriteLine($"an error occurred while running task for gene hash {gene.Id}{Environment.NewLine}{ex}");
             }
             finally
             {
