@@ -129,7 +129,7 @@ namespace Colosseum.App
                 try
                 {
                     _geneProcessTimes.AddThreadSafe(processStopwatch.Elapsed);
-                    Console.WriteLine($"id: {gene.Id}");
+                    Console.WriteLine($"\t\t\t\t\t\t\t\t========{gene.Id}========");
                     var score = gene.Score;
                     Console.Write($"{score}\t");
                     TimeSpan processElapsed = processStopwatch.Elapsed;
