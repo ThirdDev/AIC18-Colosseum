@@ -151,7 +151,7 @@ namespace Colosseum.App
                     TimeSpan arenaElapse = DateTime.Now - _arenaStartTime;
                     Console.Write($"{arenaElapse}\t");
                     TimeSpan allProcessAverage = arenaElapse / processCount;
-					double taskPerMinute = allProcessAverage / TimeSpan.FromSeconds(60);
+					double taskPerMinute = TimeSpan.FromSeconds(60) / allProcessAverage;
                     Console.Write($"{taskPerMinute}");
                 }
                 finally
