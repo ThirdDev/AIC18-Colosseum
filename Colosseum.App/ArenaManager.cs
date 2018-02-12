@@ -24,7 +24,7 @@ namespace Colosseum.App
 
         static readonly GenerationGenerator _generationGenerator = new GenerationGenerator();
 
-        public static async Task RunCompetitions(string mapPath, CancellationToken cancellationToken = default)
+        public static async Task RunCompetitions(string mapPath, bool useContainer, CancellationToken cancellationToken = default)
         {
             _arenaStartTime = DateTime.Now;
 
@@ -65,7 +65,7 @@ namespace Colosseum.App
 
                 foreach (var gene in newGeneration)
                 {
-                    competitionTasks.AddThreadSafe(processGene(gene, mapPath, lastGeneration, port, generationDir, cancellationToken));
+                    competitionTasks.AddThreadSafe(processGene(gene, mapPath, lastGeneration, port, generationDir, useContainer, cancellationToken));
 
                     port++;
                 }
@@ -86,7 +86,7 @@ namespace Colosseum.App
         static SemaphoreSlim _geneProcessLogSemaphoreSlim = new SemaphoreSlim(1);
         static List<TimeSpan> _geneProcessTimes = new List<TimeSpan>();
 
-        private static async Task processGene(Gene gene, string mapPath, List<Gene> lastGeneration, int port, DirectoryInfo generationDir, CancellationToken cancellationToken)
+        private static async Task processGene(Gene gene, string mapPath, List<Gene> lastGeneration, int port, DirectoryInfo generationDir, bool useContainer, CancellationToken cancellationToken)
         {
             await _geneProcessSemaphoreSlim.WaitAsync(cancellationToken);
             try
@@ -96,7 +96,7 @@ namespace Colosseum.App
 
                 var geneDir = generationDir.CreateSubdirectory(gene.Id.ToString());
                 geneDir.Create();
-                await runCompetition(geneDir, gene, port, mapPath, cancellationToken);
+                await runCompetition(geneDir, gene, port, mapPath, useContainer, cancellationToken);
                 var defenseDir = getGeneDefendClientDirectory(geneDir);
                 var defenseOutputPath = ClientManager.GetClientOutputPath(defenseDir, ClientMode.defend);
                 if (File.Exists(defenseOutputPath))
@@ -181,19 +181,25 @@ namespace Colosseum.App
             return rootDirectory;
         }
 
-        private static async Task runCompetition(DirectoryInfo rootDirectory, Gene gene, int port, string mapPath, CancellationToken cancellationToken = default)
+        private static async Task runCompetition(DirectoryInfo rootDirectory, Gene gene, int port, string mapPath, bool useContainer, CancellationToken cancellationToken = default)
         {
             var serverDir = getGeneServerDirectory(rootDirectory);
             var attackClientDir = getGeneAttackClientDirectory(rootDirectory);
             var defendClientDir = getGeneDefendClientDirectory(rootDirectory);
 
-            await ServerManager.InitializeServerFiles(serverDir, mapPath, port, cancellationToken);
+            await ServerManager.InitializeServerFiles(serverDir, mapPath, (!useContainer) ? port : 7099, cancellationToken);
 
             await ClientManager.InitializeClientFiles(attackClientDir, gene, ClientMode.attack, cancellationToken);
             await ClientManager.InitializeClientFiles(defendClientDir, gene, ClientMode.defend, cancellationToken);
 
-            // await runCompetitionInsideHost(port, serverDir, attackClientDir, defendClientDir, cancellationToken);
-            await runCompetitionInsideContainer(gene.Id, rootDirectory, cancellationToken);
+            if (useContainer)
+            {
+                await runCompetitionInsideContainer(gene.Id, rootDirectory, cancellationToken);
+            }
+            else
+            {
+                await runCompetitionInsideHost(port, serverDir, attackClientDir, defendClientDir, cancellationToken);
+            }
         }
 
         private static async Task runCompetitionInsideContainer(int geneId, DirectoryInfo rootDirectory, CancellationToken cancellationToken = default)

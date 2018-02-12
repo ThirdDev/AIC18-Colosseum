@@ -13,7 +13,7 @@ namespace Colosseum.App
             var mapFile = new FileInfo("maps/map.map");
             await DockerService.BuildImageAsync(Directory.GetCurrentDirectory(), DockerImageName);
             await DockerService.StopAndRemoveAllContainersAsync();
-            await ArenaManager.RunCompetitions(mapFile.FullName);
+            await ArenaManager.RunCompetitions(mapFile.FullName, useContainer: true);
         }
     }
 }
