@@ -72,7 +72,7 @@ namespace Colosseum.App
                 }
 
                 Console.WriteLine($"running generation #{generationNumber}");
-                Console.WriteLine($"this generation will have {newGeneration.Count} genes and we'll process up to {geneProcessLimit} genes at each moment");
+                Console.WriteLine($"this generation will have {newGeneration.Count} genes and we'll process up to {geneProcessLimit} genes simultaneously");
                 Console.WriteLine("-----------");
                 Console.WriteLine("no.\tscore\t\t\tid\t\telapsed\t\t\tsystem elapsed\t\tPPM\t\t\t\tcurrent time");
 
