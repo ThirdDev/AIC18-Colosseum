@@ -26,6 +26,12 @@ namespace Colosseum.App
 
         public static async Task RunCompetitions(string mapPath, bool useContainer, CancellationToken cancellationToken = default)
         {
+            if (useContainer)
+            {
+                await DockerService.BuildImageAsync(Directory.GetCurrentDirectory(), Program.DockerImageName);
+                await DockerService.StopAndRemoveAllContainersAsync();
+            }
+
             _arenaStartTime = DateTime.Now;
 
             Console.WriteLine($"welcome to Colosseum. enjoy the show :)");
