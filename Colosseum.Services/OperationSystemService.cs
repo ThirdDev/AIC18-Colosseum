@@ -20,6 +20,7 @@ namespace Colosseum.Services
             ProcessPayload processPayload,
             DirectoryInfo logDir,
             string workingDirectory,
+            bool log = true,
             Action<string> outputReceived = null,
             Action<string> errorReveived = null,
             Action exited = null,
@@ -85,7 +86,7 @@ namespace Colosseum.Services
                 {
                     if (data.Data.IsNullOrWhiteSpace().Not())
                     {
-                        await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now:s}: {data.Data}", cancellationToken);
+                        await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now:s}: {data.Data}", log, cancellationToken);
                         outputReceived(data.Data);
                     }
                 }
@@ -106,7 +107,7 @@ namespace Colosseum.Services
                 {
                     if (data.Data.IsNullOrWhiteSpace().Not())
                     {
-                        await writeCommandLogAsync((await logFilePathAsync()).stdErr, $"{DateTime.Now:s}: {data.Data}", cancellationToken);
+                        await writeCommandLogAsync((await logFilePathAsync()).stdErr, $"{DateTime.Now:s}: {data.Data}", log, cancellationToken);
                         errorReveived(data.Data);
                     }
                 }
@@ -126,7 +127,7 @@ namespace Colosseum.Services
                 processEndLocks.AddThreadSafe(endLock);
                 try
                 {
-                    await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now:s}: exited.", cancellationToken);
+                    await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now:s}: exited.", log, cancellationToken);
                     exited();
                 }
                 finally
@@ -154,7 +155,7 @@ namespace Colosseum.Services
             if (process.Start())
             {
                 processPayload.ProcessId = process.Id;
-                await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now:s}: started.", cancellationToken);
+                await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now:s}: started.", log, cancellationToken);
                 process.BeginErrorReadLine();
                 process.BeginOutputReadLine();
                 if (commandInfo.RequiresBash)
@@ -193,12 +194,16 @@ namespace Colosseum.Services
 
         private static readonly SemaphoreSlim writeCommandLogSemaphore = new SemaphoreSlim(1, 1);
 
-        private static async Task writeCommandLogAsync(string filePath, string log, CancellationToken cancellationToken)
+        private static async Task writeCommandLogAsync(string filePath, string logText, bool log, CancellationToken cancellationToken)
         {
+            if (!log)
+            {
+                return;
+            }
             await writeCommandLogSemaphore.WaitAsync();
             try
             {
-                await File.AppendAllTextAsync(filePath, $"{log}{Environment.NewLine}", cancellationToken);
+                await File.AppendAllTextAsync(filePath, $"{logText}{Environment.NewLine}", cancellationToken);
             }
             finally
             {
