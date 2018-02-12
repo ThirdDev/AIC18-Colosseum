@@ -71,18 +71,6 @@ namespace Colosseum.Services.Client
 
             ProcessPayload payload = new ProcessPayload();
 
-            void errorReceived(string line)
-            {
-                try
-                {
-                    payload.Kill();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"failed to kill process of the client located in {directory.FullName}. error:{Environment.NewLine}{ex}{Environment.NewLine}");
-                }
-            }
-
             var serverCommand = getCommandInfo(directory, port, mode, clientTimeout);
             var logDir = directory.CreateSubdirectory($"client-{mode}-process-info");
             var task = Task.Run(async () => await OperationSystemService.RunCommandAsync(
@@ -90,7 +78,6 @@ namespace Colosseum.Services.Client
                 payload,
                 logDir,
                 directory.FullName,
-                errorReceived: errorReceived,
                 cancellationToken: cancellationToken), cancellationToken);
             while (payload == null)
             {
