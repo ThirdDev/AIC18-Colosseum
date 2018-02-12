@@ -74,7 +74,7 @@ namespace Colosseum.App
                 Console.WriteLine($"running generation #{generationNumber}");
                 Console.WriteLine($"this generation will have {newGeneration.Count} genes and we'll process up to {geneProcessLimit} genes at each moment");
                 Console.WriteLine("-----------");
-                Console.WriteLine("score\telapsed\t\t\tmin avg max\t\t\t\t\t\tcount\ttotal elapsed\t\ttime per process");
+                Console.WriteLine("score\telapsed\t\t\tmin avg max\t\t\t\t\t\tcount\ttotal elapsed\t\tprocesses per minute");
 
                 foreach (var gene in newGeneration)
                 {
@@ -151,7 +151,8 @@ namespace Colosseum.App
                     TimeSpan arenaElapse = DateTime.Now - _arenaStartTime;
                     Console.Write($"{arenaElapse}\t");
                     TimeSpan allProcessAverage = arenaElapse / processCount;
-                    Console.Write($"{allProcessAverage}");
+					double taskPerMinute = allProcessAverage / TimeSpan.FromSeconds(60);
+                    Console.Write($"{taskPerMinute}");
                 }
                 finally
                 {
