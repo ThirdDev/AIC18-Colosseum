@@ -74,7 +74,7 @@ namespace Colosseum.App
                 Console.WriteLine($"running generation #{generationNumber}");
                 Console.WriteLine($"this generation will have {newGeneration.Count} genes and we'll process up to {geneProcessLimit} genes at each moment");
                 Console.WriteLine("-----------");
-                Console.WriteLine("score\telapsed\t\t\tmin avg max\t\t\t\t\t\tcount\ttotal elapsed\t\tprocesses per minute");
+                Console.WriteLine("no.\tscore\t\t\tid\t\telapsed\t\t\tsystem elapsed\t\tPPM");
 
                 foreach (var gene in newGeneration)
                 {
@@ -135,21 +135,15 @@ namespace Colosseum.App
                 try
                 {
                     _geneProcessTimes.AddThreadSafe(processStopwatch.Elapsed);
-                    Console.WriteLine($"\t\t\t\t\t\t\t\t========{gene.Id}========");
-                    var score = gene.Score;
-                    Console.Write($"{score}\t");
-                    TimeSpan processElapsed = processStopwatch.Elapsed;
-                    Console.Write($"{processElapsed}\t");
-                    TimeSpan min = _geneProcessTimes.Min();
-                    Console.Write($"{min} ");
-                    TimeSpan avg = calculateAverag(_geneProcessTimes);
-                    Console.Write($"{avg} ");
-                    TimeSpan max = _geneProcessTimes.Max();
-                    Console.Write($"{max}\t");
                     int processCount = _geneProcessTimes.Count;
-                    Console.Write($"{processCount}\t");
+                    Console.Write($"{processCount.ToString().PadRight(8)}");
+                    var score = gene.Score;
+                    Console.Write($"{score.ToString().PadRight(24)}");
+                    Console.Write($"{gene.Id.ToString().PadRight(16)}");
+                    TimeSpan processElapsed = processStopwatch.Elapsed;
+                    Console.Write($"{processElapsed.ToString().PadRight(24)}");
                     TimeSpan arenaElapse = DateTime.Now - _arenaStartTime;
-                    Console.Write($"{arenaElapse}\t");
+                    Console.Write($"{arenaElapse.ToString().PadRight(24)}");
                     TimeSpan allProcessAverage = arenaElapse / processCount;
                     double taskPerMinute = TimeSpan.FromSeconds(60) / allProcessAverage;
                     Console.Write($"{taskPerMinute}");
