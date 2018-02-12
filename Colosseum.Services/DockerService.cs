@@ -52,8 +52,14 @@ namespace Colosseum.Services
 
         public static async Task StopAndRemoveAllContainersAsync(CancellationToken cancellationToken = default)
         {
-            await runDockerCommandAsync("docker stop $(docker ps -aq)");
-            await runDockerCommandAsync("docker rm $(docker ps -aq)");
+            var running = await runDockerCommandWithOutputAsync("ps -aq");
+            var tasks = new List<Task>();
+            foreach (var container in running)
+            {
+                tasks.Add(StopAndRemoveContainerAsync(container, cancellationToken));
+            }
+
+            await Task.WhenAll(tasks);
         }
 
 
