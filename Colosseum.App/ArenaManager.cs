@@ -128,6 +128,7 @@ namespace Colosseum.App
                     }
                     else
                     {
+                        success = false;
                         gene.Score = null;
                     }
                 }
