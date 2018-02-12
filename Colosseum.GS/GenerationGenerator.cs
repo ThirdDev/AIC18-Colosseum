@@ -71,15 +71,14 @@ namespace Colosseum.GS
                     else
                     {
                         randAns -= rangeOfMutaion/2;
-                    }
-                    
-                    if (randAns > 0.5)
-                    {
-                        tmp.GenomesList.Add(generation[indexDad].GenomesList[i]);
-                    }
-                    else
-                    {
-                        tmp.GenomesList.Add(generation[indexMom].GenomesList[i]);
+                        if (randAns > 0.5)
+                        {
+                            tmp.GenomesList.Add(generation[indexDad].GenomesList[i]);
+                        }
+                        else
+                        {
+                            tmp.GenomesList.Add(generation[indexMom].GenomesList[i]);
+                        }
                     }
                 }
                 children.Add(tmp);
