@@ -12,7 +12,7 @@ namespace Colosseum.Services
     {
         public static Task BuildImageAsync(string path, string name, CancellationToken cancellationToken = default)
         {
-            return runDockerCommandAsync($"build -t {name} \"{path}\"", cancellationToken);
+            return runDockerCommandAsync($"build -t {name} \"{path}\"", false, cancellationToken);
         }
 
         /// <summary>
@@ -45,8 +45,8 @@ namespace Colosseum.Services
 
         public static async Task StopAndRemoveContainerAsync(string containerId, CancellationToken cancellationToken = default)
         {
-            await runDockerCommandAsync($"kill {containerId}", cancellationToken);
-            await runDockerCommandAsync($"rm {containerId}", cancellationToken);
+            await runDockerCommandAsync($"kill {containerId}", true, cancellationToken);
+            await runDockerCommandAsync($"rm {containerId}", false, cancellationToken);
 
         }
 
@@ -63,10 +63,10 @@ namespace Colosseum.Services
         }
 
 
-        private static Task runDockerCommandAsync(string args, CancellationToken cancellationToken = default)
+        private static Task runDockerCommandAsync(string args, bool log, CancellationToken cancellationToken = default)
         {
             var command = CommandInfo.DockerCommand(args);
-            return OperationSystemService.RunCommandAsync(command, new ProcessPayload(), tempLogDir(), null, log: false, cancellationToken: cancellationToken);
+            return OperationSystemService.RunCommandAsync(command, new ProcessPayload(), tempLogDir(), null, log: log, cancellationToken: cancellationToken);
         }
 
         private static async Task<List<string>> runDockerCommandWithOutputAsync(string args, CancellationToken cancellationToken = default)
