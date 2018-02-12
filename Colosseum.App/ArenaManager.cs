@@ -192,7 +192,37 @@ namespace Colosseum.App
             await ClientManager.InitializeClientFiles(attackClientDir, gene, ClientMode.attack, cancellationToken);
             await ClientManager.InitializeClientFiles(defendClientDir, gene, ClientMode.defend, cancellationToken);
 
-            await runCompetitionInsideHost(port, serverDir, attackClientDir, defendClientDir, cancellationToken);
+            // await runCompetitionInsideHost(port, serverDir, attackClientDir, defendClientDir, cancellationToken);
+            await runCompetitionInsideContainer(gene.Id, rootDirectory, cancellationToken);
+        }
+
+        private static Task runCompetitionInsideContainer(int geneId, DirectoryInfo rootDirectory, CancellationToken cancellationToken = default)
+        {
+            return Task.Run(() =>
+                {
+                    var containerId = DockerService.RunArena(Program.DockerImageName, rootDirectory.FullName);
+
+                    async Task checkContainer()
+                    {
+                        while (DockerService.IsContainerRunning(containerId))
+                        {
+                            await Task.Delay(100);
+                        }
+                    }
+
+                    var timeoutCheck = Task.Delay(maximumAllowedRunTime.Milliseconds);
+                    var finalTask = Task.WhenAny(checkContainer(), timeoutCheck);
+
+                    if (finalTask == timeoutCheck)
+                    {
+                        Console.WriteLine($"gene {geneId} didn't finish");
+                    }
+
+                    var containerLogPath = Path.Combine(rootDirectory.FullName, "container.log");
+                    File.WriteAllText(containerLogPath, DockerService.ContainerLog(containerLogPath));
+
+                    DockerService.StopAndRemoveContainer(containerId);
+                }, cancellationToken);
         }
 
         private static async Task runCompetitionInsideHost(int port, DirectoryInfo serverDir, DirectoryInfo attackClientDir, DirectoryInfo defendClientDir, CancellationToken cancellationToken)
