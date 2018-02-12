@@ -11,8 +11,8 @@ namespace Colosseum.App
         static async Task Main(string[] args)
         {
             var mapFile = new FileInfo("maps/map.map");
-            DockerService.BuildImage(Directory.GetCurrentDirectory(), DockerImageName);
-            DockerService.StopAndRemoveAllContainers();
+            await DockerService.BuildImageAsync(Directory.GetCurrentDirectory(), DockerImageName);
+            await DockerService.StopAndRemoveAllContainersAsync();
             await ArenaManager.RunCompetitions(mapFile.FullName);
         }
     }

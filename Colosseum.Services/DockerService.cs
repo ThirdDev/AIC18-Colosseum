@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Management.Automation;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,12 +10,9 @@ namespace Colosseum.Services
 {
     public static class DockerService
     {
-        public static void BuildImage(string path, string name)
+        public static Task BuildImageAsync(string path, string name, CancellationToken cancellationToken = default)
         {
-            using (var shell = PowerShell.Create())
-            {
-                shell.AddScript($"docker build -t {name} {path}").Invoke();
-            }
+            return runDockerCommandAsync($"build -t {name} {path}", cancellationToken);
         }
 
         /// <summary>
@@ -24,54 +21,67 @@ namespace Colosseum.Services
         /// <param name="name"></param>
         /// <param name="filesDirectory"></param>
         /// <returns>container Id</returns>
-        public static string RunArena(string name, string filesDirectory)
+        public static async Task<string> RunArenaAsync(string name, string filesDirectory, CancellationToken cancellationToken = default)
         {
-            using (var shell = PowerShell.Create())
+            var result = await runDockerCommandWithOutputAsync($"run -d -it --mount type=bind,source=\"{filesDirectory}\",target=/app/files {name}", cancellationToken);
+            if (result.Count > 1)
             {
-                var result = shell.AddScript($"docker run -d -it --mount type=bind,source=\"{filesDirectory}\",target=/app/files {name}").Invoke();
-                if (result.Count > 1)
-                {
-                    throw new Exception($"docker run returned more than 1 line:{Environment.NewLine}{string.Join(Environment.NewLine, result.AsEnumerable())}");
-                }
-                return result.First().ToString();
+                throw new Exception($"docker run returned more than 1 line:{Environment.NewLine}{string.Join(Environment.NewLine, result.AsEnumerable())}");
             }
+            return result.First().ToString();
         }
 
-        public static bool IsContainerRunning(string containerId)
+        public static async Task<bool> IsContainerRunningAsync(string containerId, CancellationToken cancellationToken = default)
         {
-            using (var shell = PowerShell.Create())
-            {
-                var result = shell.AddScript($"docker ps --filter \"id={containerId}\"").Invoke();
-                return result.Count == 2;
-            }
+            var result = await runDockerCommandWithOutputAsync($"ps --filter \"id={containerId}\"", cancellationToken);
+            return result.Count == 2;
         }
 
-        public static string ContainerLog(string containerId)
+        public static async Task<string> ContainerLogAsync(string containerId, CancellationToken cancellationToken = default)
         {
-            using (var shell = PowerShell.Create())
-            {
-                var result = shell.AddScript($"docker logs -f {containerId}").Invoke();
-                return result.ToString();
-            }
+            var result = await runDockerCommandWithOutputAsync($"logs -f {containerId}", cancellationToken);
+            return string.Join(Environment.NewLine, result);
         }
 
-        public static void StopAndRemoveContainer(string containerId)
+        public static async Task StopAndRemoveContainerAsync(string containerId, CancellationToken cancellationToken = default)
         {
-            using (var shell = PowerShell.Create())
-            {
-                shell.AddScript($"docker stop {containerId}").Invoke();
-                shell.AddScript($"docker rm {containerId}").Invoke();
-            }
+            await runDockerCommandAsync($"stop {containerId}", cancellationToken);
+            await runDockerCommandAsync($"rm {containerId}", cancellationToken);
+
         }
 
-        public static void StopAndRemoveAllContainers()
+        public static async Task StopAndRemoveAllContainersAsync(CancellationToken cancellationToken = default)
         {
-            using (var shell = PowerShell.Create())
-            {
-                shell.AddScript("docker stop $(docker ps -aq)").Invoke();
-                shell.AddScript("docker rm $(docker ps -aq)").Invoke();
-            }
+            await runDockerCommandAsync("docker stop $(docker ps -aq)");
+            await runDockerCommandAsync("docker rm $(docker ps -aq)");
         }
 
+
+        private static Task runDockerCommandAsync(string args, CancellationToken cancellationToken = default)
+        {
+            var command = CommandInfo.DockerCommand(args);
+            return OperationSystemService.RunCommandAsync(command, new ProcessPayload(), tempLogDir(), null, cancellationToken: cancellationToken);
+        }
+
+        private static async Task<List<string>> runDockerCommandWithOutputAsync(string args, CancellationToken cancellationToken = default)
+        {
+            var command = CommandInfo.DockerCommand(args);
+            List<string> final = new List<string>();
+            await OperationSystemService.RunCommandAsync(command, new ProcessPayload(), tempLogDir(), null,
+                outputReceived: line => final.Add(line),
+                cancellationToken: cancellationToken);
+            return final;
+        }
+
+        private static DirectoryInfo tempLogDir()
+        {
+            var arenaDir = new DirectoryInfo("arena");
+            arenaDir.Create();
+
+            var logDir = arenaDir.CreateSubdirectory("tmp");
+            logDir.Create();
+
+            return logDir;
+        }
     }
 }

@@ -196,33 +196,30 @@ namespace Colosseum.App
             await runCompetitionInsideContainer(gene.Id, rootDirectory, cancellationToken);
         }
 
-        private static Task runCompetitionInsideContainer(int geneId, DirectoryInfo rootDirectory, CancellationToken cancellationToken = default)
+        private static async Task runCompetitionInsideContainer(int geneId, DirectoryInfo rootDirectory, CancellationToken cancellationToken = default)
         {
-            return Task.Run(() =>
+            var containerId = await DockerService.RunArenaAsync(Program.DockerImageName, rootDirectory.FullName);
+
+            async Task checkContainer()
+            {
+                while (await DockerService.IsContainerRunningAsync(containerId))
                 {
-                    var containerId = DockerService.RunArena(Program.DockerImageName, rootDirectory.FullName);
+                    await Task.Delay(100);
+                }
+            }
 
-                    async Task checkContainer()
-                    {
-                        while (DockerService.IsContainerRunning(containerId))
-                        {
-                            await Task.Delay(100);
-                        }
-                    }
+            var timeoutCheck = Task.Delay(maximumAllowedRunTime.Milliseconds);
+            var finalTask = Task.WhenAny(checkContainer(), timeoutCheck);
 
-                    var timeoutCheck = Task.Delay(maximumAllowedRunTime.Milliseconds);
-                    var finalTask = Task.WhenAny(checkContainer(), timeoutCheck);
+            if (finalTask == timeoutCheck)
+            {
+                Console.WriteLine($"gene {geneId} didn't finish");
+            }
 
-                    if (finalTask == timeoutCheck)
-                    {
-                        Console.WriteLine($"gene {geneId} didn't finish");
-                    }
+            var containerLogPath = Path.Combine(rootDirectory.FullName, "container.log");
+            File.WriteAllText(containerLogPath, await DockerService.ContainerLogAsync(containerLogPath));
 
-                    var containerLogPath = Path.Combine(rootDirectory.FullName, "container.log");
-                    File.WriteAllText(containerLogPath, DockerService.ContainerLog(containerLogPath));
-
-                    DockerService.StopAndRemoveContainer(containerId);
-                }, cancellationToken);
+            await DockerService.StopAndRemoveContainerAsync(containerId);
         }
 
         private static async Task runCompetitionInsideHost(int port, DirectoryInfo serverDir, DirectoryInfo attackClientDir, DirectoryInfo defendClientDir, CancellationToken cancellationToken)
@@ -283,6 +280,7 @@ namespace Colosseum.App
             arenaDir.Create();
 
             var logDir = arenaDir.CreateSubdirectory("tmp");
+            logDir.Create();
 
             await OperationSystemService.RunCommandAsync(_cleanSystemCommand, new ProcessPayload(), logDir, null, cancellationToken: cancellationToken);
         }
