@@ -190,6 +190,11 @@ namespace Colosseum.App
             await ClientManager.InitializeClientFiles(attackClientDir, gene, cancellationToken);
             await ClientManager.InitializeClientFiles(defendClientDir, gene, cancellationToken);
 
+            await runCompetitionInsideHost(port, serverDir, attackClientDir, defendClientDir, cancellationToken);
+        }
+
+        private static async Task runCompetitionInsideHost(int port, DirectoryInfo serverDir, DirectoryInfo attackClientDir, DirectoryInfo defendClientDir, CancellationToken cancellationToken)
+        {
             var serverProcessPayload = await ServerManager.RunServer(serverDir, cancellationToken);
             if (!serverProcessPayload.IsRunning())
             {
