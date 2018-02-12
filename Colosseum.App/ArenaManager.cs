@@ -295,7 +295,7 @@ namespace Colosseum.App
             var logDir = arenaDir.CreateSubdirectory("tmp");
             logDir.Create();
 
-            await OperationSystemService.RunCommandAsync(_cleanSystemCommand, new ProcessPayload(), logDir, null, cancellationToken: cancellationToken);
+            await OperationSystemService.RunCommandAsync(_cleanSystemCommand, new ProcessPayload(), logDir, null, log: false, cancellationToken: cancellationToken);
         }
     }
 }

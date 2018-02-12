@@ -66,14 +66,14 @@ namespace Colosseum.Services
         private static Task runDockerCommandAsync(string args, CancellationToken cancellationToken = default)
         {
             var command = CommandInfo.DockerCommand(args);
-            return OperationSystemService.RunCommandAsync(command, new ProcessPayload(), tempLogDir(), null, cancellationToken: cancellationToken);
+            return OperationSystemService.RunCommandAsync(command, new ProcessPayload(), tempLogDir(), null, log: false, cancellationToken: cancellationToken);
         }
 
         private static async Task<List<string>> runDockerCommandWithOutputAsync(string args, CancellationToken cancellationToken = default)
         {
             var command = CommandInfo.DockerCommand(args);
             List<string> final = new List<string>();
-            await OperationSystemService.RunCommandAsync(command, new ProcessPayload(), tempLogDir(), null,
+            await OperationSystemService.RunCommandAsync(command, new ProcessPayload(), tempLogDir(), null, log: false,
                 outputReceived: line => final.Add(line),
                 cancellationToken: cancellationToken);
             return final;
