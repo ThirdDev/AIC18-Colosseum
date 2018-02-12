@@ -37,6 +37,12 @@ namespace Colosseum.Services
             return result.Count == 2;
         }
 
+        public static async Task<string> GetContainerInfo(string containerId, CancellationToken cancellationToken = default)
+        {
+            var result = await runDockerCommandWithOutputAsync($"ps --filter \"id={containerId}\"", cancellationToken);
+            return string.Join(Environment.NewLine, result);
+        }
+
         public static async Task<string> ContainerLogAsync(string containerId, CancellationToken cancellationToken = default)
         {
             var result = await runDockerCommandWithOutputAsync($"logs -f {containerId}", cancellationToken);

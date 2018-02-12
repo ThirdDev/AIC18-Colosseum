@@ -215,7 +215,6 @@ namespace Colosseum.App
         {
             var containerId = await DockerService.RunArenaAsync(Program.DockerImageName, rootDirectory.FullName);
             var startTime = DateTime.Now;
-            Console.WriteLine($"container for gene {geneId} is {containerId}");
 
             while (await DockerService.IsContainerRunningAsync(containerId))
             {
@@ -227,8 +226,11 @@ namespace Colosseum.App
                 await Task.Delay(1000);
             }
 
+            var containerInfoPath = Path.Combine(rootDirectory.FullName, "container.info");
+            await File.WriteAllTextAsync(containerInfoPath, await DockerService.GetContainerInfo(containerId, cancellationToken));
+
             var containerLogPath = Path.Combine(rootDirectory.FullName, "container.log");
-            File.WriteAllText(containerLogPath, await DockerService.ContainerLogAsync(containerId));
+            await File.WriteAllTextAsync(containerLogPath, await DockerService.ContainerLogAsync(containerId));
 
             await DockerService.StopAndRemoveContainerAsync(containerId);
         }
