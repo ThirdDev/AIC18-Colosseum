@@ -56,7 +56,14 @@ namespace Colosseum.App
 
                 var competitionTasks = new List<Task>();
 
-                await cleanSystem(cancellationToken);
+                if (useContainer)
+                {
+                    await DockerService.StopAndRemoveAllContainersAsync();
+                }
+                else
+                {
+                    await cleanSystem(cancellationToken);
+                }
 
                 Console.WriteLine($"running generation #{generationNumber}");
                 Console.WriteLine($"this generation will have {newGeneration.Count} genes and we'll process up to {geneProcessLimit} genes at each moment");
