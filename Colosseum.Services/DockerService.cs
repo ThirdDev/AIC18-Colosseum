@@ -23,29 +23,29 @@ namespace Colosseum.Services
         /// <returns>container Id</returns>
         public static async Task<string> RunArenaAsync(string name, string filesDirectory, CancellationToken cancellationToken = default)
         {
-            var result = await runDockerCommandWithOutputAsync($"run -d -it --mount type=bind,source=\"{filesDirectory}\",target=/app/files {name}", cancellationToken);
-            if (result.Count > 1)
+            var result = await runDockerCommandWithOutputAsync($"run -d -it --mount type=bind,source=\"{filesDirectory}\",target=/app/files {name}", timeout: int.MaxValue, cancellationToken: cancellationToken);
+            if (result.Count != 1)
             {
-                throw new Exception($"docker run returned more than 1 line:{Environment.NewLine}{string.Join(Environment.NewLine, result.AsEnumerable())}");
+                throw new Exception($"docker run returned invalid output:{Environment.NewLine}{string.Join(Environment.NewLine, result.AsEnumerable())}");
             }
             return result.First().ToString();
         }
 
         public static async Task<bool> IsContainerRunningAsync(string containerId, CancellationToken cancellationToken = default)
         {
-            var result = await runDockerCommandWithOutputAsync($"ps --filter \"id={containerId}\"", cancellationToken);
+            var result = await runDockerCommandWithOutputAsync($"ps --filter \"id={containerId}\"", cancellationToken: cancellationToken);
             return result.Count == 2;
         }
 
         public static async Task<string> GetContainerInfo(string containerId, CancellationToken cancellationToken = default)
         {
-            var result = await runDockerCommandWithOutputAsync($"ps --filter \"id={containerId}\"", cancellationToken);
+            var result = await runDockerCommandWithOutputAsync($"ps --filter \"id={containerId}\"", cancellationToken: cancellationToken);
             return string.Join(Environment.NewLine, result);
         }
 
         public static async Task<string> ContainerLogAsync(string containerId, CancellationToken cancellationToken = default)
         {
-            var result = await runDockerCommandWithOutputAsync($"logs -f {containerId}", cancellationToken);
+            var result = await runDockerCommandWithOutputAsync($"logs -f {containerId}", cancellationToken: cancellationToken);
             return string.Join(Environment.NewLine, result);
         }
 
@@ -75,7 +75,7 @@ namespace Colosseum.Services
             return OperationSystemService.RunCommandAsync(command, new ProcessPayload(), tempLogDir(), null, log: log, cancellationToken: cancellationToken);
         }
 
-        private static async Task<List<string>> runDockerCommandWithOutputAsync(string args, CancellationToken cancellationToken = default)
+        private static async Task<List<string>> runDockerCommandWithOutputAsync(string args, int timeout = 10000, CancellationToken cancellationToken = default)
         {
             var command = CommandInfo.DockerCommand(args);
             var processPayload = new ProcessPayload();
@@ -85,7 +85,7 @@ namespace Colosseum.Services
                 outputReceived: line => final.Add(line),
                 cancellationToken: cancellationToken);
 
-            await Task.WhenAny(processTask, Task.Delay(10000));
+            await Task.WhenAny(processTask, Task.Delay(timeout));
 
             processPayload.Kill();
 
