@@ -43,6 +43,12 @@ namespace Colosseum.Services
             return result;
         }
 
+        public static async Task<string> GetContainerInspect(string containerId, CancellationToken cancellationToken = default)
+        {
+            var result = await runDockerCommandWithOutputAsync($"inspect {containerId}", cancellationToken: cancellationToken);
+            return string.Join(Environment.NewLine, result);
+        }
+
         public static async Task<string> ContainerLogAsync(string containerId, CancellationToken cancellationToken = default)
         {
             var result = await runDockerCommandWithOutputAsync($"logs -f {containerId}", cancellationToken: cancellationToken);
