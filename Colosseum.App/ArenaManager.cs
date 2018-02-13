@@ -7,7 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +26,7 @@ namespace Colosseum.App
 
         static readonly GenerationGenerator _generationGenerator = new GenerationGenerator();
 
-        public static async Task RunCompetitions(string mapPath, bool useContainer, CancellationToken cancellationToken = default)
+        public static async Task RunCompetitions(string mapPath, bool useContainer, bool useSwarm, CancellationToken cancellationToken = default)
         {
             if (useContainer)
             {
@@ -78,7 +80,7 @@ namespace Colosseum.App
 
                 foreach (var gene in newGeneration)
                 {
-                    competitionTasks.AddThreadSafe(processGene(gene, mapPath, lastGeneration, port, generationDir, useContainer, cancellationToken));
+                    competitionTasks.AddThreadSafe(processGene(gene, mapPath, lastGeneration, port, generationDir, useContainer: useContainer, useSwarm: useSwarm, cancellationToken));
 
                     port++;
                 }
@@ -99,7 +101,7 @@ namespace Colosseum.App
         static SemaphoreSlim _geneProcessLogSemaphoreSlim = new SemaphoreSlim(1);
         static List<TimeSpan> _geneProcessTimes = new List<TimeSpan>();
 
-        private static async Task processGene(Gene gene, string mapPath, List<Gene> lastGeneration, int port, DirectoryInfo generationDir, bool useContainer, CancellationToken cancellationToken)
+        private static async Task processGene(Gene gene, string mapPath, List<Gene> lastGeneration, int port, DirectoryInfo generationDir, bool useContainer, bool useSwarm, CancellationToken cancellationToken)
         {
             await _geneProcessSemaphoreSlim.WaitAsync(cancellationToken);
             try
@@ -109,7 +111,7 @@ namespace Colosseum.App
 
                 var geneDir = generationDir.CreateSubdirectory(gene.Id.ToString());
                 geneDir.Create();
-                var success = await runCompetition(geneDir, gene, port, mapPath, useContainer, cancellationToken);
+                var success = await runCompetition(geneDir, gene, port, mapPath, useContainer: useContainer, useSwarm: useSwarm, cancellationToken);
                 if (success)
                 {
                     var defenseDir = getGeneDefendClientDirectory(geneDir);
@@ -199,24 +201,70 @@ namespace Colosseum.App
             return rootDirectory;
         }
 
-        private static async Task<bool> runCompetition(DirectoryInfo rootDirectory, Gene gene, int port, string mapPath, bool useContainer, CancellationToken cancellationToken = default)
+        private static DirectoryInfo getTempDir()
         {
-            var serverDir = getGeneServerDirectory(rootDirectory);
-            var attackClientDir = getGeneAttackClientDirectory(rootDirectory);
-            var defendClientDir = getGeneDefendClientDirectory(rootDirectory);
+            var arenaDir = new DirectoryInfo("arena");
+            arenaDir.Create();
 
-            await ServerManager.InitializeServerFiles(serverDir, mapPath, (!useContainer) ? port : 7099, cancellationToken);
+            var tmpDir = arenaDir.CreateSubdirectory("tmp");
+            tmpDir.Create();
+            return tmpDir;
+        }
 
-            await ClientManager.InitializeClientFiles(attackClientDir, gene, ClientMode.attack, cancellationToken);
-            await ClientManager.InitializeClientFiles(defendClientDir, gene, ClientMode.defend, cancellationToken);
+        static HttpClient _httpClient = new HttpClient();
 
-            if (useContainer)
+
+        private static async Task<bool> runCompetition(DirectoryInfo rootDirectory, Gene gene, int port, string mapPath, bool useContainer, bool useSwarm, CancellationToken cancellationToken = default)
+        {
+            if (useSwarm)
             {
-                return await runCompetitionInsideContainer(gene.Id, rootDirectory, cancellationToken);
+                var tmpDir = getTempDir();
+                var geneTempFile = new FileInfo(Path.Combine(tmpDir.FullName, $"{gene.Id}.zip"));
+
+                if (geneTempFile.Exists)
+                {
+                    await geneTempFile.DeleteAsync();
+                }
+
+                var payload = new
+                {
+                    Gene = gene,
+                    mapFileName = Path.GetFileName(mapPath)
+                };
+
+                var httpContent = new StringContent(JsonConvert.SerializeObject(payload));
+
+                var response = await _httpClient.PostAsync("127.0.0.1:74275", httpContent);
+
+                using (var fs = geneTempFile.Create())
+                {
+                    await response.Content.ReadAsStreamAsync().Result.CopyToAsync(fs);
+                }
+
+                rootDirectory.Create();
+                ZipFile.ExtractToDirectory(geneTempFile.FullName, rootDirectory.FullName);
+
+                return true;
             }
             else
             {
-                return await runCompetitionInsideHost(gene.Id, port, serverDir, attackClientDir, defendClientDir, cancellationToken);
+                var serverDir = getGeneServerDirectory(rootDirectory);
+                var attackClientDir = getGeneAttackClientDirectory(rootDirectory);
+                var defendClientDir = getGeneDefendClientDirectory(rootDirectory);
+
+                await ServerManager.InitializeServerFiles(serverDir, mapPath, (!useContainer) ? port : 7099, cancellationToken);
+
+                await ClientManager.InitializeClientFiles(attackClientDir, gene, ClientMode.attack, cancellationToken);
+                await ClientManager.InitializeClientFiles(defendClientDir, gene, ClientMode.defend, cancellationToken);
+
+                if (useContainer)
+                {
+                    return await runCompetitionInsideContainer(gene.Id, rootDirectory, cancellationToken);
+                }
+                else
+                {
+                    return await runCompetitionInsideHost(gene.Id, port, serverDir, attackClientDir, defendClientDir, cancellationToken);
+                }
             }
         }
 
