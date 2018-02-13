@@ -28,8 +28,7 @@ namespace Colosseum.GS
                 }
                 adamAndEveAndFriends.Add(tmp);
             }
-            var nextGen = Genetic(adamAndEveAndFriends);
-            return nextGen;
+            return adamAndEveAndFriends;
         }
 
         //Generates a new Generation based on the last Generation
@@ -55,13 +54,9 @@ namespace Colosseum.GS
             Random random = new Random();
             for(int j = 0 ; j < count ; j++)
             {
-                //int indexDad = (int)(random.NextDouble() * generation.Count);
-                //int indexMom = (int)(random.NextDouble() * generation.Count);
-                double randomIndex = GaussianRandom(random , 0 , stdDrivationForLives);
-                while (randomIndex >= 1) randomIndex = GaussianRandom(random, 0 , stdDrivationForLives);
-                int indexDad = (int)(randomIndex * generation.Count);
-                while (randomIndex >= 1) randomIndex = GaussianRandom(random, 0 , stdDrivationForLives);
-                int indexMom = (int)(randomIndex * generation.Count);
+                int indexDad = GetRandomParentIndex(random, generation.Count);
+                int indexMom = GetRandomParentIndex(random, generation.Count);
+
                 var tmp = new Gene();
                 for (int i = 0; i < Gene.LengthOfGene; i++)
                 {
@@ -75,15 +70,14 @@ namespace Colosseum.GS
                     else
                     {
                         randAns -= rangeOfMutaion/2;
-                    }
-                    
-                    if (randAns > 0.5)
-                    {
-                        tmp.GenomesList.Add(generation[indexDad].GenomesList[i]);
-                    }
-                    else
-                    {
-                        tmp.GenomesList.Add(generation[indexMom].GenomesList[i]);
+                        if (randAns > 0.5)
+                        {
+                            tmp.GenomesList.Add(generation[indexDad].GenomesList[i]);
+                        }
+                        else
+                        {
+                            tmp.GenomesList.Add(generation[indexMom].GenomesList[i]);
+                        }
                     }
                 }
                 children.Add(tmp);
@@ -92,8 +86,19 @@ namespace Colosseum.GS
             return children;
 
         }
-        
-        
+
+        private int GetRandomParentIndex(Random random, int count)
+        {
+            double randomIndex;
+            do
+            {
+                randomIndex = GaussianRandom(random, 0, stdDrivationForLives);
+            } while (randomIndex >= 1);
+
+            return (int)(randomIndex * count);
+        }
+
+
         //returns a normal random in range of (0,1)
         private double GaussianRandom(Random random , double mean , double stdDrivation)
         {

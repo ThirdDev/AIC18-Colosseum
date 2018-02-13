@@ -11,5 +11,13 @@ namespace System.Collections.Generic
             int index = random.Next(0, enumerable.Count());
             return enumerable.ElementAt(index);
         }
+
+        public static List<T> ToListThreadSafe<T>(this IEnumerable<T> enumerable)
+        {
+            lock (enumerable)
+            {
+                return enumerable.ToList();
+            }
+        }
     }
 }

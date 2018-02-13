@@ -17,17 +17,17 @@ namespace Colosseum.Services.Client
     public static class ClientManager
     {
         static FileInfo _clientName => new FileInfo("Client.jar");
-        static FileInfo _clientConfigName => new FileInfo("clientConfig.cfg");
-        static FileInfo _clientOutput => new FileInfo($"{_clientConfigName}.out");
+        static FileInfo _clientConfigName(ClientMode mode) => new FileInfo($"client.{mode}.cfg");
+        static FileInfo _clientOutput(ClientMode mode) => new FileInfo($"{_clientConfigName(mode)}.out");
 
-        private static string getConfigPath(DirectoryInfo directory)
+        private static string getConfigPath(DirectoryInfo directory, ClientMode mode)
         {
-            return Path.Combine(directory.FullName, _clientConfigName.Name);
+            return Path.Combine(directory.FullName, _clientConfigName(mode).Name);
         }
 
         private static CommandInfo getCommandInfo(DirectoryInfo directory, int port, ClientMode mode, int clientTimeout = 1000)
         {
-            var configPath = getConfigPath(directory);
+            var configPath = getConfigPath(directory, mode);
 
             var serverConfig = new ServerConfig();
 
@@ -45,9 +45,9 @@ namespace Colosseum.Services.Client
             return gene.ToString();
         }
 
-        public static async Task InitializeClientFiles(DirectoryInfo directory, Gene gene, CancellationToken cancellationToken = default)
+        public static async Task InitializeClientFiles(DirectoryInfo directory, Gene gene, ClientMode mode, CancellationToken cancellationToken = default)
         {
-            Debug.WriteLine($"initalizing client file for gene id {gene.Id} in directory {directory.FullName}");
+            Debug.WriteLine($"initializing client file for gene id {gene.Id} in directory {directory.FullName}");
 
             var clientJarFile = new FileInfo(_clientName.FullName);
             if (!clientJarFile.Exists)
@@ -55,14 +55,14 @@ namespace Colosseum.Services.Client
                 throw new FileNotFoundException($"client file doesn't exist at {clientJarFile.FullName}");
             }
 
-            var clientConfigFile = new FileInfo(Path.Combine(directory.FullName, _clientConfigName.Name));
+            var clientConfigFile = new FileInfo(Path.Combine(directory.FullName, _clientConfigName(mode).Name));
             if (clientConfigFile.Exists)
             {
                 clientConfigFile.Delete();
             }
             await File.WriteAllTextAsync(clientConfigFile.FullName, getConfig(gene), cancellationToken);
 
-            Debug.WriteLine($"end of initalizing client file for gene id {gene.Id} in directory {directory.FullName}");
+            Debug.WriteLine($"end of initializing client file for gene id {gene.Id} in directory {directory.FullName}");
         }
 
         public static async Task<ProcessPayload> RunClient(DirectoryInfo directory, int port, ClientMode mode, int clientTimeout = 1000, CancellationToken cancellationToken = default)
@@ -71,26 +71,13 @@ namespace Colosseum.Services.Client
 
             ProcessPayload payload = new ProcessPayload();
 
-            void errorReceived(string line)
-            {
-                try
-                {
-                    payload.Kill();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"failed to kill process of the client located in {directory.FullName}. error:{Environment.NewLine}{ex}{Environment.NewLine}");
-                }
-            }
-
             var serverCommand = getCommandInfo(directory, port, mode, clientTimeout);
-            var logDir = directory.CreateSubdirectory("process-info");
+            var logDir = directory.CreateSubdirectory($"client-{mode}-process-info");
             var task = Task.Run(async () => await OperationSystemService.RunCommandAsync(
                 serverCommand,
                 payload,
                 logDir,
                 directory.FullName,
-                errorReveived: errorReceived,
                 cancellationToken: cancellationToken), cancellationToken);
             while (payload == null)
             {
@@ -105,9 +92,9 @@ namespace Colosseum.Services.Client
             return payload;
         }
 
-        public static string GetClientOutputPath(DirectoryInfo directory)
+        public static string GetClientOutputPath(DirectoryInfo directory, ClientMode mode)
         {
-            return Path.Combine(directory.FullName, _clientOutput.Name);
+            return Path.Combine(directory.FullName, _clientOutput(mode).Name);
         }
     }
 }
