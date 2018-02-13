@@ -238,7 +238,7 @@ namespace Colosseum.App
             }
 
             var containerInfoPath = Path.Combine(rootDirectory.FullName, "container.info");
-            await File.WriteAllTextAsync(containerInfoPath, await DockerService.GetContainerInfo(containerId, cancellationToken));
+            await File.AppendAllLinesAsync(containerInfoPath, await DockerService.GetContainerInfo(containerId, showAll: true, cancellationToken: cancellationToken));
 
             var containerLogPath = Path.Combine(rootDirectory.FullName, "container.log");
             await File.WriteAllTextAsync(containerLogPath, await DockerService.ContainerLogAsync(containerId));

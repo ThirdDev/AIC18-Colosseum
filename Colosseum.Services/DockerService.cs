@@ -33,14 +33,14 @@ namespace Colosseum.Services
 
         public static async Task<bool> IsContainerRunningAsync(string containerId, CancellationToken cancellationToken = default)
         {
-            var result = await runDockerCommandWithOutputAsync($"ps --filter \"id={containerId}\"", cancellationToken: cancellationToken);
+            var result = await GetContainerInfo(containerId, showAll: false, cancellationToken: cancellationToken);
             return result.Count == 2;
         }
 
-        public static async Task<string> GetContainerInfo(string containerId, CancellationToken cancellationToken = default)
+        public static async Task<List<string>> GetContainerInfo(string containerId, bool showAll, CancellationToken cancellationToken = default)
         {
-            var result = await runDockerCommandWithOutputAsync($"ps --filter \"id={containerId}\"", cancellationToken: cancellationToken);
-            return string.Join(Environment.NewLine, result);
+            var result = await runDockerCommandWithOutputAsync($"ps{(showAll ? " -a" : "")} --filter \"id={containerId}\"", cancellationToken: cancellationToken);
+            return result;
         }
 
         public static async Task<string> ContainerLogAsync(string containerId, CancellationToken cancellationToken = default)
