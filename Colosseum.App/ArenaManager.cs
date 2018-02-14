@@ -248,7 +248,7 @@ namespace Colosseum.App
             var backupPath = attackClientDir.CreateSubdirectory($"failed-attempt-{tryCount}").FullName;
             
             foreach (var file in attackClientDir.GetFiles())
-                file.CopyTo(backupPath);
+                file.CopyTo(Path.Combine(backupPath, file.Name));
         }
 
         private static async Task<bool> runCompetitionInsideContainer(int geneId, DirectoryInfo rootDirectory, CancellationToken cancellationToken = default)
