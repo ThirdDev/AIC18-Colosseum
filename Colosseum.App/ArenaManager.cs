@@ -150,7 +150,7 @@ namespace Colosseum.App
                     TimeSpan processElapsed = processStopwatch.Elapsed;
                     Console.Write($"{processElapsed.ToString(@"mm\:ss\.fff").PadRight(16)}");
                     TimeSpan arenaElapse = DateTime.Now - _arenaStartTime;
-                    Console.Write($"{arenaElapse.ToString(@"mm\:ss\.fff").PadRight(24)}");
+                    Console.Write($"{arenaElapse.ToString(@"hh\:mm\:ss\.fff").PadRight(24)}");
                     TimeSpan allProcessAverage = arenaElapse / processCount;
                     double taskPerMinute = TimeSpan.FromSeconds(60) / allProcessAverage;
                     Console.Write($"{taskPerMinute.ToString("F2").PadRight(12)}");
