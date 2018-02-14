@@ -1,2 +1,2 @@
-docker kill $(docker ps -aq)
-# docker rm $(docker ps -aq)
+docker kill $(docker ps -q)
+docker rm $(docker ps -aq)
