@@ -141,7 +141,7 @@ namespace Colosseum.App
 
                     string successState = "";
                     if (competitionResult.Status == CompetitionResultStatus.Successful)
-                        successState = "x" + (competitionResult.TryCount == 0 ? "" : competitionResult.TryCount.ToString());
+                        successState = "x" + (competitionResult.TryCount == 1 ? "" : competitionResult.TryCount.ToString());
                     Console.Write($"{successState.PadRight(8)}");
 
                     var score = gene.Score.HasValue ? gene.Score.ToString() : "null";
@@ -208,14 +208,14 @@ namespace Colosseum.App
             await ClientManager.InitializeClientFiles(attackClientDir, gene, ClientMode.attack, cancellationToken);
             await ClientManager.InitializeClientFiles(defendClientDir, gene, ClientMode.defend, cancellationToken);
 
-            int tryCount = 0;
+            int tryCount = 1;
 
             if (useContainer)
             {
                 while (await runCompetitionInsideContainer(gene.Id, rootDirectory, cancellationToken) == false)
                 {
                     tryCount++;
-                    if (tryCount >= maximumTryCount)
+                    if (tryCount > maximumTryCount)
                         return new CompetitionResult
                         {
                             Status = CompetitionResultStatus.Failed,
