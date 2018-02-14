@@ -45,6 +45,21 @@ namespace Colosseum.App
             Console.WriteLine($"welcome to Colosseum. enjoy the show :)");
 
             List<Gene> lastGeneration = null;
+            var lastGenerationFile = new FileInfo("generationInfo.json");
+            if (lastGenerationFile.Exists)
+            {
+                Console.WriteLine($"loading last generation from {lastGenerationFile.FullName}");
+                try
+                {
+                    var content = await File.ReadAllTextAsync(lastGenerationFile.FullName, cancellationToken);
+                    lastGeneration = JsonConvert.DeserializeObject<List<Gene>>(content);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"loading last generation failed. error:{Environment.NewLine}{ex}");
+                }
+            }
+
             int generationNumber = 1;
 
             var arenaDir = new DirectoryInfo("arena");
