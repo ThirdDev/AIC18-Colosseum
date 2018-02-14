@@ -141,7 +141,7 @@ namespace Colosseum.App
 
                     string successState = "";
                     if (competitionResult.Status == CompetitionResultStatus.Successful)
-                        successState = "x" + (competitionResult.TryCount == 1 ? "" : competitionResult.TryCount.ToString());
+                        successState = "x" + (competitionResult.TryCount == 0 ? "" : competitionResult.TryCount.ToString());
                     Console.Write($"{successState.PadRight(8)}");
 
                     var score = gene.Score.HasValue ? gene.Score.ToString() : "null";
