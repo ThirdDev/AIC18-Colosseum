@@ -214,6 +214,9 @@ namespace Colosseum.App
             {
                 while (await runCompetitionInsideContainer(gene.Id, rootDirectory, cancellationToken) == false)
                 {
+                    backupAttempt(attackClientDir, tryCount);
+                    backupAttempt(defendClientDir, tryCount);
+
                     tryCount++;
                     if (tryCount > maximumTryCount)
                         return new CompetitionResult
@@ -238,6 +241,14 @@ namespace Colosseum.App
                     Status = success ? CompetitionResultStatus.Successful : CompetitionResultStatus.Failed,
                 };
             }
+        }
+
+        private static void backupAttempt(DirectoryInfo attackClientDir, int tryCount)
+        {
+            var backupPath = attackClientDir.CreateSubdirectory($"failed-attempt-{tryCount}").FullName;
+            
+            foreach (var file in attackClientDir.GetFiles())
+                file.CopyTo(backupPath);
         }
 
         private static async Task<bool> runCompetitionInsideContainer(int geneId, DirectoryInfo rootDirectory, CancellationToken cancellationToken = default)
