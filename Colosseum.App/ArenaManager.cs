@@ -75,7 +75,7 @@ namespace Colosseum.App
                 Console.WriteLine($"running generation #{generationNumber}");
                 Console.WriteLine($"this generation will have {newGeneration.Count} genes and we'll process up to {geneProcessLimit} genes simultaneously");
                 Console.WriteLine("-----------");
-                Console.WriteLine("no.\tsuccess\tscore\t\t\tid\t\telapsed\t\t\tsystem elapsed\t\t\tPPM\t\t\tcurrent time");
+                Console.WriteLine("no.\tsuccess\tscore\t\tid\t\telapsed\t\tsystem elapsed\t\tPPM\t\tcurrent time");
 
                 foreach (var gene in newGeneration)
                 {
@@ -145,15 +145,15 @@ namespace Colosseum.App
                     Console.Write($"{successState.PadRight(8)}");
 
                     var score = gene.Score.HasValue ? gene.Score?.ToString("F2") : "null";
-                    Console.Write($"{score.ToString().PadRight(24)}");
+                    Console.Write($"{score.ToString().PadRight(16)}");
                     Console.Write($"{gene.Id.ToString().PadRight(16)}");
                     TimeSpan processElapsed = processStopwatch.Elapsed;
-                    Console.Write($"{processElapsed.ToString(@"mm\:ss\.fff").PadRight(24)}");
+                    Console.Write($"{processElapsed.ToString(@"mm\:ss\.fff").PadRight(16)}");
                     TimeSpan arenaElapse = DateTime.Now - _arenaStartTime;
                     Console.Write($"{arenaElapse.ToString(@"mm\:ss\.fff").PadRight(24)}");
                     TimeSpan allProcessAverage = arenaElapse / processCount;
                     double taskPerMinute = TimeSpan.FromSeconds(60) / allProcessAverage;
-                    Console.Write($"{taskPerMinute.ToString("F2").PadRight(24)}");
+                    Console.Write($"{taskPerMinute.ToString("F2").PadRight(12)}");
                     Console.Write(DateTime.Now.ToString("s"));
                 }
                 finally
