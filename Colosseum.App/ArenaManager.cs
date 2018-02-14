@@ -21,7 +21,7 @@ namespace Colosseum.App
         static DateTime _arenaStartTime = DateTime.Now;
         static readonly TimeSpan maximumAllowedRunTime = TimeSpan.FromSeconds(45);
         static readonly int maximumTryCount = 3;
-        
+
 
         static readonly GenerationGenerator _generationGenerator = new GenerationGenerator();
 
@@ -199,60 +199,64 @@ namespace Colosseum.App
 
         private static async Task<CompetitionResult> runCompetition(DirectoryInfo rootDirectory, Gene gene, int port, string mapPath, bool useContainer, CancellationToken cancellationToken = default)
         {
-            var serverDir = getGeneServerDirectory(rootDirectory);
-            var attackClientDir = getGeneAttackClientDirectory(rootDirectory);
-            var defendClientDir = getGeneDefendClientDirectory(rootDirectory);
-
-            await ServerManager.InitializeServerFiles(serverDir, mapPath, (!useContainer) ? port : 7099, cancellationToken);
-
-            await ClientManager.InitializeClientFiles(attackClientDir, gene, ClientMode.attack, cancellationToken);
-            await ClientManager.InitializeClientFiles(defendClientDir, gene, ClientMode.defend, cancellationToken);
-
             int tryCount = 1;
 
-            if (useContainer)
+            while (tryCount <= maximumTryCount)
             {
-                while (await runCompetitionInsideContainer(gene.Id, rootDirectory, cancellationToken) == false)
-                {
-                    // attack and defend folders are the same now, so calling backupAttempt for one of them is enough.
-                    backupAttempt(attackClientDir, tryCount);
+                var result = false;
 
-                    tryCount++;
-                    if (tryCount > maximumTryCount)
-                        return new CompetitionResult
-                        {
-                            Status = CompetitionResultStatus.Failed,
-                            TryCount = tryCount,
-                        };
+                if (useContainer)
+                {
+                    result = await runCompetitionInsideContainer(gene, port, mapPath, rootDirectory, useContainer, cancellationToken);
+                    if (!result)
+                    {
+                        backupAttempt(rootDirectory, tryCount);
+                    }
+                }
+                else
+                {
+                    result = await runCompetitionInsideHost(gene, port, mapPath, rootDirectory, useContainer, cancellationToken);
                 }
 
-                return new CompetitionResult
+                if (result)
                 {
-                    Status = CompetitionResultStatus.Successful,
-                    TryCount = tryCount,
-                };
-            }
-            else
-            {
-                var success = await runCompetitionInsideHost(gene.Id, port, serverDir, attackClientDir, defendClientDir, cancellationToken);
+                    return new CompetitionResult
+                    {
+                        Status = CompetitionResultStatus.Successful,
+                        TryCount = tryCount,
+                    };
+                }
 
-                return new CompetitionResult
-                {
-                    Status = success ? CompetitionResultStatus.Successful : CompetitionResultStatus.Failed,
-                };
+                tryCount++;
             }
+
+            return new CompetitionResult
+            {
+                Status = CompetitionResultStatus.Failed,
+                TryCount = tryCount - 1,
+            };
+        }
+
+        private static async Task initializeCompeteionDirectory(Gene gene, int port, string mapPath, bool useContainer, DirectoryInfo rootDirectory, CancellationToken cancellationToken)
+        {
+            await ServerManager.InitializeServerFiles(rootDirectory, mapPath, (!useContainer) ? port : 7099, cancellationToken);
+
+            await ClientManager.InitializeClientFiles(rootDirectory, gene, ClientMode.attack, cancellationToken);
+            await ClientManager.InitializeClientFiles(rootDirectory, gene, ClientMode.defend, cancellationToken);
         }
 
         private static void backupAttempt(DirectoryInfo attackClientDir, int tryCount)
         {
             var backupPath = attackClientDir.CreateSubdirectory($"failed-attempt-{tryCount}").FullName;
-            
+
             foreach (var file in attackClientDir.GetFiles())
                 file.CopyTo(Path.Combine(backupPath, file.Name));
         }
 
-        private static async Task<bool> runCompetitionInsideContainer(int geneId, DirectoryInfo rootDirectory, CancellationToken cancellationToken = default)
+        private static async Task<bool> runCompetitionInsideContainer(Gene gene, int port, string mapPath, DirectoryInfo rootDirectory, bool useContainer, CancellationToken cancellationToken = default)
         {
+            await initializeCompeteionDirectory(gene, port, mapPath, useContainer, rootDirectory, cancellationToken);
+
             var containerId = await DockerService.RunArenaAsync(Program.DockerImageName, rootDirectory.FullName);
             var startTime = DateTime.Now;
             bool hasFinished = true;
@@ -290,23 +294,25 @@ namespace Colosseum.App
             return hasFinished;
         }
 
-        private static async Task<bool> runCompetitionInsideHost(int geneId, int port, DirectoryInfo serverDir, DirectoryInfo attackClientDir, DirectoryInfo defendClientDir, CancellationToken cancellationToken)
+        private static async Task<bool> runCompetitionInsideHost(Gene gene, int port, string mapPath, DirectoryInfo rootDirectory, bool useContainer, CancellationToken cancellationToken)
         {
+            await initializeCompeteionDirectory(gene, port, mapPath, useContainer, rootDirectory, cancellationToken);
+
             bool hasFinished = true;
 
-            var serverProcessPayload = await ServerManager.RunServer(serverDir, cancellationToken);
+            var serverProcessPayload = await ServerManager.RunServer(rootDirectory, cancellationToken);
             if (!serverProcessPayload.IsRunning())
             {
                 throw new Exception("server is not running");
             }
 
-            var attackClientPayload = await ClientManager.RunClient(attackClientDir, port, ClientMode.attack, cancellationToken: cancellationToken);
+            var attackClientPayload = await ClientManager.RunClient(rootDirectory, port, ClientMode.attack, cancellationToken: cancellationToken);
             if (!attackClientPayload.IsRunning())
             {
                 throw new Exception("attack client is not running");
             }
 
-            var defendClientPayload = await ClientManager.RunClient(defendClientDir, port, ClientMode.defend, cancellationToken: cancellationToken);
+            var defendClientPayload = await ClientManager.RunClient(rootDirectory, port, ClientMode.defend, cancellationToken: cancellationToken);
             if (!defendClientPayload.IsRunning())
             {
                 throw new Exception("defend client is not running");
@@ -343,8 +349,8 @@ namespace Colosseum.App
 
             if (hasFinished)
             {
-                var defenderClientOutputPath = ClientManager.GetClientOutputPath(defendClientDir, ClientMode.defend);
-                var attackerClientOutputPath = ClientManager.GetClientOutputPath(attackClientDir, ClientMode.attack);
+                var defenderClientOutputPath = ClientManager.GetClientOutputPath(rootDirectory, ClientMode.defend);
+                var attackerClientOutputPath = ClientManager.GetClientOutputPath(rootDirectory, ClientMode.attack);
 
                 hasFinished = File.Exists(defenderClientOutputPath) && File.Exists(attackerClientOutputPath);
             }
