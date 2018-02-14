@@ -148,9 +148,9 @@ namespace Colosseum.App
                     Console.Write($"{score.ToString().PadRight(24)}");
                     Console.Write($"{gene.Id.ToString().PadRight(16)}");
                     TimeSpan processElapsed = processStopwatch.Elapsed;
-                    Console.Write($"{processElapsed.ToString().PadRight(24)}");
+                    Console.Write($"{processElapsed.ToString(@"mm\:ss\.fff").PadRight(24)}");
                     TimeSpan arenaElapse = DateTime.Now - _arenaStartTime;
-                    Console.Write($"{arenaElapse.ToString().PadRight(24)}");
+                    Console.Write($"{arenaElapse.ToString(@"mm\:ss\.fff").PadRight(24)}");
                     TimeSpan allProcessAverage = arenaElapse / processCount;
                     double taskPerMinute = TimeSpan.FromSeconds(60) / allProcessAverage;
                     Console.Write($"{taskPerMinute.ToString("F2").PadRight(24)}");
