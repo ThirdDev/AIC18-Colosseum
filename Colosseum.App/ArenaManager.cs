@@ -20,7 +20,7 @@ namespace Colosseum.App
         private static int geneProcessLimit => 8;
         static DateTime _arenaStartTime = DateTime.Now;
         static readonly TimeSpan maximumAllowedRunTime = TimeSpan.FromSeconds(120);
-        static readonly int maximumTryCount = 2;
+        static readonly int maximumTryCount = 3;
         
 
         static readonly GenerationGenerator _generationGenerator = new GenerationGenerator();
