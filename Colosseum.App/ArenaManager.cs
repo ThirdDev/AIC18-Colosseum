@@ -28,10 +28,17 @@ namespace Colosseum.App
 
         public static async Task RunCompetitions(string mapPath, bool useContainer, bool useSwarm, CancellationToken cancellationToken = default)
         {
-            if (useContainer)
+            if (useSwarm)
             {
-                await DockerService.BuildImageAsync(Directory.GetCurrentDirectory(), Program.DockerImageName);
-                await DockerService.StopAndRemoveAllContainersAsync();
+
+            }
+            else
+            {
+                if (useContainer)
+                {
+                    await DockerService.BuildImageAsync(Directory.GetCurrentDirectory(), Program.DockerImageName);
+                    await DockerService.StopAndRemoveAllContainersAsync();
+                }
             }
 
             _arenaStartTime = DateTime.Now;
@@ -64,13 +71,20 @@ namespace Colosseum.App
 
                 var competitionTasks = new List<Task>();
 
-                if (useContainer)
+                if (useSwarm)
                 {
-                    await DockerService.StopAndRemoveAllContainersAsync();
+
                 }
                 else
                 {
-                    await cleanSystem(cancellationToken);
+                    if (useContainer)
+                    {
+                        await DockerService.StopAndRemoveAllContainersAsync();
+                    }
+                    else
+                    {
+                        await cleanSystem(cancellationToken);
+                    }
                 }
 
                 Console.WriteLine($"running generation #{generationNumber}");
@@ -211,7 +225,16 @@ namespace Colosseum.App
             return tmpDir;
         }
 
-        static HttpClient _httpClient = new HttpClient();
+        static HttpClient _httpClient;
+
+        static ArenaManager()
+        {
+            _httpClient = new HttpClient
+            {
+                Timeout = maximumAllowedRunTime
+            };
+            _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+        }
 
 
         private static async Task<bool> runCompetition(DirectoryInfo rootDirectory, Gene gene, int port, string mapPath, bool useContainer, bool useSwarm, CancellationToken cancellationToken = default)
@@ -234,7 +257,7 @@ namespace Colosseum.App
 
                 var httpContent = new StringContent(JsonConvert.SerializeObject(payload));
 
-                var response = await _httpClient.PostAsync("127.0.0.1:74275", httpContent);
+                var response = await _httpClient.PostAsync("http://127.0.0.1:32768/api/arena", httpContent);
 
                 using (var fs = geneTempFile.Create())
                 {
