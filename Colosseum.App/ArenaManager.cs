@@ -144,7 +144,7 @@ namespace Colosseum.App
                         successState = "x" + (competitionResult.TryCount == 1 ? "" : competitionResult.TryCount.ToString());
                     Console.Write($"{successState.PadRight(8)}");
 
-                    var score = gene.Score.HasValue ? gene.Score.ToString() : "null";
+                    var score = gene.Score.HasValue ? gene.Score?.ToString("F2") : "null";
                     Console.Write($"{score.ToString().PadRight(24)}");
                     Console.Write($"{gene.Id.ToString().PadRight(16)}");
                     TimeSpan processElapsed = processStopwatch.Elapsed;
@@ -153,7 +153,7 @@ namespace Colosseum.App
                     Console.Write($"{arenaElapse.ToString().PadRight(24)}");
                     TimeSpan allProcessAverage = arenaElapse / processCount;
                     double taskPerMinute = TimeSpan.FromSeconds(60) / allProcessAverage;
-                    Console.Write($"{taskPerMinute.ToString().PadRight(24)}");
+                    Console.Write($"{taskPerMinute.ToString("F2").PadRight(24)}");
                     Console.Write(DateTime.Now.ToString("s"));
                 }
                 finally
