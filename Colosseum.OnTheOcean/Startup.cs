@@ -34,6 +34,10 @@ namespace Colosseum.OnTheOcean
                 app.UseDeveloperExceptionPage();
             }
 
+            //Accept All HTTP Request Methods from all origins
+            app.UseCors(builder =>
+                builder.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
+
             app.UseMvc();
         }
     }
