@@ -20,7 +20,8 @@ namespace Colosseum.App
         private static int geneProcessLimit => 8;
         static DateTime _arenaStartTime = DateTime.Now;
         static readonly TimeSpan maximumAllowedRunTime = TimeSpan.FromSeconds(120);
-
+        static readonly int maximumTryCount = 2;
+        
 
         static readonly GenerationGenerator _generationGenerator = new GenerationGenerator();
 
@@ -109,26 +110,18 @@ namespace Colosseum.App
 
                 var geneDir = generationDir.CreateSubdirectory(gene.Id.ToString());
                 geneDir.Create();
-                var success = await runCompetition(geneDir, gene, port, mapPath, useContainer, cancellationToken);
-                if (success)
+                var competitionResult = await runCompetition(geneDir, gene, port, mapPath, useContainer, cancellationToken);
+                if (competitionResult.Status == CompetitionResultStatus.Successful)
                 {
                     var defenseDir = getGeneDefendClientDirectory(geneDir);
                     var defenseOutputPath = ClientManager.GetClientOutputPath(defenseDir, ClientMode.defend);
-                    if (File.Exists(defenseOutputPath))
+                    var scoreString = (await File.ReadAllLinesAsync(defenseOutputPath, cancellationToken)).First();
+                    if (double.TryParse(scoreString, out double score))
                     {
-                        var scoreString = (await File.ReadAllLinesAsync(defenseOutputPath, cancellationToken)).First();
-                        if (double.TryParse(scoreString, out double score))
-                        {
-                            gene.Score = score;
-                        }
-                        else
-                        {
-                            gene.Score = null;
-                        }
+                        gene.Score = score;
                     }
                     else
                     {
-                        success = false;
                         gene.Score = null;
                     }
                 }
@@ -145,7 +138,12 @@ namespace Colosseum.App
                     _geneProcessTimes.AddThreadSafe(processStopwatch.Elapsed);
                     int processCount = _geneProcessTimes.Count;
                     Console.Write($"{processCount.ToString().PadRight(8)}");
-                    Console.Write($"{(success ? "x" : "").PadRight(8)}");
+
+                    string successState = "";
+                    if (competitionResult.Status == CompetitionResultStatus.Successful)
+                        successState = "x" + (competitionResult.TryCount == 1 ? "" : competitionResult.TryCount.ToString());
+                    Console.Write($"{successState.PadRight(8)}");
+
                     var score = gene.Score.HasValue ? gene.Score.ToString() : "null";
                     Console.Write($"{score.ToString().PadRight(24)}");
                     Console.Write($"{gene.Id.ToString().PadRight(16)}");
@@ -199,7 +197,7 @@ namespace Colosseum.App
             return rootDirectory;
         }
 
-        private static async Task<bool> runCompetition(DirectoryInfo rootDirectory, Gene gene, int port, string mapPath, bool useContainer, CancellationToken cancellationToken = default)
+        private static async Task<CompetitionResult> runCompetition(DirectoryInfo rootDirectory, Gene gene, int port, string mapPath, bool useContainer, CancellationToken cancellationToken = default)
         {
             var serverDir = getGeneServerDirectory(rootDirectory);
             var attackClientDir = getGeneAttackClientDirectory(rootDirectory);
@@ -210,13 +208,35 @@ namespace Colosseum.App
             await ClientManager.InitializeClientFiles(attackClientDir, gene, ClientMode.attack, cancellationToken);
             await ClientManager.InitializeClientFiles(defendClientDir, gene, ClientMode.defend, cancellationToken);
 
+            int tryCount = 0;
+
             if (useContainer)
             {
-                return await runCompetitionInsideContainer(gene.Id, rootDirectory, cancellationToken);
+                while (await runCompetitionInsideContainer(gene.Id, rootDirectory, cancellationToken) == false)
+                {
+                    tryCount++;
+                    if (tryCount >= maximumTryCount)
+                        return new CompetitionResult
+                        {
+                            Status = CompetitionResultStatus.Failed,
+                            TryCount = tryCount,
+                        };
+                }
+
+                return new CompetitionResult
+                {
+                    Status = CompetitionResultStatus.Successful,
+                    TryCount = tryCount,
+                };
             }
             else
             {
-                return await runCompetitionInsideHost(gene.Id, port, serverDir, attackClientDir, defendClientDir, cancellationToken);
+                var success = await runCompetitionInsideHost(gene.Id, port, serverDir, attackClientDir, defendClientDir, cancellationToken);
+
+                return new CompetitionResult
+                {
+                    Status = success ? CompetitionResultStatus.Successful : CompetitionResultStatus.Failed,
+                };
             }
         }
 
@@ -235,6 +255,14 @@ namespace Colosseum.App
                     break;
                 }
                 await Task.Delay(1000);
+            }
+
+            if (hasFinished)
+            {
+                var defenderClientOutputPath = ClientManager.GetClientOutputPath(rootDirectory, ClientMode.defend);
+                var attackerClientOutputPath = ClientManager.GetClientOutputPath(rootDirectory, ClientMode.attack);
+
+                hasFinished = File.Exists(defenderClientOutputPath) && File.Exists(attackerClientOutputPath);
             }
 
             var containerInfoPath = Path.Combine(rootDirectory.FullName, "container.info");
@@ -299,6 +327,15 @@ namespace Colosseum.App
             if (serverProcessPayload.IsRunning())
             {
                 serverProcessPayload.Kill();
+            }
+
+
+            if (hasFinished)
+            {
+                var defenderClientOutputPath = ClientManager.GetClientOutputPath(defendClientDir, ClientMode.defend);
+                var attackerClientOutputPath = ClientManager.GetClientOutputPath(attackClientDir, ClientMode.attack);
+
+                hasFinished = File.Exists(defenderClientOutputPath) && File.Exists(attackerClientOutputPath);
             }
 
             return hasFinished;
