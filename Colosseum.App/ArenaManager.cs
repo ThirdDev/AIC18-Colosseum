@@ -214,8 +214,8 @@ namespace Colosseum.App
             {
                 while (await runCompetitionInsideContainer(gene.Id, rootDirectory, cancellationToken) == false)
                 {
+                    // attack and defend folders are the same now, so calling backupAttempt for one of them is enough.
                     backupAttempt(attackClientDir, tryCount);
-                    backupAttempt(defendClientDir, tryCount);
 
                     tryCount++;
                     if (tryCount > maximumTryCount)
