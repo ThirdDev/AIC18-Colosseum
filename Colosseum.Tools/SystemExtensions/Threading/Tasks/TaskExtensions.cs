@@ -1,6 +1,8 @@
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace System.Threading.Tasks
+namespace Colosseum.Tools.SystemExtensions.Threading.Tasks
 {
     public static class TaskExtensionMethods
     {

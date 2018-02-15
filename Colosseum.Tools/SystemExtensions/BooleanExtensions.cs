@@ -1,4 +1,4 @@
-﻿namespace System
+﻿namespace Colosseum.Tools.SystemExtensions
 {
     public static class BooleanExtensions
     {

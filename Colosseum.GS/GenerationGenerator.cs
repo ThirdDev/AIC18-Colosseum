@@ -10,20 +10,20 @@ namespace Colosseum.GS
         private const double rangeOfMutaion = 0.05;
         public const int generationPopulation = 50;
 
-        private const double stdDrivationForLives = PartToLive*2/3;
-        
-        
-        public List<Gene> randomGeneration ()
+        private const double stdDrivationForLives = PartToLive * 2 / 3;
+
+
+        public List<Gene> RandomGeneration()
         {
-            Random random = new Random();
-            List<Gene> adamAndEveAndFriends = new List<Gene>(10);
-            
-            for (int j = 0; j < generationPopulation; j++)
+            var random = new Random();
+            var adamAndEveAndFriends = new List<Gene>(10);
+
+            for (var j = 0; j < generationPopulation; j++)
             {
                 var tmp = new Gene();
-                for (int i = 0; i < Gene.LengthOfGene; i++)
+                for (var i = 0; i < Gene.LengthOfGene; i++)
                 {
-                    double weight = (random.NextDouble() - 0.5) * 20;
+                    var weight = (random.NextDouble() - 0.5) * 20;
                     tmp.GenomesList.Add(weight);
                 }
                 adamAndEveAndFriends.Add(tmp);
@@ -35,41 +35,41 @@ namespace Colosseum.GS
         //Last Generation should be evaluted beforehead
         public List<Gene> Genetic(List<Gene> lastGeneration)
         {
-            if(lastGeneration==null)
+            if (lastGeneration == null)
             {
-                lastGeneration = randomGeneration();
+                lastGeneration = RandomGeneration();
             }
             lastGeneration = lastGeneration.OrderByDescending(x => x.Score).ToList();
-            List<Gene> newGeneration = lastGeneration.GetRange(0, (int)(lastGeneration.Count * PartToLive));
-            newGeneration.AddRange(ChildrenMaker(lastGeneration,(int)(lastGeneration.Count * (1-PartToLive))));
+            var newGeneration = lastGeneration.GetRange(0, (int)(lastGeneration.Count * PartToLive));
+            newGeneration.AddRange(ChildrenMaker(lastGeneration, (int)(lastGeneration.Count * (1 - PartToLive))));
             return newGeneration;
         }
-        
-        
+
+
         //Generates a list of new genes based on the input generation.
         //The input generation should be a descending sorted list of genes based on their scores.
         public List<Gene> ChildrenMaker(List<Gene> generation, int count)
         {
-            List<Gene> children = new List<Gene>(count);
-            Random random = new Random();
-            for(int j = 0 ; j < count ; j++)
+            var children = new List<Gene>(count);
+            var random = new Random();
+            for (var j = 0; j < count; j++)
             {
-                int indexDad = GetRandomParentIndex(random, generation.Count);
-                int indexMom = GetRandomParentIndex(random, generation.Count);
+                var indexDad = getRandomParentIndex(random, generation.Count);
+                var indexMom = getRandomParentIndex(random, generation.Count);
 
                 var tmp = new Gene();
-                for (int i = 0; i < Gene.LengthOfGene; i++)
+                for (var i = 0; i < Gene.LengthOfGene; i++)
                 {
-                    double randAns = random.NextDouble();
+                    var randAns = random.NextDouble();
                     if (randAns < rangeOfMutaion)
                     {
-                        double mean = (generation[indexDad].GenomesList[i] + generation[indexMom].GenomesList[i]) / 2;
-                        double derivation = Math.Abs(generation[indexDad].GenomesList[i] - mean);
-                        tmp.GenomesList.Add(GaussianRandom(random, mean , derivation));
+                        var mean = (generation[indexDad].GenomesList[i] + generation[indexMom].GenomesList[i]) / 2;
+                        var derivation = Math.Abs(generation[indexDad].GenomesList[i] - mean);
+                        tmp.GenomesList.Add(gaussianRandom(random, mean, derivation));
                     }
                     else
                     {
-                        randAns -= rangeOfMutaion/2;
+                        randAns -= rangeOfMutaion / 2;
                         if (randAns > 0.5)
                         {
                             tmp.GenomesList.Add(generation[indexDad].GenomesList[i]);
@@ -87,12 +87,12 @@ namespace Colosseum.GS
 
         }
 
-        private int GetRandomParentIndex(Random random, int count)
+        private int getRandomParentIndex(Random random, int count)
         {
             double randomIndex;
             do
             {
-                randomIndex = GaussianRandom(random, 0, stdDrivationForLives);
+                randomIndex = gaussianRandom(random, 0, stdDrivationForLives);
             } while (randomIndex >= 1);
 
             return (int)(randomIndex * count);
@@ -100,12 +100,12 @@ namespace Colosseum.GS
 
 
         //returns a normal random in range of (0,1)
-        private double GaussianRandom(Random random , double mean , double stdDrivation)
+        private double gaussianRandom(Random random, double mean, double stdDrivation)
         {
-            
-            double u1 = 1.0-random.NextDouble(); //uniform(0,1] random doubles
-            double u2 = 1.0-random.NextDouble();
-            double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) *
+
+            var u1 = 1.0 - random.NextDouble(); //uniform(0,1] random doubles
+            var u2 = 1.0 - random.NextDouble();
+            var randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) *
                                    Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
             return Math.Abs(mean + randStdNormal * stdDrivation);
         }

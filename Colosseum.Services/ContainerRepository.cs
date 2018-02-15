@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,7 +16,7 @@ namespace Colosseum.Services
 
     public static class ContainerRepository
     {
-        private static List<ContainerInfo> containers = new List<ContainerInfo>();
+        private static readonly List<ContainerInfo> _containers = new List<ContainerInfo>();
 
         public static async Task InitalizeContainers(int count, string imageName, CancellationToken cancellationToken = default)
         {
@@ -31,7 +29,7 @@ namespace Colosseum.Services
                 subdir.Delete(true);
             }
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 var containerDir = containerHomeDir.CreateSubdirectory(i.ToString());
                 var id = await DockerService.RunArenaAsync(imageName, containerDir.FullName, cancellationToken);
@@ -40,13 +38,13 @@ namespace Colosseum.Services
                     Id = id,
                     FilesDirectory = containerDir
                 };
-                containers.Add(containerInfo);
+                _containers.Add(containerInfo);
             }
         }
 
         public static ContainerInfo GetAFreeContainer()
         {
-            var container = containers.FirstOrDefault(x => x.IsAvailable) ?? GetAFreeContainer();
+            var container = _containers.FirstOrDefault(x => x.IsAvailable) ?? GetAFreeContainer();
             container.FilesDirectory.Delete(true);
             container.FilesDirectory.Create();
             return container;

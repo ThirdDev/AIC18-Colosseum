@@ -1,6 +1,5 @@
 ﻿using Colosseum.GS;
 using Colosseum.Services.Server;
-using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -35,8 +34,6 @@ namespace Colosseum.Services.Client
             {
                 FileName = @"C:\ProgramData\Oracle\Java\javapath\java.EXE",
                 Args = $"-Xms100m -Xmx1g -jar \"{_clientName.FullName}\" 127.0.0.1 {port} {serverConfig.UIToken} {clientTimeout} {mode} \"{configPath}\"",
-                RequiresBash = false,
-                HasStandardInput = false
             };
         }
 
@@ -69,23 +66,19 @@ namespace Colosseum.Services.Client
         {
             Debug.WriteLine($"running client file in directory {directory.FullName} in mode {mode}");
 
-            ProcessPayload payload = new ProcessPayload();
+            var payload = new ProcessPayload();
 
             var serverCommand = getCommandInfo(directory, port, mode, clientTimeout);
             var logDir = directory.CreateSubdirectory($"client-{mode}-process-info");
-            var task = Task.Run(async () => await OperationSystemService.RunCommandAsync(
+            var unused = Task.Run(async () => await OperationSystemService.RunCommandAsync(
                 serverCommand,
                 payload,
                 logDir,
                 directory.FullName,
                 cancellationToken: cancellationToken), cancellationToken);
-            while (payload == null)
-            {
-                await Task.Delay(100);
-            }
             while (!payload.IsRunning())
             {
-                await Task.Delay(100);
+                await Task.Delay(100, cancellationToken);
             }
 
             Debug.WriteLine($"returning payload of client file in directory {directory.FullName} in mode {mode}");

@@ -1,6 +1,4 @@
-﻿using Colosseum.Services;
-using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 
 namespace Colosseum.App
@@ -9,7 +7,7 @@ namespace Colosseum.App
     {
         public static string DockerImageName => "aic-standalone";
 
-        private static async Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var mapFile = new FileInfo("maps/map.map");
             await ArenaManager.RunCompetitions(mapFile.FullName, CompetetionMode.ContainerPerCompetetion);

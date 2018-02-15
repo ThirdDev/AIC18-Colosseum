@@ -2,17 +2,19 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Colosseum.Tools.SystemExtensions;
+using Colosseum.Tools.SystemExtensions.Collection.Generic;
+using Colosseum.Tools.SystemExtensions.Diagnostics;
 
 namespace Colosseum.Services
 {
-    public class OperationSystemService : IDisposable
+    public static class OperationSystemService
     {
-        private static readonly int initTime = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
         private static readonly List<Process> _processes = new List<Process>();
 
         public static async Task RunCommandAsync(
@@ -28,31 +30,26 @@ namespace Colosseum.Services
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var process = new Process();
-
-            process = new Process();
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.RedirectStandardInput = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.WorkingDirectory = workingDirectory;
-            if (commandInfo.RequiresBash)
+            Process process = new Process
             {
-                process.StartInfo.FileName = "powershell";
-                process.StartInfo.Arguments = "-NoLogo -s";
-            }
-            else
-            {
-                process.StartInfo.FileName = commandInfo.FileName;
-                process.StartInfo.Arguments = commandInfo.Args;
-            }
+                StartInfo =
+                {
+                    CreateNoWindow = true,
+                    RedirectStandardError = true,
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    WorkingDirectory = workingDirectory,
+                    FileName = commandInfo.FileName,
+                    Arguments = commandInfo.Args
+                }
+            };
 
             var logCommandInfoSemaphore = new SemaphoreSlim(1, 1);
             async Task<(string stdOut, string stdErr)> logFilePathAsync()
             {
                 var commandInfoFilePath = Path.Combine(logDir.FullName, "command.info");
-                await logCommandInfoSemaphore.WaitAsync();
+                await logCommandInfoSemaphore.WaitAsync(cancellationToken);
                 try
                 {
                     if (!File.Exists(commandInfoFilePath))
@@ -76,7 +73,7 @@ namespace Colosseum.Services
             errorReceived = errorReceived ?? (x => { });
             exited = exited ?? (() => { });
 
-            HashSet<object> processEndLocks = new HashSet<object>();
+            var processEndLocks = new HashSet<object>();
 
             process.OutputDataReceived += async (sender, data) =>
             {
@@ -92,10 +89,7 @@ namespace Colosseum.Services
                 }
                 finally
                 {
-                    if (processEndLocks != null)
-                    {
-                        processEndLocks.RemoveThreadSafe(endLock);
-                    }
+                    processEndLocks.RemoveThreadSafe(endLock);
                 }
             };
 
@@ -113,10 +107,7 @@ namespace Colosseum.Services
                 }
                 finally
                 {
-                    if (processEndLocks != null)
-                    {
-                        processEndLocks.RemoveThreadSafe(endLock);
-                    }
+                    processEndLocks.RemoveThreadSafe(endLock);
                 }
 
             };
@@ -132,10 +123,7 @@ namespace Colosseum.Services
                 }
                 finally
                 {
-                    if (processEndLocks != null)
-                    {
-                        processEndLocks.RemoveThreadSafe(endLock);
-                    }
+                    processEndLocks.RemoveThreadSafe(endLock);
                 }
             };
             #endregion
@@ -158,21 +146,6 @@ namespace Colosseum.Services
                 await writeCommandLogAsync((await logFilePathAsync()).stdOut, $"{DateTime.Now:s}: started.", log, cancellationToken);
                 process.BeginErrorReadLine();
                 process.BeginOutputReadLine();
-                if (commandInfo.RequiresBash)
-                {
-                    await process.StandardInput.WriteLineAsync(commandInfo.OneLineCommand);
-                    if (commandInfo.HasStandardInput)
-                    {
-                        await process.StandardInput.WriteLineAsync(commandInfo.GetStandardInput());
-                    }
-                }
-                else
-                {
-                    if (commandInfo.HasStandardInput)
-                    {
-                        await process.StandardInput.WriteLineAsync(commandInfo.GetStandardInput());
-                    }
-                }
             }
             else
             {
@@ -183,13 +156,10 @@ namespace Colosseum.Services
             if (cancellationToken.IsCancellationRequested)
                 process.Kill();
 
-            await Task.Run(async () => { while (processPayload.IsRunning()) { await Task.Delay(100); } }, cancellationToken);
-            await Task.Run(async () => { while (processEndLocks.ToList().Any()) { await Task.Delay(100); } }, cancellationToken);
-            await Task.Delay(commandInfo.WaitAfter, cancellationToken);
+            await Task.Run(async () => { while (processPayload.IsRunning()) { await Task.Delay(100, cancellationToken); } }, cancellationToken);
+            await Task.Run(async () => { while (processEndLocks.ToList().Any()) { await Task.Delay(100, cancellationToken); } }, cancellationToken);
 
             _processes.RemoveThreadSafe(process);
-            Random r = new Random();
-
         }
 
         private static readonly SemaphoreSlim writeCommandLogSemaphore = new SemaphoreSlim(1, 1);
@@ -200,7 +170,7 @@ namespace Colosseum.Services
             {
                 return;
             }
-            await writeCommandLogSemaphore.WaitAsync();
+            await writeCommandLogSemaphore.WaitAsync(cancellationToken);
             try
             {
                 await File.AppendAllTextAsync(filePath, $"{logText}{Environment.NewLine}", cancellationToken);
@@ -210,70 +180,27 @@ namespace Colosseum.Services
                 writeCommandLogSemaphore.Release();
             }
         }
-
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            Console.WriteLine($"disposing... $disposing: {disposing}");
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    foreach (var process in _processes)
-                    {
-                        process.Kill();
-                    }
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
-
-                disposedValue = true;
-            }
-        }
-
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~OSService() {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
-
-        // This code added to correctly implement the disposable pattern.
-        void IDisposable.Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
-        }
-        #endregion
     }
 
     public class CommandInfo
     {
         public string FileName { get; set; }
         public string Args { get; set; } = "";
-        public int WaitAfter { get; set; } = 0;
-        public bool RequiresBash { get; set; } = false;
-        public bool HasStandardInput { get; set; } = false;
-        [JsonIgnore]
-        public Func<string> GetStandardInput { get; set; }
 
+        [SuppressMessage("ReSharper", "UnusedMember.Global")]
         public string OneLineCommand => $"{FileName} {Args}";
 
         public static CommandInfo DockerCommand(string args) =>
             new CommandInfo
             {
                 FileName = @"C:\Program Files\Docker\Docker\Resources\bin\docker.EXE",
-                RequiresBash = false,
                 Args = args
             };
     }
 
     public class ProcessPayload
     {
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         public int? ProcessId { get; set; }
 
         public bool IsRunning()
@@ -309,6 +236,7 @@ namespace Colosseum.Services
             {
                 return;
             }
+            // ReSharper disable once PossibleInvalidOperationException
             Process.GetProcessById(ProcessId.Value).Kill();
             if (IsRunning())
             {

@@ -7,7 +7,7 @@ namespace Colosseum.GS
     {
         public int Id => GetHashCode();
         public const int LengthOfGene = 31 * 10;
-        public List<double> GenomesList { get; private set; } = new List<double>(LengthOfGene);
+        public List<double> GenomesList { get; } = new List<double>(LengthOfGene);
         public double? Score { get; set; }
 
         public override string ToString()
