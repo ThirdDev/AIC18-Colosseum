@@ -48,6 +48,8 @@ namespace Colosseum.App
                     await DockerService.StopAndRemoveAllContainersAsync(cancellationToken);
                     break;
                 case CompetetionMode.ReusableContainer:
+                    await DockerService.BuildImageAsync(Directory.GetCurrentDirectory(), Program.DockerImageName, cancellationToken);
+                    await DockerService.StopAndRemoveAllContainersAsync(cancellationToken);
                     await ContainerRepository.InitalizeContainers(_geneProcessLimit, Program.DockerImageName, cancellationToken);
                     break;
             }
