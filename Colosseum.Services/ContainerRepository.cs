@@ -11,7 +11,7 @@ namespace Colosseum.Services
     {
         public string Id { get; set; }
         public DirectoryInfo FilesDirectory { get; set; }
-        public bool IsAvailable => _semaphore.CurrentCount != 0;
+        public bool IsAvailable => _semaphore.CurrentCount != 0 && !DockerService.IsContainerRunningAsync(Id).Result;
         private SemaphoreSlim _semaphore => new SemaphoreSlim(1);
         public void Release() => _semaphore.Release();
         public Task WaitAsync(CancellationToken cancellationToken = default) => _semaphore.WaitAsync();
