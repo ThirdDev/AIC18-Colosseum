@@ -278,8 +278,7 @@ namespace Colosseum.App
 
             await initializeCompeteionDirectory(gene, 7099, mapPath, rootDirectory, cancellationToken);
 
-            var containerInfo = ContainerRepository.GetAFreeContainer();
-            await containerInfo.Semaphore.WaitAsync(cancellationToken);
+            var containerInfo = await ContainerRepository.GetAFreeContainer(cancellationToken);
             try
             {
                 foreach (var file in rootDirectory.GetFiles())
@@ -321,7 +320,7 @@ namespace Colosseum.App
             }
             finally
             {
-                containerInfo.Semaphore.Release();
+                containerInfo.Release();
             }
 
         }

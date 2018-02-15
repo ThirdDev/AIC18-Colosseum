@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Colosseum.Tools.SystemExtensions.IO;
 
 namespace Colosseum.Services
 {
@@ -10,8 +11,10 @@ namespace Colosseum.Services
     {
         public string Id { get; set; }
         public DirectoryInfo FilesDirectory { get; set; }
-        public bool IsAvailable => Semaphore.CurrentCount != 0;
-        public SemaphoreSlim Semaphore => new SemaphoreSlim(1);
+        public bool IsAvailable => _semaphore.CurrentCount != 0;
+        private SemaphoreSlim _semaphore => new SemaphoreSlim(1);
+        public void Release() => _semaphore.Release();
+        public Task WaitAsync(CancellationToken cancellationToken = default) => _semaphore.WaitAsync();
     }
 
     public static class ContainerRepository
@@ -42,12 +45,32 @@ namespace Colosseum.Services
             }
         }
 
-        public static ContainerInfo GetAFreeContainer()
+        private static readonly SemaphoreSlim _getAFreeDeviceSemaphoreSlim = new SemaphoreSlim(1);
+
+        public static async Task<ContainerInfo> GetAFreeContainer(CancellationToken cancellationToken = default)
         {
-            var container = _containers.FirstOrDefault(x => x.IsAvailable) ?? GetAFreeContainer();
-            container.FilesDirectory.Delete(true);
-            container.FilesDirectory.Create();
-            return container;
+            await _getAFreeDeviceSemaphoreSlim.WaitAsync(cancellationToken);
+            try
+            {
+                while (true)
+                {
+                    var container = _containers.FirstOrDefault(x => x.IsAvailable);
+                    if (container == null)
+                    {
+                        await Task.Delay(1000, cancellationToken);
+                        continue;
+                    }
+
+                    await container.WaitAsync(cancellationToken);
+                    container.FilesDirectory.DeleteForce();
+                    container.FilesDirectory.Create();
+                    return container;
+                }
+            }
+            finally
+            {
+                _getAFreeDeviceSemaphoreSlim.Release();
+            }
         }
     }
 }
