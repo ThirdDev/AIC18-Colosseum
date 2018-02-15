@@ -74,6 +74,15 @@ namespace Colosseum.Services
             await Task.WhenAll(tasks);
         }
 
+        public static async Task StartContainer(string contaierId, CancellationToken cancellationToken)
+        {
+            var result = await runDockerCommandWithOutputAsync($"start {contaierId}", cancellationToken: cancellationToken);
+            if (result.Count != 1 || !result[0].Equals(contaierId))
+            {
+                throw new Exception($"docker returned invalid result: {string.Join(Environment.NewLine, result)}");
+            }
+        }
+
 
         private static Task runDockerCommandAsync(string args, bool log, CancellationToken cancellationToken = default)
         {
