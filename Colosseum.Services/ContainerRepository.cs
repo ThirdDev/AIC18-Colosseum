@@ -29,7 +29,7 @@ namespace Colosseum.Services
 
             foreach (var subdir in containerHomeDir.GetDirectories())
             {
-                subdir.Delete(true);
+                subdir.DeleteForce();
             }
 
             for (var i = 0; i < count; i++)
