@@ -3,7 +3,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Colosseum.Services.Server
 {
-    class ServerConfig
+    internal class ServerConfig
     {
         public string Map { get; set; }
         public string Deploy { get; private set; } = "false";

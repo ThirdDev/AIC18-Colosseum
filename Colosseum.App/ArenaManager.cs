@@ -23,14 +23,14 @@ namespace Colosseum.App
 
     public static class ArenaManager
     {
-        static int _startPort => 8000;
+        private static int _startPort => 8000;
         private static int geneProcessLimit => 9;
-        static DateTime _arenaStartTime = DateTime.Now;
-        static readonly TimeSpan maximumAllowedRunTime = TimeSpan.FromSeconds(45);
-        static readonly int maximumTryCount = 3;
+        private static DateTime _arenaStartTime = DateTime.Now;
+        private static readonly TimeSpan maximumAllowedRunTime = TimeSpan.FromSeconds(45);
+        private static readonly int maximumTryCount = 3;
 
 
-        static readonly GenerationGenerator _generationGenerator = new GenerationGenerator();
+        private static readonly GenerationGenerator _generationGenerator = new GenerationGenerator();
 
         public static async Task RunCompetitions(string mapPath, CompetetionMode competetionMode, CancellationToken cancellationToken = default)
         {
@@ -133,9 +133,9 @@ namespace Colosseum.App
             }
         }
 
-        static SemaphoreSlim _geneProcessSemaphoreSlim = new SemaphoreSlim(geneProcessLimit);
-        static SemaphoreSlim _geneProcessLogSemaphoreSlim = new SemaphoreSlim(1);
-        static List<TimeSpan> _geneProcessTimes = new List<TimeSpan>();
+        private static SemaphoreSlim _geneProcessSemaphoreSlim = new SemaphoreSlim(geneProcessLimit);
+        private static SemaphoreSlim _geneProcessLogSemaphoreSlim = new SemaphoreSlim(1);
+        private static List<TimeSpan> _geneProcessTimes = new List<TimeSpan>();
 
         private static async Task processGene(Gene gene, string mapPath, List<Gene> lastGeneration, int port, DirectoryInfo generationDir, CompetetionMode competetionMode, CancellationToken cancellationToken)
         {
@@ -456,7 +456,7 @@ namespace Colosseum.App
             return hasFinished;
         }
 
-        static CommandInfo _cleanSystemCommand =>
+        private static CommandInfo _cleanSystemCommand =>
             new CommandInfo
             {
                 FileName = @"C:\WINDOWS\system32\taskkill.EXE",

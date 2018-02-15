@@ -7,9 +7,9 @@ namespace Colosseum.Services.Server
 {
     public static class ServerManager
     {
-        static FileInfo _serverJarFileName => new FileInfo("AIC18-Server.jar");
-        static FileInfo _serverConfigsFileName => new FileInfo("server.cfg");
-        static FileInfo _gameLogFileName => new FileInfo("game.log");
+        private static FileInfo _serverJarFileName => new FileInfo("AIC18-Server.jar");
+        private static FileInfo _serverConfigsFileName => new FileInfo("server.cfg");
+        private static FileInfo _gameLogFileName => new FileInfo("game.log");
 
         private static string getConfigPath(DirectoryInfo directory)
         {

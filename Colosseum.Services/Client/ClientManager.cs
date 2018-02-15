@@ -16,9 +16,9 @@ namespace Colosseum.Services.Client
 
     public static class ClientManager
     {
-        static FileInfo _clientName => new FileInfo("Client.jar");
-        static FileInfo _clientConfigName(ClientMode mode) => new FileInfo($"client.{mode}.cfg");
-        static FileInfo _clientOutput(ClientMode mode) => new FileInfo($"{_clientConfigName(mode)}.out");
+        private static FileInfo _clientName => new FileInfo("Client.jar");
+        private static FileInfo _clientConfigName(ClientMode mode) => new FileInfo($"client.{mode}.cfg");
+        private static FileInfo _clientOutput(ClientMode mode) => new FileInfo($"{_clientConfigName(mode)}.out");
 
         private static string getConfigPath(DirectoryInfo directory, ClientMode mode)
         {

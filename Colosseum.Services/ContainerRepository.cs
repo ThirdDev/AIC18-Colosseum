@@ -18,7 +18,7 @@ namespace Colosseum.Services
 
     public static class ContainerRepository
     {
-        static List<ContainerInfo> containers = new List<ContainerInfo>();
+        private static List<ContainerInfo> containers = new List<ContainerInfo>();
 
         public static async Task InitalizeContainers(int count, string imageName, CancellationToken cancellationToken = default)
         {
