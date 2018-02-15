@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Threading;
 
 namespace Colosseum.Tools.SystemExtensions.IO
 {
@@ -16,7 +18,24 @@ namespace Colosseum.Tools.SystemExtensions.IO
                 dir.DeleteForce();
             }
 
-            directoryInfo.Delete();
+            var retryCount = 0;
+            while (true)
+            {
+                try
+                {
+                    directoryInfo.Delete();
+                    break;
+                }
+                catch
+                {
+                    retryCount++;
+                    if (retryCount >= 10)
+                    {
+                        throw;
+                    }
+                    Thread.Sleep(1);
+                }
+            }
         }
     }
 }
