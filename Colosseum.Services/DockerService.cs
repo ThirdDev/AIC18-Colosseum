@@ -64,7 +64,7 @@ namespace Colosseum.Services
 
         public static async Task StopAndRemoveAllContainersAsync(CancellationToken cancellationToken = default)
         {
-            var running = await runDockerCommandWithOutputAsync("ps -aq");
+            var running = await runDockerCommandWithOutputAsync("ps -aq", cancellationToken: cancellationToken);
             var tasks = new List<Task>();
             foreach (var container in running)
             {
