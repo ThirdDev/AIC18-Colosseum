@@ -34,7 +34,7 @@ namespace Colosseum.Services.Server
             }.Serialize();
         }
 
-        public static async Task InitializeServerFiles(DirectoryInfo directory, string mapPath, int port, CancellationToken cancellationToken = default)
+        public static async Task InitializeServerFiles(DirectoryInfo directory, string mapPath, int port, bool overWriteFiles = false, CancellationToken cancellationToken = default)
         {
             var serverJarFile = new FileInfo(_serverJarFileName.FullName);
             if (!serverJarFile.Exists)
@@ -47,7 +47,7 @@ namespace Colosseum.Services.Server
             {
                 throw new FileNotFoundException($"map file doesn't exist at {mapFile.FullName}");
             }
-            mapFile.CopyTo(Path.Combine(directory.FullName, mapFile.Name));
+            mapFile.CopyTo(Path.Combine(directory.FullName, mapFile.Name), overWriteFiles);
 
             var serverConfigFile = new FileInfo(Path.Combine(directory.FullName, _serverConfigsFileName.Name));
             if (serverConfigFile.Exists)

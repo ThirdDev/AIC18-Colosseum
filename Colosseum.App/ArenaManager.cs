@@ -256,9 +256,9 @@ namespace Colosseum.App
             };
         }
 
-        private static async Task initializeCompeteionDirectory(Gene gene, int port, string mapPath, DirectoryInfo rootDirectory, CancellationToken cancellationToken)
+        private static async Task initializeCompeteionDirectory(Gene gene, int port, string mapPath, DirectoryInfo rootDirectory, bool overWriteFiles = false, CancellationToken cancellationToken = default)
         {
-            await ServerManager.InitializeServerFiles(rootDirectory, mapPath, port, cancellationToken);
+            await ServerManager.InitializeServerFiles(rootDirectory, mapPath, port, overWriteFiles, cancellationToken);
 
             await ClientManager.InitializeClientFiles(rootDirectory, gene, ClientMode.attack, cancellationToken);
             await ClientManager.InitializeClientFiles(rootDirectory, gene, ClientMode.defend, cancellationToken);
@@ -276,15 +276,17 @@ namespace Colosseum.App
         {
             var hasFinished = true;
 
-            await initializeCompeteionDirectory(gene, 7099, mapPath, rootDirectory, cancellationToken);
+            //await initializeCompeteionDirectory(gene, 7099, mapPath, rootDirectory, overWriteFiles: true, cancellationToken: cancellationToken);
 
             var containerInfo = await ContainerRepository.GetAFreeContainer(cancellationToken);
             try
             {
-                foreach (var file in rootDirectory.GetFiles())
-                {
-                    file.CopyTo(Path.Combine(containerInfo.FilesDirectory.FullName, file.Name));
-                }
+                //foreach (var file in rootDirectory.GetFiles())
+                //{
+                //    file.CopyTo(Path.Combine(containerInfo.FilesDirectory.FullName, file.Name), true);
+                //}
+
+                await initializeCompeteionDirectory(gene, 7099, mapPath, containerInfo.FilesDirectory, overWriteFiles: true, cancellationToken: cancellationToken);
 
                 await DockerService.StartContainer(containerInfo.Id, cancellationToken);
                 var startTime = DateTime.Now;
@@ -297,6 +299,11 @@ namespace Colosseum.App
                         break;
                     }
                     await Task.Delay(1000, cancellationToken);
+                }
+
+                foreach (var file in containerInfo.FilesDirectory.GetFiles())
+                {
+                    file.CopyTo(Path.Combine(rootDirectory.FullName, file.Name), true);
                 }
 
                 if (hasFinished)
@@ -327,7 +334,7 @@ namespace Colosseum.App
 
         private static async Task<bool> runCompetitionInsideContainer(Gene gene, string mapPath, DirectoryInfo rootDirectory, CancellationToken cancellationToken = default)
         {
-            await initializeCompeteionDirectory(gene, 7099, mapPath, rootDirectory, cancellationToken);
+            await initializeCompeteionDirectory(gene, 7099, mapPath, rootDirectory, cancellationToken: cancellationToken);
 
             var containerId = await DockerService.RunArenaAsync(Program.DockerImageName, rootDirectory.FullName, cancellationToken);
             var startTime = DateTime.Now;
@@ -374,7 +381,7 @@ namespace Colosseum.App
 
         private static async Task<bool> runCompetitionInsideHost(Gene gene, int port, string mapPath, DirectoryInfo rootDirectory, CancellationToken cancellationToken)
         {
-            await initializeCompeteionDirectory(gene, port, mapPath, rootDirectory, cancellationToken);
+            await initializeCompeteionDirectory(gene, port, mapPath, rootDirectory, cancellationToken: cancellationToken);
 
             var hasFinished = true;
 
