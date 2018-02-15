@@ -34,10 +34,20 @@ namespace Colosseum.App
 
         public static async Task RunCompetitions(string mapPath, CompetetionMode competetionMode, CancellationToken cancellationToken = default)
         {
-            if (competetionMode == CompetetionMode.ContainerPerCompetetion)
+
+            switch (competetionMode)
             {
-                await DockerService.BuildImageAsync(Directory.GetCurrentDirectory(), Program.DockerImageName);
-                await DockerService.StopAndRemoveAllContainersAsync();
+                case CompetetionMode.NoContainer:
+                    break;
+                case CompetetionMode.ContainerPerCompetetion:
+                    await DockerService.BuildImageAsync(Directory.GetCurrentDirectory(), Program.DockerImageName);
+                    await DockerService.StopAndRemoveAllContainersAsync();
+                    break;
+                case CompetetionMode.ReusableContainer:
+                    await ContainerRepository.InitalizeContainers(geneProcessLimit, Program.DockerImageName, cancellationToken);
+                    break;
+                default:
+                    break;
             }
 
             _arenaStartTime = DateTime.Now;
@@ -85,13 +95,18 @@ namespace Colosseum.App
 
                 var competitionTasks = new List<Task>();
 
-                if (competetionMode == CompetetionMode.ContainerPerCompetetion)
+                switch (competetionMode)
                 {
-                    await DockerService.StopAndRemoveAllContainersAsync();
-                }
-                else
-                {
-                    await cleanSystem(cancellationToken);
+                    case CompetetionMode.NoContainer:
+                        await cleanSystem(cancellationToken);
+                        break;
+                    case CompetetionMode.ContainerPerCompetetion:
+                        await DockerService.StopAndRemoveAllContainersAsync();
+                        break;
+                    case CompetetionMode.ReusableContainer:
+                        break;
+                    default:
+                        break;
                 }
 
                 Console.WriteLine($"running generation #{generationNumber}");
@@ -240,7 +255,8 @@ namespace Colosseum.App
                         }
                         break;
                     case CompetetionMode.ReusableContainer:
-                    //break;
+                        result = await runCompetetionInsideReusableContainer(gene, mapPath, rootDirectory, cancellationToken);
+                        break;
                     default:
                         throw new NotImplementedException();
                         //break;
@@ -279,6 +295,60 @@ namespace Colosseum.App
 
             foreach (var file in attackClientDir.GetFiles())
                 file.CopyTo(Path.Combine(backupPath, file.Name));
+        }
+
+        private static async Task<bool> runCompetetionInsideReusableContainer(Gene gene, string mapPath, DirectoryInfo rootDirectory, CancellationToken cancellationToken = default)
+        {
+            var hasFinished = true;
+
+            await initializeCompeteionDirectory(gene, 7099, mapPath, rootDirectory, cancellationToken);
+
+            var containerInfo = ContainerRepository.GetAFreeContainer();
+            await containerInfo.Semaphore.WaitAsync(cancellationToken);
+            try
+            {
+                foreach (var file in rootDirectory.GetFiles())
+                {
+                    file.CopyTo(Path.Combine(containerInfo.FilesDirectory.FullName, file.Name));
+                }
+
+                await DockerService.StartContainer(containerInfo.Id, cancellationToken);
+                var startTime = DateTime.Now; ;
+                while (await DockerService.IsContainerRunningAsync(containerInfo.Id, cancellationToken))
+                {
+                    if ((DateTime.Now - startTime) > maximumAllowedRunTime)
+                    {
+                        //Console.WriteLine($"gene {geneId} didn't finish");
+                        hasFinished = false;
+                        break;
+                    }
+                    await Task.Delay(1000);
+                }
+
+                if (hasFinished)
+                {
+                    var defenderClientOutputPath = ClientManager.GetClientOutputPath(rootDirectory, ClientMode.defend);
+                    var attackerClientOutputPath = ClientManager.GetClientOutputPath(rootDirectory, ClientMode.attack);
+
+                    hasFinished = File.Exists(defenderClientOutputPath) && File.Exists(attackerClientOutputPath);
+                }
+
+                var containerInfoPath = Path.Combine(rootDirectory.FullName, "container.info");
+                await File.AppendAllLinesAsync(containerInfoPath, await DockerService.GetContainerInfo(containerInfo.Id, showAll: true, cancellationToken: cancellationToken), cancellationToken);
+
+                var containerInspect = Path.Combine(rootDirectory.FullName, "container.inspect.json");
+                await File.WriteAllTextAsync(containerInspect, await DockerService.GetContainerInspect(containerInfo.Id, cancellationToken: cancellationToken), cancellationToken);
+
+                var containerLogPath = Path.Combine(rootDirectory.FullName, "container.log");
+                await File.WriteAllTextAsync(containerLogPath, await DockerService.ContainerLogAsync(containerInfo.Id, cancellationToken), cancellationToken);
+
+                return hasFinished;
+            }
+            finally
+            {
+                containerInfo.Semaphore.Release();
+            }
+
         }
 
         private static async Task<bool> runCompetitionInsideContainer(Gene gene, string mapPath, DirectoryInfo rootDirectory, CancellationToken cancellationToken = default)
