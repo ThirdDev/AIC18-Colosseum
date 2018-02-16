@@ -43,6 +43,9 @@ namespace Colosseum.Experiment
 
                 if (print)
                     PrintState(units);
+
+                if (units.Count == 0)
+                    break;
             }
 
             var creepPrice = new Creep().Price * (units.Count(x => x is Creep) + deadUnits.Count(x => x is Creep) + survivorUnits.Count(x => x is Creep));

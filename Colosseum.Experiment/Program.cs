@@ -10,7 +10,7 @@ namespace Colosseum.Experiment
     class Program
     {
 
-        const int turns = 50;
+        const int turns = 100;
 
         static void Main(string[] args)
         {
