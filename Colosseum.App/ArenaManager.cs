@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Colosseum.Tools.SystemExtensions;
 using Colosseum.Tools.SystemExtensions.Collection.Generic;
+using Colosseum.Tools.SystemExtensions.IO;
 using Colosseum.Tools.SystemExtensions.Threading.Tasks;
 
 namespace Colosseum.App
@@ -301,10 +302,7 @@ namespace Colosseum.App
                     await Task.Delay(1000, cancellationToken);
                 }
 
-                foreach (var file in containerInfo.FilesDirectory.GetFiles())
-                {
-                    file.CopyTo(Path.Combine(rootDirectory.FullName, file.Name), true);
-                }
+                containerInfo.FilesDirectory.CopyContentsTo(rootDirectory);
 
                 if (hasFinished)
                 {

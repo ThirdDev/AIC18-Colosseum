@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Colosseum.Tools.SystemExtensions.IO
 {
@@ -18,7 +20,7 @@ namespace Colosseum.Tools.SystemExtensions.IO
                 dir.DeleteForce();
             }
 
-            var retryCount = 0;
+            //var retryCount = 0;
             while (true)
             {
                 try
@@ -28,13 +30,40 @@ namespace Colosseum.Tools.SystemExtensions.IO
                 }
                 catch
                 {
-                    retryCount++;
-                    if (retryCount >= 10)
-                    {
-                        throw;
-                    }
-                    Thread.Sleep(1);
+                    //retryCount++;
+                    //if (retryCount >= 10)
+                    //{
+                    //    throw;
+                    //}
+                    Task.Delay(1).Wait();
                 }
+            }
+        }
+
+        public static void CopyContentsTo(this DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
+        {
+            foreach (var file in sourceDirectory.GetFiles())
+            {
+                file.ForceCopyTo(Path.Combine(destinationDirectory.FullName, file.Name), true);
+            }
+
+            foreach (var dir in sourceDirectory.GetDirectories())
+            {
+                while (true)
+                {
+                    try
+                    {
+                        var desDirectoryInfo = destinationDirectory.GetDirectories().FirstOrDefault(x => x.Name == dir.Name) ??
+                                               destinationDirectory.CreateSubdirectory(dir.Name);
+                        dir.CopyContentsTo(desDirectoryInfo);
+                        break;
+                    }
+                    catch
+                    {
+                        Task.Delay(1).Wait();
+                    }
+                }
+
             }
         }
     }
