@@ -1,4 +1,5 @@
 ﻿using Colosseum.Experiment.GeneParsers;
+using Colosseum.Experiment.ScoringPolicies;
 using Colosseum.GS;
 using System;
 using System.Diagnostics;
@@ -15,6 +16,7 @@ namespace Colosseum.Experiment
         {
             var simulator = new Simulator(15, new int[] { 4, 4, 5, 6, 7, 8, 9 }, new int[] { 12, 2 });
 
+            var scoringPolicy = new ExplorePolicy();
             //Stopwatch stopwatch = new Stopwatch();
             //stopwatch.Start();
             //for (int i = 0; i < 1000; i++)
@@ -34,7 +36,7 @@ namespace Colosseum.Experiment
                 foreach (var gene in generation)
                 {
                     var result = simulator.Simulate(turns, new MyGeneParser(gene));
-                    gene.Score = result.CalculateTotalScore();
+                    gene.Score = scoringPolicy.CalculateTotalScore(result);
                 }
 
                 Console.WriteLine($"Generation #{i + 1} finished. Statistics:");
@@ -61,8 +63,6 @@ namespace Colosseum.Experiment
                     simulator.Simulate(turns, new MyGeneParser(bestGene), print: true);
                     Console.ReadKey();
                 }
-
-
 
                 generation = gg.Genetic(generation);
             }
