@@ -64,7 +64,7 @@ namespace Colosseum.Experiment
 
 
 
-                generation = gg.ChildrenMaker(generation, generation.Count);
+                generation = gg.Genetic(generation);
             }
 
 
