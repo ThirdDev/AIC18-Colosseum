@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Colosseum.Tools.SystemExtensions.Collection.Generic;
 
 namespace Colosseum.Services
 {
@@ -20,6 +20,7 @@ namespace Colosseum.Services
         /// </summary>
         /// <param name="name"></param>
         /// <param name="filesDirectory"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns>container Id</returns>
         public static async Task<string> RunArenaAsync(string name, string filesDirectory, CancellationToken cancellationToken = default)
         {
@@ -28,7 +29,7 @@ namespace Colosseum.Services
             {
                 throw new Exception($"docker run returned invalid output:{Environment.NewLine}{string.Join(Environment.NewLine, result.AsEnumerable())}");
             }
-            return result.First().ToString();
+            return result.First();
         }
 
         public static async Task<bool> IsContainerRunningAsync(string containerId, CancellationToken cancellationToken = default)
@@ -64,7 +65,7 @@ namespace Colosseum.Services
 
         public static async Task StopAndRemoveAllContainersAsync(CancellationToken cancellationToken = default)
         {
-            var running = await runDockerCommandWithOutputAsync("ps -aq");
+            var running = await runDockerCommandWithOutputAsync("ps -aq", cancellationToken: cancellationToken);
             var tasks = new List<Task>();
             foreach (var container in running)
             {
@@ -72,6 +73,15 @@ namespace Colosseum.Services
             }
 
             await Task.WhenAll(tasks);
+        }
+
+        public static async Task StartContainer(string contaierId, CancellationToken cancellationToken)
+        {
+            var result = await runDockerCommandWithOutputAsync($"start {contaierId}", cancellationToken: cancellationToken);
+            if (result.Count != 1 || !result[0].Equals(contaierId))
+            {
+                throw new Exception($"docker returned invalid result: {string.Join(Environment.NewLine, result)}");
+            }
         }
 
 
@@ -85,13 +95,13 @@ namespace Colosseum.Services
         {
             var command = CommandInfo.DockerCommand(args);
             var processPayload = new ProcessPayload();
-            List<string> final = new List<string>();
+            var final = new List<string>();
 
             var processTask = OperationSystemService.RunCommandAsync(command, processPayload, tempLogDir(), null, log: false,
                 outputReceived: line => final.Add(line),
                 cancellationToken: cancellationToken);
 
-            await Task.WhenAny(processTask, Task.Delay(timeout));
+            await Task.WhenAny(processTask, Task.Delay(timeout, cancellationToken));
 
             processPayload.Kill();
 

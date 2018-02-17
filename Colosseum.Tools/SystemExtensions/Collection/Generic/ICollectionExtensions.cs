@@ -1,4 +1,6 @@
-namespace System.Collections.Generic
+using System.Collections.Generic;
+
+namespace Colosseum.Tools.SystemExtensions.Collection.Generic
 {
     public static class ICollectionExtensions
     {

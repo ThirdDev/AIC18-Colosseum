@@ -1,6 +1,8 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
-namespace System.Collections.Generic
+namespace Colosseum.Tools.SystemExtensions.Collection.Generic
 {
     public static class IEnumerableExtensions
     {
@@ -8,7 +10,7 @@ namespace System.Collections.Generic
 
         public static T RandomElement<T>(this IEnumerable<T> enumerable)
         {
-            int index = random.Next(0, enumerable.Count());
+            var index = random.Next(0, enumerable.Count());
             return enumerable.ElementAt(index);
         }
 

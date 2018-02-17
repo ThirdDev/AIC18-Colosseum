@@ -1,5 +1,4 @@
-﻿using Colosseum.Services;
-using System.IO;
+﻿using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,9 +6,8 @@ namespace Colosseum.Services.Server
 {
     public static class ServerManager
     {
-        static FileInfo _serverJarFileName => new FileInfo("AIC18-Server.jar");
-        static FileInfo _serverConfigsFileName => new FileInfo("server.cfg");
-        static FileInfo _gameLogFileName => new FileInfo("game.log");
+        private static FileInfo _serverJarFileName => new FileInfo("AIC18-Server.jar");
+        private static FileInfo _serverConfigsFileName => new FileInfo("server.cfg");
 
         private static string getConfigPath(DirectoryInfo directory)
         {
@@ -23,8 +21,6 @@ namespace Colosseum.Services.Server
             {
                 FileName = @"C:\ProgramData\Oracle\Java\javapath\java.EXE",
                 Args = $"-Xms100m -Xmx1g -jar \"{_serverJarFileName.FullName}\" --config=\"{configPath}\"",
-                RequiresBash = false,
-                HasStandardInput = false
             };
         }
 
@@ -38,7 +34,7 @@ namespace Colosseum.Services.Server
             }.Serialize();
         }
 
-        public static async Task InitializeServerFiles(DirectoryInfo directory, string mapPath, int port, CancellationToken cancellationToken = default)
+        public static async Task InitializeServerFiles(DirectoryInfo directory, string mapPath, int port, bool overWriteFiles = false, CancellationToken cancellationToken = default)
         {
             var serverJarFile = new FileInfo(_serverJarFileName.FullName);
             if (!serverJarFile.Exists)
@@ -51,7 +47,7 @@ namespace Colosseum.Services.Server
             {
                 throw new FileNotFoundException($"map file doesn't exist at {mapFile.FullName}");
             }
-            mapFile.CopyTo(Path.Combine(directory.FullName, mapFile.Name));
+            mapFile.CopyTo(Path.Combine(directory.FullName, mapFile.Name), overWriteFiles);
 
             var serverConfigFile = new FileInfo(Path.Combine(directory.FullName, _serverConfigsFileName.Name));
             if (serverConfigFile.Exists)
@@ -61,24 +57,15 @@ namespace Colosseum.Services.Server
             await File.WriteAllTextAsync(serverConfigFile.FullName, getServerConfig(mapPath, port), cancellationToken);
         }
 
-        public static string GetGameLogPath(DirectoryInfo directory)
-        {
-            return Path.Combine(directory.FullName, _gameLogFileName.Name);
-        }
-
         public static async Task<ProcessPayload> RunServer(DirectoryInfo directory, CancellationToken cancellationToken = default)
         {
-            ProcessPayload payload = new ProcessPayload();
+            var payload = new ProcessPayload();
             var serverCommand = getCommandInfo(directory);
             var logDir = directory.CreateSubdirectory("server-process-info");
-            var task = Task.Run(async () => await OperationSystemService.RunCommandAsync(serverCommand, payload, logDir, directory.FullName, cancellationToken: cancellationToken), cancellationToken);
-            while (payload == null)
-            {
-                await Task.Delay(100);
-            }
+            var unused = Task.Run(async () => await OperationSystemService.RunCommandAsync(serverCommand, payload, logDir, directory.FullName, cancellationToken: cancellationToken), cancellationToken);
             while (!payload.IsRunning())
             {
-                await Task.Delay(100);
+                await Task.Delay(100, cancellationToken);
             }
             return payload;
         }

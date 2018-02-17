@@ -1,13 +1,15 @@
-namespace System
+using System;
+
+namespace Colosseum.Tools.SystemExtensions
 {
     public static class VersionExtensions
     {
         public static Version FromString(string version, bool setDefaultToMax = false)
         {
-            int major = 0;
-            int minor = 0;
-            int buuld = 0;
-            int revision = 0;
+            var major = 0;
+            var minor = 0;
+            var buuld = 0;
+            var revision = 0;
 
             if (setDefaultToMax)
             {

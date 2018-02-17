@@ -1,4 +1,6 @@
-﻿namespace System
+﻿using System.Linq;
+
+namespace Colosseum.Tools.SystemExtensions
 {
     public static class StringExtensions
     {
@@ -8,12 +10,7 @@
 
         public static string ToValidFileName(this string str)
         {
-            foreach (char c in System.IO.Path.GetInvalidFileNameChars())
-            {
-                str = str.Replace(c, '_');
-            }
-
-            return str;
+            return System.IO.Path.GetInvalidFileNameChars().Aggregate(str, (current, c) => current.Replace(c, '_'));
         }
 
         public static string ToValidBashPath(this string str)

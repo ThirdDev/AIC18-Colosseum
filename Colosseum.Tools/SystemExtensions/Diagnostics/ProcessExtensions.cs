@@ -1,7 +1,9 @@
-﻿using System.Threading;
+﻿using System;
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace System.Diagnostics
+namespace Colosseum.Tools.SystemExtensions.Diagnostics
 {
     public static class ProcessExtensions
     {

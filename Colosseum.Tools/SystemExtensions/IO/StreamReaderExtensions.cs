@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 
-namespace System.IO
+namespace Colosseum.Tools.SystemExtensions.IO
 {
     public static class StreamReaderExtensions
     {
         public static string[] ReadAllLines(this StreamReader streamReader)
         {
-            List<string> lines = new List<string>();
+            var lines = new List<string>();
 
             while (!streamReader.EndOfStream)
             {
