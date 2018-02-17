@@ -56,7 +56,7 @@ namespace Colosseum.Experiment
                 int xx = 0;
                 foreach (var item in bestGene.GenomesList)
                 {
-                    Console.Write(((int)Math.Max(7, item) - 7) + ", ");
+                    Console.Write(MyGeneParser.GeneToTroopCount(item) + ", ");
                     xx++;
                     if (xx == 15)
                         Console.WriteLine();

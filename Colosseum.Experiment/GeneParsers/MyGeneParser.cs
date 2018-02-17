@@ -30,9 +30,14 @@ namespace Colosseum.Experiment.GeneParsers
 
             return new AttackAction
             {
-                CountOfCreeps = (int)Math.Max(7, a) - 7,
-                CountOfHeros = (int)Math.Max(7, b) - 7,
+                CountOfCreeps = GeneToTroopCount(a),
+                CountOfHeros = GeneToTroopCount(b),
             };
+        }
+
+        public static int GeneToTroopCount(double a)
+        {
+            return (int)Math.Max(7, a) - 7;
         }
     }
 }
