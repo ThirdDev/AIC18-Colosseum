@@ -14,22 +14,21 @@ namespace Colosseum.Experiment
 
         static void Main(string[] args)
         {
-            var simulator = new Simulator(15, new int[] { 4, 4, 5, 6, 7, 8, 9 }, new int[] { 12, 2 });
+            int[] cannons, archers;
+
+            //cannons = new int[] { 4, 4, 5, 6, 7, 8, 9 };
+            //archers = new int[] { 12, 2 };
+
+            cannons = new int[] { };
+            archers = new int[] { 3, 5, 7, 9, 12 };
+
+            var simulator = new Simulator(15, cannons, archers);
 
             IScoringPolicy scoringPolicy;
 
             //scoringPolicy = new ExplorePolicy();
             scoringPolicy = new DamagePolicy();
-
-            //Stopwatch stopwatch = new Stopwatch();
-            //stopwatch.Start();
-            //for (int i = 0; i < 1000; i++)
-            //{
-            //    simulator.Simulate(100, new MyGeneParser(null));
-            //}
-            //stopwatch.Stop();
-            //Console.WriteLine(stopwatch.Elapsed);
-
+            
             var gg = new GenerationGenerator();
 
             var generation = gg.randomGeneration();
@@ -71,7 +70,7 @@ namespace Colosseum.Experiment
                     Console.WriteLine();
                     Console.WriteLine("Results: ");
                     Console.WriteLine($"Damages to base: {result.ReachedToTheEnd}");
-                    Console.WriteLine($"Total money spent: {result.TotalPrice}" );
+                    Console.WriteLine($"Total money spent: {result.TotalPrice}");
                     Console.WriteLine($"Score: {scoringPolicy.CalculateTotalScore(result)}");
                     Console.WriteLine();
                     Console.ReadKey();
