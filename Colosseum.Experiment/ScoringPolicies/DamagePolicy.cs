@@ -7,7 +7,7 @@ namespace Colosseum.Experiment.ScoringPolicies
 {
     internal class DamagePolicy : IScoringPolicy
     {
-        const int preferredMoneyToSpend = 1200;
+        const int preferredMoneyToSpend = 200;
 
         public double CalculateTotalScore(SimulationResult result)
         {

@@ -16,11 +16,14 @@ namespace Colosseum.Experiment
         {
             int[] cannons, archers;
 
-            //cannons = new int[] { 4, 4, 5, 6, 7, 8, 9 };
-            //archers = new int[] { 12, 2 };
+            //cannons = new int[] { 1, 3, 5, 7, 9, 11, 13};
+            //archers = new int[] { 1, 3, 5, 7, 9, 11, 13};
 
-            cannons = new int[] { };
-            archers = new int[] { 3, 5, 7, 9, 12 };
+            //cannons = new int[] { };
+            //archers = new int[] { 3, 5, 7, 9, 12 };
+
+            cannons = new int[] { 2, 2 };
+            archers = new int[] { 5, 7, 9 };
 
             var simulator = new Simulator(15, cannons, archers);
 
@@ -72,6 +75,7 @@ namespace Colosseum.Experiment
                     Console.WriteLine($"Damages to base: {result.ReachedToTheEnd}");
                     Console.WriteLine($"Total money spent: {result.TotalPrice}");
                     Console.WriteLine($"Score: {scoringPolicy.CalculateTotalScore(result)}");
+                    Console.WriteLine($"Turns: {result.Turns}");
                     Console.WriteLine();
                     Console.ReadKey();
                 }

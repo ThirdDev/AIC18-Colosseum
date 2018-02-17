@@ -21,18 +21,20 @@ namespace Colosseum.Experiment
             archers = _archers.Select(x => new Archer(x)).ToArray();
         }
 
-        public SimulationResult Simulate(int turns, IGeneParser parser, bool print = false)
+        public SimulationResult Simulate(int maximumTurns, IGeneParser parser, bool print = false)
         {
             List<Unit> units = new List<Unit>();
             List<Unit> deadUnits = new List<Unit>();
             List<Unit> survivorUnits = new List<Unit>();
+
+            int elapsedTurns = 0;
 
             foreach (var item in cannons)
                 item.Reset();
             foreach (var item in archers)
                 item.Reset();
 
-            for (int i = 0; i < turns; i++)
+            for (int i = 0; i < maximumTurns; i++)
             {
                 ProcessTowers(units);
                 deadUnits.AddRange(ProcessDeadUnits(units));
@@ -51,6 +53,8 @@ namespace Colosseum.Experiment
 
                 if (units.Count == 0)
                     break;
+
+                elapsedTurns++;
             }
 
             var creepPrice = new Creep().Price * (units.Count(x => x is Creep) + deadUnits.Count(x => x is Creep) + survivorUnits.Count(x => x is Creep));
@@ -61,7 +65,7 @@ namespace Colosseum.Experiment
                 ReachedToTheEnd = survivorUnits.Count,
                 DeadPositions = deadUnits.Select(x => x.Position).ToArray(),
                 Length = pathLength,
-                Turns = turns,
+                Turns = elapsedTurns,
                 TotalPrice = creepPrice + heroPrice,
             };
         }
