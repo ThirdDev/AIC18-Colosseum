@@ -51,7 +51,7 @@ namespace Colosseum.Experiment
                 if (print)
                     PrintState(units, survivorUnits.Count);
 
-                if (units.Count == 0)
+                if ((units.Count == 0) && (i > parser.Gene.GenomesList.Count / 2))
                     break;
 
                 elapsedTurns++;
