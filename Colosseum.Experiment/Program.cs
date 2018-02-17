@@ -22,8 +22,14 @@ namespace Colosseum.Experiment
             //cannons = new int[] { };
             //archers = new int[] { 3, 5, 7, 9, 12 };
 
-            cannons = new int[] { 2, 2 };
-            archers = new int[] { 5, 7, 9 };
+            //cannons = new int[] { 2, 2, 3, 3, 4, 4 };
+            //archers = new int[] { };
+
+            //cannons = new int[] { 2, 2 };
+            //archers = new int[] { 5, 7, 9 };
+
+            cannons = new int[] { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6 };
+            archers = new int[] { 7, 7, 8, 8, 9, 9, 10, 10, 11, 11 };
 
             var simulator = new Simulator(15, cannons, archers);
 
@@ -36,8 +42,9 @@ namespace Colosseum.Experiment
 
             var generation = gg.randomGeneration();
 
-
-            for (int i = 0; i < 1000; i++)
+            Stopwatch st = new Stopwatch();
+            st.Start();
+            for (int i = 0; i < 100; i++)
             {
                 foreach (var gene in generation)
                 {
@@ -45,6 +52,7 @@ namespace Colosseum.Experiment
                     gene.Score = scoringPolicy.CalculateTotalScore(result);
                 }
 
+                /**/
                 var sortedGeneration = generation.OrderBy(x => x.Score).ToList();
 
                 Console.WriteLine($"Generation #{i + 1} finished. Statistics:");
@@ -63,7 +71,7 @@ namespace Colosseum.Experiment
                 }
                 Console.WriteLine();
                 Console.WriteLine();
-
+                
                 if (Console.KeyAvailable)
                 {
                     Console.ReadKey();
@@ -79,9 +87,11 @@ namespace Colosseum.Experiment
                     Console.WriteLine();
                     Console.ReadKey();
                 }
-
+                /**/
                 generation = gg.Genetic(generation);
             }
+            st.Stop();
+            Console.WriteLine(st.Elapsed);
 
 
             Console.ReadLine();
