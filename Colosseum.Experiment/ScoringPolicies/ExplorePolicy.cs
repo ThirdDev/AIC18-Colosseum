@@ -7,7 +7,7 @@ namespace Colosseum.Experiment.ScoringPolicies
 {
     internal class ExplorePolicy : IScoringPolicy
     {
-        const int preferredMoneyToSpend = 300;
+        const int preferredMoneyToSpend = 600;
 
         private double CalculateDeadScore(SimulationResult result)
         {
@@ -33,7 +33,7 @@ namespace Colosseum.Experiment.ScoringPolicies
         {
             return (result.ReachedToTheEnd > 0 ? 1 : 0) * 100.0 +
                 Math.Pow(CalculateDeadScore(result), 1.1) * 10.0 +
-                -Math.Pow(result.TotalPrice / (preferredMoneyToSpend / 3), 3);
+                -Math.Pow(result.TotalPrice / (preferredMoneyToSpend / 4), 4);
         }
     }
 }
