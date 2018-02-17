@@ -27,6 +27,11 @@ namespace Colosseum.Experiment
             List<Unit> deadUnits = new List<Unit>();
             List<Unit> survivorUnits = new List<Unit>();
 
+            foreach (var item in cannons)
+                item.Reset();
+            foreach (var item in archers)
+                item.Reset();
+
             for (int i = 0; i < turns; i++)
             {
                 ProcessTowers(units);

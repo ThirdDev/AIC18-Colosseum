@@ -32,5 +32,10 @@ namespace Colosseum.Experiment.Towers
         {
             return position == Position - 1 || position == Position || position == Position + 1;
         }
+
+        public void Reset()
+        {
+            RechargeCounter = -1;
+        }
     }
 }
