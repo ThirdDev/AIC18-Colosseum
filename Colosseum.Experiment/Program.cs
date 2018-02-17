@@ -16,7 +16,11 @@ namespace Colosseum.Experiment
         {
             var simulator = new Simulator(15, new int[] { 4, 4, 5, 6, 7, 8, 9 }, new int[] { 12, 2 });
 
-            var scoringPolicy = new ExplorePolicy();
+            IScoringPolicy scoringPolicy;
+
+            //scoringPolicy = new ExplorePolicy();
+            scoringPolicy = new DamagePolicy();
+
             //Stopwatch stopwatch = new Stopwatch();
             //stopwatch.Start();
             //for (int i = 0; i < 1000; i++)
@@ -39,12 +43,14 @@ namespace Colosseum.Experiment
                     gene.Score = scoringPolicy.CalculateTotalScore(result);
                 }
 
+                var sortedGeneration = generation.OrderBy(x => x.Score).ToList();
+
                 Console.WriteLine($"Generation #{i + 1} finished. Statistics:");
-                Console.WriteLine($"\tMin score = {generation.Min(x => x.Score)}");
+                Console.WriteLine($"\tMin score = {sortedGeneration.First().Score}");
                 Console.WriteLine($"\tAverage score = {generation.Average(x => x.Score)}");
-                Console.WriteLine($"\tMax score = {generation.Max(x => x.Score)}");
+                Console.WriteLine($"\tMax score = {sortedGeneration.Last().Score}");
                 Console.WriteLine("\tBest gene: ");
-                var bestGene = generation.OrderBy(x => x.Score).Last();
+                var bestGene = sortedGeneration.Last();
                 int xx = 0;
                 foreach (var item in bestGene.GenomesList)
                 {
@@ -60,7 +66,14 @@ namespace Colosseum.Experiment
                 {
                     Console.ReadKey();
                     Console.ReadKey();
-                    simulator.Simulate(turns, new MyGeneParser(bestGene), print: true);
+                    var result = simulator.Simulate(turns, new MyGeneParser(bestGene), print: true);
+                    Console.WriteLine();
+                    Console.WriteLine();
+                    Console.WriteLine("Results: ");
+                    Console.WriteLine($"Damages to base: {result.ReachedToTheEnd}");
+                    Console.WriteLine($"Total money spent: {result.TotalPrice}" );
+                    Console.WriteLine($"Score: {scoringPolicy.CalculateTotalScore(result)}");
+                    Console.WriteLine();
                     Console.ReadKey();
                 }
 

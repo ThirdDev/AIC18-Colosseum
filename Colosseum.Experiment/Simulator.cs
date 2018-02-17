@@ -42,7 +42,7 @@ namespace Colosseum.Experiment
                     units.Add(new Hero());
 
                 if (print)
-                    PrintState(units);
+                    PrintState(units, survivorUnits.Count);
 
                 if (units.Count == 0)
                     break;
@@ -61,7 +61,7 @@ namespace Colosseum.Experiment
             };
         }
 
-        private void PrintState(List<Unit> units)
+        private void PrintState(List<Unit> units, int survivorUnitsCount)
         {
             //return;
             var creeps = units.Where(x => x is Creep);
@@ -70,16 +70,22 @@ namespace Colosseum.Experiment
             for (int i = 0; i < pathLength; i++)
             {
                 var count = creeps.Count(x => x.Position == i);
-                Console.Write(count == 0 ? " " : count.ToString());
+                Console.Write((count == 0 ? " " : count.ToString() + ",").PadLeft(3));
             }
             Console.WriteLine(">");
             Console.Write("<");
             for (int i = 0; i < pathLength; i++)
             {
                 var count = heros.Count(x => x.Position == i);
-                Console.Write(count == 0 ? " " : count.ToString());
+                Console.Write((count == 0 ? " " : count.ToString() + ",").PadLeft(3));
             }
-            Console.WriteLine(">");
+            Console.Write("> ");
+
+            for (int i = 0; i < survivorUnitsCount; i++)
+                Console.Write("*");
+
+            Console.WriteLine();
+            Console.WriteLine();
             Console.WriteLine();
         }
 
