@@ -143,8 +143,8 @@ namespace Colosseum.Experiment
             var creepGeneString = string.Join(", ", bestGene.GenomesList.GetRange(0, length).Select(MyGeneParser.GeneToTroopCount));
             var heroGeneString = string.Join(", ", bestGene.GenomesList.GetRange(length, length).Select(MyGeneParser.GeneToTroopCount));
 
-            Console.WriteLine($"creeps:  {creepGeneString}");
-            Console.WriteLine($"archers:{heroGeneString}");
+            Console.WriteLine($"creeps: {creepGeneString}");
+            Console.WriteLine($"heros:  {heroGeneString}");
 
             Console.WriteLine();
             Console.WriteLine();
