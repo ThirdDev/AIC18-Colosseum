@@ -45,10 +45,10 @@ namespace Colosseum.Experiment
             var lengthOfGene = length * 2;
             var maximumCountOfGenerations = 1000;
 
-            var towerCount = 10;
+            var towerCount = 20;
             var archerTowerCount = (int)gaussianRandom(towerCount / 2.0, 1);
             var canonTowerCount = towerCount - archerTowerCount;
-            preferredMoneyToSpend = archerTowerCount * 120 + canonTowerCount * 120;
+            preferredMoneyToSpend = archerTowerCount * 100 + canonTowerCount * 100;
 
             cannons = randomTowerOrder(canonTowerCount, length);
             archers = randomTowerOrder(archerTowerCount, length);
