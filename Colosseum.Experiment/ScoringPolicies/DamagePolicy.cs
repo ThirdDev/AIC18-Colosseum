@@ -7,12 +7,17 @@ namespace Colosseum.Experiment.ScoringPolicies
 {
     internal class DamagePolicy : IScoringPolicy
     {
-        const int preferredMoneyToSpend = 4000;
+        readonly int _preferredMoneyToSpend;
+
+        public DamagePolicy(int preferredMoneyToSpend)
+        {
+            _preferredMoneyToSpend = preferredMoneyToSpend;
+        }
 
         public double CalculateTotalScore(SimulationResult result)
         {
             return (result.ReachedToTheEnd > 0 ? (result.ReachedToTheEnd) : 0) * 30.0 +
-                -Math.Pow(result.TotalPrice / (preferredMoneyToSpend / 4), 4);
+                -Math.Pow(result.TotalPrice / ((double)_preferredMoneyToSpend / 4), 4);
         }
     }
 }

@@ -7,7 +7,12 @@ namespace Colosseum.Experiment.ScoringPolicies
 {
     internal class ExplorePolicy : IScoringPolicy
     {
-        const int preferredMoneyToSpend = 600;
+        readonly int _preferredMoneyToSpend;
+
+        public ExplorePolicy(int preferredMoneyToSpend)
+        {
+            _preferredMoneyToSpend = preferredMoneyToSpend;
+        }
 
         private double CalculateDeadScore(SimulationResult result)
         {
@@ -17,7 +22,7 @@ namespace Colosseum.Experiment.ScoringPolicies
             {
                 int count = result.DeadPositions.Count(x => x == i);
                 int c2 = Math.Min(count, 3); // Don't fool me!
-                avg += c2 * (double)i; 
+                avg += c2 * (double)i;
                 w += c2;
             }
 
@@ -33,7 +38,7 @@ namespace Colosseum.Experiment.ScoringPolicies
         {
             return (result.ReachedToTheEnd > 0 ? 1 : 0) * 100.0 +
                 Math.Pow(CalculateDeadScore(result), 1.1) * 10.0 +
-                -Math.Pow(result.TotalPrice / (preferredMoneyToSpend / 4), 4);
+                -Math.Pow(result.TotalPrice / ((double)_preferredMoneyToSpend / 4), 4);
         }
     }
 }

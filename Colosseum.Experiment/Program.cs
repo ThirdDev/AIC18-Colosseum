@@ -3,6 +3,7 @@ using Colosseum.Experiment.ScoringPolicies;
 using Colosseum.GS;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Colosseum.Experiment
@@ -12,7 +13,8 @@ namespace Colosseum.Experiment
 
         const int turns = 1000;
 
-        static void Main(string[] args)
+        [SuppressMessage("ReSharper", "JoinDeclarationAndInitializer")]
+        public static void Main()
         {
             int[] cannons, archers;
 
@@ -35,17 +37,18 @@ namespace Colosseum.Experiment
             //archers = new int[] { 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 22, 22, 24, 24 };
 
             int length = 15;
+            var preferredMoneyToSpend = 4000;
 
             var simulator = new Simulator(length, cannons, archers);
 
             IScoringPolicy scoringPolicy;
 
             //scoringPolicy = new ExplorePolicy();
-            scoringPolicy = new DamagePolicy();
+            scoringPolicy = new DamagePolicy(preferredMoneyToSpend);
 
             var gg = new GenerationGenerator();
 
-            var generation = gg.randomGeneration();
+            var generation = gg.RandomGeneration();
 
             Stopwatch st = new Stopwatch();
             st.Start();
