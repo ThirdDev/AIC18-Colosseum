@@ -48,6 +48,7 @@ namespace Colosseum.Experiment
             var towerCount = 10;
             var archerTowerCount = (int)gaussianRandom(towerCount, towerCount);
             var canonTowerCount = towerCount - archerTowerCount;
+            preferredMoneyToSpend = archerTowerCount * 120 + canonTowerCount * 100;
 
             cannons = randomTowerOrder(canonTowerCount, length);
             archers = randomTowerOrder(archerTowerCount, length);
@@ -86,7 +87,7 @@ namespace Colosseum.Experiment
                 {
                     Console.ReadKey();
                     Console.ReadKey();
-                    logGeneSimulationResult(simulator, bestGene, scoringPolicy);
+                    logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend);
                     Console.ReadKey();
                 }
                 /**/
@@ -96,7 +97,7 @@ namespace Colosseum.Experiment
                 }
                 else
                 {
-                    logGeneSimulationResult(simulator, bestGene, scoringPolicy);
+                    logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend);
                 }
             }
             st.Stop();
@@ -116,14 +117,14 @@ namespace Colosseum.Experiment
             return string.Join(", ", positions.Select(x => (x == 0) ? "  " : $"{identifier}{x}"));
         }
 
-        private static void logGeneSimulationResult(Simulator simulator, Gene bestGene, IScoringPolicy scoringPolicy)
+        private static void logGeneSimulationResult(Simulator simulator, Gene bestGene, IScoringPolicy scoringPolicy, int preferredMoneyToSpend)
         {
             var result = simulator.Simulate(turns, new MyGeneParser(bestGene), print: true);
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine("Results: ");
             Console.WriteLine($"Damages to base: {result.ReachedToTheEnd}");
-            Console.WriteLine($"Total money spent: {result.TotalPrice}");
+            Console.WriteLine($"Total money spent: {result.TotalPrice} with {preferredMoneyToSpend} prefered");
             Console.WriteLine($"Score: {scoringPolicy.CalculateTotalScore(result)}");
             Console.WriteLine($"Turns: {result.Turns}");
             Console.WriteLine();
