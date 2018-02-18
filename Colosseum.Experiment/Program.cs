@@ -40,6 +40,7 @@ namespace Colosseum.Experiment
             var preferredMoneyToSpend = 4000;
             var generationPopulation = 500;
             var lengthOfGene = length * 2;
+            var maximumCountOfGenerations = 100;
 
             var simulator = new Simulator(length, cannons, archers);
 
@@ -54,7 +55,7 @@ namespace Colosseum.Experiment
 
             var st = new Stopwatch();
             st.Start();
-            for (var i = 0; i < 100; i++)
+            for (var i = 0; i < maximumCountOfGenerations; i++)
             {
                 foreach (var gene in generation)
                 {
@@ -64,45 +65,63 @@ namespace Colosseum.Experiment
 
                 /**/
                 var sortedGeneration = generation.OrderBy(x => x.Score).ToList();
-
-                Console.WriteLine($"Generation #{i + 1} finished. Statistics:");
-                Console.WriteLine($"\tMin score = {sortedGeneration.First().Score}");
-                Console.WriteLine($"\tAverage score = {generation.Average(x => x.Score)}");
-                Console.WriteLine($"\tMax score = {sortedGeneration.Last().Score}");
-                Console.WriteLine("\tBest gene: ");
                 var bestGene = sortedGeneration.Last();
 
-                var creepGeneString = string.Join(", ", bestGene.GenomesList.GetRange(0, length).Select(MyGeneParser.GeneToTroopCount));
-                var heroGeneString = string.Join(", ", bestGene.GenomesList.GetRange(length, length).Select(MyGeneParser.GeneToTroopCount));
-                Console.WriteLine(creepGeneString);
-                Console.WriteLine(heroGeneString);
-
-                Console.WriteLine();
-                Console.WriteLine();
+                logGenerationStatistics(length, generation, i, sortedGeneration, bestGene);
 
                 if (Console.KeyAvailable)
                 {
                     Console.ReadKey();
                     Console.ReadKey();
-                    var result = simulator.Simulate(turns, new MyGeneParser(bestGene), print: true);
-                    Console.WriteLine();
-                    Console.WriteLine();
-                    Console.WriteLine("Results: ");
-                    Console.WriteLine($"Damages to base: {result.ReachedToTheEnd}");
-                    Console.WriteLine($"Total money spent: {result.TotalPrice}");
-                    Console.WriteLine($"Score: {scoringPolicy.CalculateTotalScore(result)}");
-                    Console.WriteLine($"Turns: {result.Turns}");
-                    Console.WriteLine();
+                    logGeneSimulationResult(simulator, bestGene, scoringPolicy);
                     Console.ReadKey();
                 }
                 /**/
-                generation = gg.Genetic(generation);
+                if (i != maximumCountOfGenerations - 1)
+                {
+                    generation = gg.Genetic(generation);
+                }
+                else
+                {
+                    logGeneSimulationResult(simulator, bestGene, scoringPolicy);
+                }
             }
             st.Stop();
             Console.WriteLine(st.Elapsed);
 
 
             Console.ReadLine();
+        }
+
+        private static void logGeneSimulationResult(Simulator simulator, Gene bestGene, IScoringPolicy scoringPolicy)
+        {
+            var result = simulator.Simulate(turns, new MyGeneParser(bestGene), print: true);
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine("Results: ");
+            Console.WriteLine($"Damages to base: {result.ReachedToTheEnd}");
+            Console.WriteLine($"Total money spent: {result.TotalPrice}");
+            Console.WriteLine($"Score: {scoringPolicy.CalculateTotalScore(result)}");
+            Console.WriteLine($"Turns: {result.Turns}");
+            Console.WriteLine();
+        }
+
+        private static void logGenerationStatistics(int length, System.Collections.Generic.List<Gene> generation, int i, System.Collections.Generic.List<Gene> sortedGeneration, Gene bestGene)
+        {
+            Console.WriteLine($"Generation #{i + 1} finished. Statistics:");
+            Console.WriteLine($"\tMin score = {sortedGeneration.First().Score}");
+            Console.WriteLine($"\tAverage score = {generation.Average(x => x.Score)}");
+            Console.WriteLine($"\tMax score = {sortedGeneration.Last().Score}");
+            Console.WriteLine("\tBest gene: ");
+
+
+            var creepGeneString = string.Join(", ", bestGene.GenomesList.GetRange(0, length).Select(MyGeneParser.GeneToTroopCount));
+            var heroGeneString = string.Join(", ", bestGene.GenomesList.GetRange(length, length).Select(MyGeneParser.GeneToTroopCount));
+            Console.WriteLine(creepGeneString);
+            Console.WriteLine(heroGeneString);
+
+            Console.WriteLine();
+            Console.WriteLine();
         }
     }
 }
