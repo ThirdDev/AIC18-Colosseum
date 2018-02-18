@@ -23,7 +23,7 @@ namespace Colosseum.Experiment
             _archers = archers.Select(x => new Archer(x)).ToArray();
         }
 
-        public SimulationResult Simulate(IGeneParser parser, bool print = false)
+        public SimulationResult Simulate(IGeneParser parser, bool print = false, string archersString = "", string cannonsString = "")
         {
             var units = new List<Unit>();
             var deadUnits = new List<Unit>();
@@ -51,7 +51,7 @@ namespace Colosseum.Experiment
                     units.Add(new Hero());
 
                 if (print)
-                    PrintState(units, survivorUnits.Count);
+                    PrintState(units, survivorUnits.Count, archersString, cannonsString);
 
                 if ((units.Count == 0) && (i > parser.Gene.GenomesList.Count / 2))
                     break;
@@ -75,30 +75,33 @@ namespace Colosseum.Experiment
             };
         }
 
-        private void PrintState(List<Unit> units, int survivorUnitsCount)
+        private void PrintState(List<Unit> units, int survivorUnitsCount, string archersString, string cannonsString)
         {
             //return;
             var creeps = units.Where(x => x is Creep);
             var heros = units.Where(x => x is Hero);
+            Console.WriteLine();
+            //Console.WriteLine(" " + archersString);
             Console.Write("<");
             for (var i = 0; i < _pathLength; i++)
             {
                 var count = creeps.Count(x => x.Position == i);
-                Console.Write((count == 0 ? " " : count.ToString() + ",").PadLeft(3));
+                Console.Write((count == 0 ? " " : count + ",").PadLeft(3));
             }
             Console.WriteLine(">");
             Console.Write("<");
             for (var i = 0; i < _pathLength; i++)
             {
                 var count = heros.Count(x => x.Position == i);
-                Console.Write((count == 0 ? " " : count.ToString() + ",").PadLeft(3));
+                Console.Write((count == 0 ? " " : count + ",").PadLeft(3));
             }
+
             Console.Write("> ");
 
             for (var i = 0; i < survivorUnitsCount; i++)
                 Console.Write("*");
-
             Console.WriteLine();
+            //Console.WriteLine(" " + cannonsString);
             Console.WriteLine();
             Console.WriteLine();
         }

@@ -87,7 +87,7 @@ namespace Colosseum.Experiment
                 {
                     Console.ReadKey();
                     Console.ReadKey();
-                    logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend);
+                    logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend, archerString, cannonString);
                     Console.ReadKey();
                 }
                 /**/
@@ -97,7 +97,7 @@ namespace Colosseum.Experiment
                 }
                 else
                 {
-                    logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend);
+                    logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend, archerString, cannonString);
                 }
             }
             st.Stop();
@@ -114,12 +114,12 @@ namespace Colosseum.Experiment
             {
                 positions[t]++;
             }
-            return string.Join(", ", positions.Select(x => (x == 0) ? "  " : $"{identifier}{x}"));
+            return string.Join(", ", positions.Select(x => ((x == 0) ? "" : $"{x}{identifier}").PadLeft(3)));
         }
 
-        private static void logGeneSimulationResult(Simulator simulator, Gene bestGene, IScoringPolicy scoringPolicy, int preferredMoneyToSpend)
+        private static void logGeneSimulationResult(Simulator simulator, Gene bestGene, IScoringPolicy scoringPolicy, int preferredMoneyToSpend, string archersString, string cannonsString)
         {
-            var result = simulator.Simulate(new MyGeneParser(bestGene), print: true);
+            var result = simulator.Simulate(new MyGeneParser(bestGene), true, archersString, cannonsString);
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine("Results: ");
