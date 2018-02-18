@@ -43,7 +43,7 @@ namespace Colosseum.Experiment
             var preferredMoneyToSpend = 4000;
             var generationPopulation = 500;
             var lengthOfGene = length * 2;
-            var maximumCountOfGenerations = 100;
+            var maximumCountOfGenerations = 1000;
 
             var towerCount = 10;
             var archerTowerCount = (int)gaussianRandom(towerCount, towerCount);
