@@ -44,7 +44,7 @@ namespace Colosseum.Experiment
             var generationPopulation = 500;
             var lengthOfGene = length * 2;
             var maximumCountOfGenerations = 1000;
-            var geneToTroopMean = -7.0;
+            var geneToTroopMean = 0;
 
             var towerCount = 20;
             var archerTowerCount = (int)gaussianRandom(towerCount / 2.0, 1);
