@@ -71,14 +71,12 @@ namespace Colosseum.Experiment
                 Console.WriteLine($"\tMax score = {sortedGeneration.Last().Score}");
                 Console.WriteLine("\tBest gene: ");
                 var bestGene = sortedGeneration.Last();
-                int xx = 0;
-                foreach (var item in bestGene.GenomesList)
-                {
-                    Console.Write(MyGeneParser.GeneToTroopCount(item) + ", ");
-                    xx++;
-                    if (xx == length)
-                        Console.WriteLine();
-                }
+
+                var creepGeneString = string.Join(", ", bestGene.GenomesList.GetRange(0, length).Select(MyGeneParser.GeneToTroopCount));
+                var heroGeneString = string.Join(", ", bestGene.GenomesList.GetRange(length, length).Select(MyGeneParser.GeneToTroopCount));
+                Console.WriteLine(creepGeneString);
+                Console.WriteLine(heroGeneString);
+
                 Console.WriteLine();
                 Console.WriteLine();
 
