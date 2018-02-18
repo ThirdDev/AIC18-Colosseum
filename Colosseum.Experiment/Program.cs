@@ -156,7 +156,13 @@ namespace Colosseum.Experiment
         private static int[] randomTowerOrder(int count, int exclusiveMaxLocation)
         {
             var towers = new List<int>();
-            for (var i = 0; i < count; i++)
+            var gaussianTowerCount = (int)gaussianRandom(count / 2.0, 1.2);
+            for (var i = 0; i < gaussianTowerCount; i++)
+            {
+                towers.Add((int)gaussianRandom(exclusiveMaxLocation / 2.0, 1.2));
+            }
+
+            for (var i = 0; i < count - gaussianTowerCount; i++)
             {
                 towers.Add(_random.Next(exclusiveMaxLocation));
             }
