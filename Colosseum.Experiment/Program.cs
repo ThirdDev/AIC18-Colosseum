@@ -38,6 +38,7 @@ namespace Colosseum.Experiment
 
             int length = 15;
             var preferredMoneyToSpend = 4000;
+            var generationPopulation = 500;
 
             var simulator = new Simulator(length, cannons, archers);
 
@@ -46,7 +47,7 @@ namespace Colosseum.Experiment
             //scoringPolicy = new ExplorePolicy();
             scoringPolicy = new DamagePolicy(preferredMoneyToSpend);
 
-            var gg = new GenerationGenerator();
+            var gg = new GenerationGenerator(generationPopulation);
 
             var generation = gg.RandomGeneration();
 
