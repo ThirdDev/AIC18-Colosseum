@@ -106,9 +106,9 @@ namespace Colosseum.Experiment
             Console.WriteLine();
         }
 
-        private static void logGenerationStatistics(int length, System.Collections.Generic.List<Gene> generation, int i, System.Collections.Generic.List<Gene> sortedGeneration, Gene bestGene)
+        private static void logGenerationStatistics(int length, List<Gene> generation, int generationNumber, List<Gene> sortedGeneration, Gene bestGene)
         {
-            Console.WriteLine($"Generation #{i + 1} finished. Statistics:");
+            Console.WriteLine($"Generation #{generationNumber + 1} finished. Statistics:");
             Console.WriteLine($"\tMin score = {sortedGeneration.First().Score}");
             Console.WriteLine($"\tAverage score = {generation.Average(x => x.Score)}");
             Console.WriteLine($"\tMax score = {sortedGeneration.Last().Score}");
