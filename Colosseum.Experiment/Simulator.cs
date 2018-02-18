@@ -10,18 +10,20 @@ namespace Colosseum.Experiment
 {
     class Simulator
     {
-        readonly int pathLength;
-        readonly Cannon[] cannons;
-        readonly Archer[] archers;
+        readonly int _pathLength;
+        private readonly int _maximumTurns;
+        readonly Cannon[] _cannons;
+        readonly Archer[] _archers;
 
-        public Simulator(int _pathLength, IEnumerable<int> _cannons, IEnumerable<int> _archers)
+        public Simulator(int pathLength, int maximumTurns, IEnumerable<int> cannons, IEnumerable<int> archers)
         {
-            pathLength = _pathLength;
-            cannons = _cannons.Select(x => new Cannon(x)).ToArray();
-            archers = _archers.Select(x => new Archer(x)).ToArray();
+            _pathLength = pathLength;
+            _maximumTurns = maximumTurns;
+            _cannons = cannons.Select(x => new Cannon(x)).ToArray();
+            _archers = archers.Select(x => new Archer(x)).ToArray();
         }
 
-        public SimulationResult Simulate(int maximumTurns, IGeneParser parser, bool print = false)
+        public SimulationResult Simulate(IGeneParser parser, bool print = false)
         {
             var units = new List<Unit>();
             var deadUnits = new List<Unit>();
@@ -29,12 +31,12 @@ namespace Colosseum.Experiment
 
             var elapsedTurns = 0;
 
-            foreach (var item in cannons)
+            foreach (var item in _cannons)
                 item.Reset();
-            foreach (var item in archers)
+            foreach (var item in _archers)
                 item.Reset();
 
-            for (var i = 0; i < maximumTurns; i++)
+            for (var i = 0; i < _maximumTurns; i++)
             {
                 ProcessTowers(units);
                 deadUnits.AddRange(ProcessDeadUnits(units));
@@ -65,7 +67,7 @@ namespace Colosseum.Experiment
                 ReachedToTheEnd = survivorUnits.Count,
                 DamagesToEnemyBase = survivorUnits.Sum(x => x.DamageToEnemyBase),
                 DeadPositions = deadUnits.Select(x => x.Position).ToArray(),
-                Length = pathLength,
+                Length = _pathLength,
                 Turns = elapsedTurns,
                 TotalPrice = creepPrice + heroPrice,
             };
@@ -77,14 +79,14 @@ namespace Colosseum.Experiment
             var creeps = units.Where(x => x is Creep);
             var heros = units.Where(x => x is Hero);
             Console.Write("<");
-            for (var i = 0; i < pathLength; i++)
+            for (var i = 0; i < _pathLength; i++)
             {
                 var count = creeps.Count(x => x.Position == i);
                 Console.Write((count == 0 ? " " : count.ToString() + ",").PadLeft(3));
             }
             Console.WriteLine(">");
             Console.Write("<");
-            for (var i = 0; i < pathLength; i++)
+            for (var i = 0; i < _pathLength; i++)
             {
                 var count = heros.Count(x => x.Position == i);
                 Console.Write((count == 0 ? " " : count.ToString() + ",").PadLeft(3));
@@ -101,8 +103,8 @@ namespace Colosseum.Experiment
 
         private List<Unit> ProcessSurvivedUnits(List<Unit> units)
         {
-            var survivedUnits = units.Where(x => x.Position >= pathLength).ToList();
-            units.RemoveAll(x => x.Position >= pathLength);
+            var survivedUnits = units.Where(x => x.Position >= _pathLength).ToList();
+            units.RemoveAll(x => x.Position >= _pathLength);
 
             return survivedUnits;
         }
@@ -117,7 +119,7 @@ namespace Colosseum.Experiment
 
         private void ProcessTowers(List<Unit> units)
         {
-            foreach (var item in cannons)
+            foreach (var item in _cannons)
             {
                 if (!item.CanAttack())
                     continue;
@@ -131,7 +133,7 @@ namespace Colosseum.Experiment
                 }
             }
 
-            foreach (var item in archers)
+            foreach (var item in _archers)
             {
                 if (!item.CanAttack())
                     continue;
@@ -145,9 +147,9 @@ namespace Colosseum.Experiment
                 }
             }
 
-            foreach (var item in cannons)
+            foreach (var item in _cannons)
                 item.TurnPassed();
-            foreach (var item in archers)
+            foreach (var item in _archers)
                 item.TurnPassed();
         }
     }

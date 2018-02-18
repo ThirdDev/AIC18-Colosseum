@@ -56,7 +56,7 @@ namespace Colosseum.Experiment
             var archerString = towerLocationsToString(archers, length, "a");
             var cannonString = towerLocationsToString(cannons, length, "c");
 
-            var simulator = new Simulator(length, cannons, archers);
+            var simulator = new Simulator(length, turns, cannons, archers);
 
             IScoringPolicy scoringPolicy;
 
@@ -73,7 +73,7 @@ namespace Colosseum.Experiment
             {
                 foreach (var gene in generation)
                 {
-                    var result = simulator.Simulate(turns, new MyGeneParser(gene));
+                    var result = simulator.Simulate(new MyGeneParser(gene));
                     gene.Score = scoringPolicy.CalculateTotalScore(result);
                 }
 
@@ -119,7 +119,7 @@ namespace Colosseum.Experiment
 
         private static void logGeneSimulationResult(Simulator simulator, Gene bestGene, IScoringPolicy scoringPolicy, int preferredMoneyToSpend)
         {
-            var result = simulator.Simulate(turns, new MyGeneParser(bestGene), print: true);
+            var result = simulator.Simulate(new MyGeneParser(bestGene), print: true);
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine("Results: ");
