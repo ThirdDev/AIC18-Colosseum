@@ -155,7 +155,7 @@ namespace Colosseum.Experiment
 
         private static int[] randomTowerOrder(int count, int exclusiveMaxLocation)
         {
-            var towers = new List<int>();
+            var towers = new List<int>(count);
             var gaussianTowerCount = (int)gaussianRandom(count / 2.0, 1.2);
             for (var i = 0; i < gaussianTowerCount; i++)
             {
