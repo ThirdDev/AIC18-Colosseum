@@ -123,7 +123,7 @@ namespace Colosseum.Experiment
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine("Results: ");
-            Console.WriteLine($"Damages to base: {result.ReachedToTheEnd}");
+            Console.WriteLine($"Damages to base: {result.DamagesToEnemyBase}");
             Console.WriteLine($"Total money spent: {result.TotalPrice} with {preferredMoneyToSpend} prefered");
             Console.WriteLine($"Score: {scoringPolicy.CalculateTotalScore(result)}");
             Console.WriteLine($"Turns: {result.Turns}");

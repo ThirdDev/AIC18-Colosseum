@@ -63,6 +63,7 @@ namespace Colosseum.Experiment
             return new SimulationResult
             {
                 ReachedToTheEnd = survivorUnits.Count,
+                DamagesToEnemyBase = survivorUnits.Sum(x => x.DamageToEnemyBase),
                 DeadPositions = deadUnits.Select(x => x.Position).ToArray(),
                 Length = pathLength,
                 Turns = elapsedTurns,
@@ -136,7 +137,7 @@ namespace Colosseum.Experiment
                     continue;
 
                 var affectedUnit = units.Where(x => item.IsInRange(x.Position)).OrderByDescending(x => x.Position).FirstOrDefault();
-                
+
                 if (affectedUnit != null)
                 {
                     item.Attack();

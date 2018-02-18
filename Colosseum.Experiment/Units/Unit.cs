@@ -11,7 +11,8 @@ namespace Colosseum.Experiment.Units
         public abstract int Health { get; set; }
         public abstract int DamageByCannon { get; }
         public abstract int DamageByArcher { get; }
-        public abstract int Price { get;  }
+        public abstract int Price { get; }
+        public abstract int DamageToEnemyBase { get; }
 
 
         /// <summary>
