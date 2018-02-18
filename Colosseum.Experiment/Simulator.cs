@@ -10,9 +10,9 @@ namespace Colosseum.Experiment
 {
     class Simulator
     {
-        int pathLength;
-        Cannon[] cannons;
-        Archer[] archers;
+        readonly int pathLength;
+        readonly Cannon[] cannons;
+        readonly Archer[] archers;
 
         public Simulator(int _pathLength, IEnumerable<int> _cannons, IEnumerable<int> _archers)
         {
