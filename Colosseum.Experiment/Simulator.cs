@@ -75,33 +75,27 @@ namespace Colosseum.Experiment
             };
         }
 
+        private string getUnitMap(IEnumerable<Unit> units)
+        {
+            var positions = Enumerable.Repeat(0, _pathLength).ToArray();
+            foreach (var t in units)
+            {
+                positions[t.Position]++;
+            }
+            return "<" + string.Join(", ", positions.Select(x => ((x == 0) ? "" : $"{x}").PadLeft(3))) + ">";
+
+        }
+
         private void PrintState(List<Unit> units, int survivorUnitsCount, string archersString, string cannonsString)
         {
             //return;
             var creeps = units.Where(x => x is Creep);
             var heros = units.Where(x => x is Hero);
             Console.WriteLine();
-            //Console.WriteLine(" " + archersString);
-            Console.Write("<");
-            for (var i = 0; i < _pathLength; i++)
-            {
-                var count = creeps.Count(x => x.Position == i);
-                Console.Write((count == 0 ? " " : count + ",").PadLeft(3));
-            }
-            Console.WriteLine(">");
-            Console.Write("<");
-            for (var i = 0; i < _pathLength; i++)
-            {
-                var count = heros.Count(x => x.Position == i);
-                Console.Write((count == 0 ? " " : count + ",").PadLeft(3));
-            }
-
-            Console.Write("> ");
-
-            for (var i = 0; i < survivorUnitsCount; i++)
-                Console.Write("*");
-            Console.WriteLine();
-            //Console.WriteLine(" " + cannonsString);
+            Console.WriteLine(" " + archersString);
+            Console.WriteLine(getUnitMap(creeps));
+            Console.WriteLine(getUnitMap(heros) + string.Join("", Enumerable.Repeat("*", survivorUnitsCount)));
+            Console.WriteLine(" " + cannonsString);
             Console.WriteLine();
             Console.WriteLine();
         }
