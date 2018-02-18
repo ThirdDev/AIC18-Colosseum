@@ -9,9 +9,12 @@ namespace Colosseum.Experiment.GeneParsers
     {
         public Gene Gene { get; private set; }
 
-        public MyGeneParser(Gene gene)
+        private readonly double _mean;
+
+        public MyGeneParser(Gene gene, double mean)
         {
             Gene = gene;
+            _mean = mean;
         }
 
         const int len = 15;
@@ -30,14 +33,14 @@ namespace Colosseum.Experiment.GeneParsers
 
             return new AttackAction
             {
-                CountOfCreeps = GeneToTroopCount(a),
-                CountOfHeros = GeneToTroopCount(b),
+                CountOfCreeps = GeneToTroopCount(a, _mean),
+                CountOfHeros = GeneToTroopCount(b, _mean),
             };
         }
 
-        public static int GeneToTroopCount(double a)
+        public static int GeneToTroopCount(double a, double mean)
         {
-            return (int)Math.Max(7, a) - 7;
+            return (int)(Math.Max(-mean, a) + mean);
         }
     }
 }
