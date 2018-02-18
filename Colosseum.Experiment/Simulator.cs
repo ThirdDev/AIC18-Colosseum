@@ -94,7 +94,7 @@ namespace Colosseum.Experiment
             Console.WriteLine();
             Console.WriteLine(" " + archersString);
             Console.WriteLine(getUnitMap(creeps));
-            Console.WriteLine(getUnitMap(heros) + string.Join("", Enumerable.Repeat("*", survivorUnitsCount)));
+            Console.WriteLine(getUnitMap(heros) + " " + string.Join("", Enumerable.Repeat("*", survivorUnitsCount)));
             Console.WriteLine(" " + cannonsString);
             Console.WriteLine();
             Console.WriteLine();
