@@ -59,8 +59,10 @@ namespace Colosseum.Experiment
                 elapsedTurns++;
             }
 
-            var creepPrice = new Creep().Price * (units.Count(x => x is Creep) + deadUnits.Count(x => x is Creep) + survivorUnits.Count(x => x is Creep));
-            var heroPrice = new Hero().Price * (units.Count(x => x is Hero) + deadUnits.Count(x => x is Hero) + survivorUnits.Count(x => x is Hero));
+            //var creepPrice = new Creep().Price * (units.Count(x => x is Creep) + deadUnits.Count(x => x is Creep) + survivorUnits.Count(x => x is Creep));
+            //var heroPrice = new Hero().Price * (units.Count(x => x is Hero) + deadUnits.Count(x => x is Hero) + survivorUnits.Count(x => x is Hero));
+
+            var price = units.Union(deadUnits).Union(survivorUnits).Sum(x => x.Price);
 
             return new SimulationResult
             {
@@ -69,7 +71,7 @@ namespace Colosseum.Experiment
                 DeadPositions = deadUnits.Select(x => x.Position).ToArray(),
                 Length = _pathLength,
                 Turns = elapsedTurns,
-                TotalPrice = creepPrice + heroPrice,
+                TotalPrice = price,
             };
         }
 
