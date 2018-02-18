@@ -34,7 +34,7 @@ namespace Colosseum.App
         private const int _maximumTryCount = 3;
 
 
-        private static readonly GenerationGenerator _generationGenerator = new GenerationGenerator(50);
+        private static readonly GenerationGenerator _generationGenerator = new GenerationGenerator(50, 200);
 
         [SuppressMessage("ReSharper", "FunctionNeverReturns")]
         public static async Task RunCompetitions(string mapPath, CompetetionMode competetionMode, CancellationToken cancellationToken = default)

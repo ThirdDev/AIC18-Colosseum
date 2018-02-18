@@ -8,11 +8,13 @@ namespace Colosseum.GS
     {
         private const double PartToLive = 0.15;
         private const double rangeOfMutaion = 0.05;
-        private int _generationPopulation;
+        private readonly int _generationPopulation;
+        private readonly int _lengthOfGene;
 
-        public GenerationGenerator(int generationPopulation)
+        public GenerationGenerator(int generationPopulation, int lengthOfGene)
         {
             _generationPopulation = generationPopulation;
+            _lengthOfGene = lengthOfGene;
         }
 
         private const double stdDrivationForLives = PartToLive * 2 / 3;
@@ -26,7 +28,7 @@ namespace Colosseum.GS
             for (var j = 0; j < _generationPopulation; j++)
             {
                 var tmp = new Gene();
-                for (var i = 0; i < Gene.LengthOfGene; i++)
+                for (var i = 0; i < _lengthOfGene; i++)
                 {
                     var weight = (random.NextDouble() - 0.5) * 20;
                     tmp.GenomesList.Add(weight);
@@ -63,7 +65,7 @@ namespace Colosseum.GS
                 var indexMom = getRandomParentIndex(random, generation.Count);
 
                 var tmp = new Gene();
-                for (var i = 0; i < Gene.LengthOfGene; i++)
+                for (var i = 0; i < _lengthOfGene; i++)
                 {
                     var randAns = random.NextDouble();
                     if (randAns < rangeOfMutaion)
