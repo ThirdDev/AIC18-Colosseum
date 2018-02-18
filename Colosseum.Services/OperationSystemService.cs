@@ -30,7 +30,7 @@ namespace Colosseum.Services
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            Process process = new Process
+            var process = new Process
             {
                 StartInfo =
                 {

@@ -16,12 +16,12 @@ namespace Colosseum.Experiment.ScoringPolicies
 
         private double CalculateDeadScore(SimulationResult result)
         {
-            double avg = 0.0;
-            int w = 0;
-            for (int i = 0; i < result.Length; i++)
+            var avg = 0.0;
+            var w = 0;
+            for (var i = 0; i < result.Length; i++)
             {
-                int count = result.DeadPositions.Count(x => x == i);
-                int c2 = Math.Min(count, 3); // Don't fool me!
+                var count = result.DeadPositions.Count(x => x == i);
+                var c2 = Math.Min(count, 3); // Don't fool me!
                 avg += c2 * (double)i;
                 w += c2;
             }

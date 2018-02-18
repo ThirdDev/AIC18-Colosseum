@@ -23,18 +23,18 @@ namespace Colosseum.Experiment
 
         public SimulationResult Simulate(int maximumTurns, IGeneParser parser, bool print = false)
         {
-            List<Unit> units = new List<Unit>();
-            List<Unit> deadUnits = new List<Unit>();
-            List<Unit> survivorUnits = new List<Unit>();
+            var units = new List<Unit>();
+            var deadUnits = new List<Unit>();
+            var survivorUnits = new List<Unit>();
 
-            int elapsedTurns = 0;
+            var elapsedTurns = 0;
 
             foreach (var item in cannons)
                 item.Reset();
             foreach (var item in archers)
                 item.Reset();
 
-            for (int i = 0; i < maximumTurns; i++)
+            for (var i = 0; i < maximumTurns; i++)
             {
                 ProcessTowers(units);
                 deadUnits.AddRange(ProcessDeadUnits(units));
@@ -43,9 +43,9 @@ namespace Colosseum.Experiment
                 survivorUnits.AddRange(ProcessSurvivedUnits(units));
 
                 var action = parser.Parse(i);
-                for (int j = 0; j < action.CountOfCreeps; j++)
+                for (var j = 0; j < action.CountOfCreeps; j++)
                     units.Add(new Creep());
-                for (int j = 0; j < action.CountOfHeros; j++)
+                for (var j = 0; j < action.CountOfHeros; j++)
                     units.Add(new Hero());
 
                 if (print)
@@ -76,21 +76,21 @@ namespace Colosseum.Experiment
             var creeps = units.Where(x => x is Creep);
             var heros = units.Where(x => x is Hero);
             Console.Write("<");
-            for (int i = 0; i < pathLength; i++)
+            for (var i = 0; i < pathLength; i++)
             {
                 var count = creeps.Count(x => x.Position == i);
                 Console.Write((count == 0 ? " " : count.ToString() + ",").PadLeft(3));
             }
             Console.WriteLine(">");
             Console.Write("<");
-            for (int i = 0; i < pathLength; i++)
+            for (var i = 0; i < pathLength; i++)
             {
                 var count = heros.Count(x => x.Position == i);
                 Console.Write((count == 0 ? " " : count.ToString() + ",").PadLeft(3));
             }
             Console.Write("> ");
 
-            for (int i = 0; i < survivorUnitsCount; i++)
+            for (var i = 0; i < survivorUnitsCount; i++)
                 Console.Write("*");
 
             Console.WriteLine();

@@ -36,10 +36,10 @@ namespace Colosseum.Experiment
             //cannons = new int[] { 1, 1, 3, 3, 5, 5, 7, 7, 9, 9, 11, 11, 13, 13, 15, 15, 17, 17, 19, 19, 21, 21, 23, 23 };
             //archers = new int[] { 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 22, 22, 24, 24 };
 
-            int length = 15;
+            var length = 15;
             var preferredMoneyToSpend = 4000;
             var generationPopulation = 500;
-            int lengthOfGene = length * 2;
+            var lengthOfGene = length * 2;
 
             var simulator = new Simulator(length, cannons, archers);
 
@@ -52,9 +52,9 @@ namespace Colosseum.Experiment
 
             var generation = gg.RandomGeneration();
 
-            Stopwatch st = new Stopwatch();
+            var st = new Stopwatch();
             st.Start();
-            for (int i = 0; i < 100; i++)
+            for (var i = 0; i < 100; i++)
             {
                 foreach (var gene in generation)
                 {
