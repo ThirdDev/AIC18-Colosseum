@@ -18,8 +18,8 @@ namespace Colosseum.Experiment
         [SuppressMessage("ReSharper", "JoinDeclarationAndInitializer")]
         public static void Main()
         {
-            SolutionMaker solutionMaker = new SolutionMaker(new SingleTower(), new DamagePolicy(500));
-            solutionMaker.Make(10);
+            SolutionMaker solutionMaker = new SolutionMaker(new TwoTowers(), new DamagePolicy(600));
+            solutionMaker.Make(40);
             return;
 
             int[] cannons, archers;
