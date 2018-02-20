@@ -46,14 +46,14 @@ namespace Colosseum.Experiment
             Console.WriteLine();
 
 
-            TimeSpan reportPeriod = TimeSpan.FromSeconds(0.5);
+            TimeSpan reportPeriod = TimeSpan.FromSeconds(2);
             int progress = 0;
 
             using (new Timer(
-                _ => Console.Write($"\r{progress + 1} / {towerStates.Count}"),
+                _ => WriteStatus(progress + 1, towerStates.Count, reportPeriod),
                 null, reportPeriod, reportPeriod))
             {
-                Parallel.For(0, towerStates.Count, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (long i) => 
+                Parallel.For(0, towerStates.Count, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (long i) =>
                 {
                     List<List<Gene>> bestGenes = new List<List<Gene>>();
                     for (int j = 0; j < countOfBestGenesToSave; j++)
@@ -71,7 +71,7 @@ namespace Colosseum.Experiment
                 });
             }
 
-            Console.Write($"\r{towerStates.Count} / {towerStates.Count}");
+            Console.Write($"\r{towerStates.Count} / {towerStates.Count}                                                                         ");
 
             Console.WriteLine();
             Console.WriteLine($"Writing output file '{outputFile}'...");
@@ -84,6 +84,15 @@ namespace Colosseum.Experiment
 
             Console.WriteLine("Done.");
             Console.ReadKey();
+        }
+
+        int prevProg = 0;
+        private void WriteStatus(int progress, int totalCount, TimeSpan period)
+        {
+            double spm = 60.0 * (progress - prevProg) / period.TotalSeconds;
+            
+            Console.Write($"\r{progress} / {totalCount} - SPM: {spm.ToString("F1")}");
+            prevProg = progress;
         }
 
         private TowerStateResult GetTowerStateResult(TowerState towerState, List<List<Gene>> bestGenes, int pathLength)
