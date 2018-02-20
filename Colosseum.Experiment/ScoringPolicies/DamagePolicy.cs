@@ -16,8 +16,15 @@ namespace Colosseum.Experiment.ScoringPolicies
 
         public double CalculateTotalScore(SimulationResult result)
         {
+            //return (result.ReachedToTheEnd > 0 ? (result.ReachedToTheEnd) : 0) * 30.0 +
+            //    -Math.Pow(result.TotalPrice / (_preferredMoneyToSpend / 3.0), 4);
             return (result.DamagesToEnemyBase > 0 ? (Math.Min(result.DamagesToEnemyBase, 50)) : 0) * 30.0 +
-                -Math.Pow(result.TotalPrice / ((double)_preferredMoneyToSpend / 4), 4);
+                -Math.Pow(result.TotalPrice / (_preferredMoneyToSpend / 3.0), 4);
+        }
+
+        public int GetPreferredMoneyToSpend()
+        {
+            return _preferredMoneyToSpend;
         }
     }
 }

@@ -38,7 +38,12 @@ namespace Colosseum.Experiment.ScoringPolicies
         {
             return (result.ReachedToTheEnd > 0 ? 1 : 0) * 100.0 +
                 Math.Pow(CalculateDeadScore(result), 1.1) * 10.0 +
-                -Math.Pow(result.TotalPrice / ((double)_preferredMoneyToSpend / 4), 4);
+                -Math.Pow(result.TotalPrice / (_preferredMoneyToSpend / 3.0), 4);
+        }
+
+        public int GetPreferredMoneyToSpend()
+        {
+            return _preferredMoneyToSpend;
         }
     }
 }

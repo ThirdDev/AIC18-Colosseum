@@ -1,7 +1,8 @@
 ﻿namespace Colosseum.Experiment.ScoringPolicies
 {
-    internal interface IScoringPolicy
+    public interface IScoringPolicy
     {
         double CalculateTotalScore(SimulationResult result);
+        int GetPreferredMoneyToSpend();
     }
 }
