@@ -124,7 +124,7 @@ namespace Colosseum.Experiment
                     {
                         Console.ReadKey();
                         Console.ReadKey();
-                        logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend, archerString, cannonString, geneToTroopMean);
+                        logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend, archerString, cannonString, geneToTroopMean, length);
                         Console.ReadKey();
                     }
                 }
