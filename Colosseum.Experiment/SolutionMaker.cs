@@ -18,6 +18,7 @@ namespace Colosseum.Experiment
         const int maximumTurns = 100;
         const int generationCount = 100;
         const int countOfBestGenesToSave = 3;
+        const int maximumGenerations = 300;
 
         private readonly ITowerStateMaker towerStateMaker;
         private readonly IScoringPolicy scoringPolicy;
@@ -143,6 +144,13 @@ namespace Colosseum.Experiment
         {
             if (bestScores.Count < 11)
                 return false;
+
+            if (bestScores.Count > maximumGenerations)
+            {
+                Console.WriteLine("A gene has failed to converge.");
+                Console.WriteLine();
+                return true;
+            }
 
             if ((bestScores[bestScores.Count - 1] == bestScores[bestScores.Count - 10]) && (bestScores[bestScores.Count - 1] != 0))
                 return true;
