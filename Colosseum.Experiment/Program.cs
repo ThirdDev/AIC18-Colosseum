@@ -7,6 +7,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using System.IO;
+using Colosseum.Tools.SystemExtensions.Collection.Generic;
 
 namespace Colosseum.Experiment
 {
@@ -16,9 +20,9 @@ namespace Colosseum.Experiment
         const int turns = 1000;
 
         [SuppressMessage("ReSharper", "JoinDeclarationAndInitializer")]
-        public static void Main()
+        public static async Task Main()
         {
-            /**/
+            /**
             SolutionMaker solutionMaker = new SolutionMaker(new ThreeTowers(), new DamagePolicy(600));
             solutionMaker.Make(20);
             return;
@@ -44,8 +48,8 @@ namespace Colosseum.Experiment
             //cannons = new int[] { 1, 1, 3, 3, 5, 5, 7, 7, 9, 9, 11, 11, 13, 13, 15, 15, 17, 17, 19, 19, 21, 21, 23, 23 };
             //archers = new int[] { 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 22, 22, 24, 24 };
 
-            cannons = new int[] { 3, 9 };
-            archers = new int[] { 6, 9 };
+            //cannons = new int[] { 3, 9 };
+            //archers = new int[] { 6, 9 };
 
 
 
@@ -64,18 +68,90 @@ namespace Colosseum.Experiment
             //cannons = randomTowerOrder(canonTowerCount, length);
             //archers = randomTowerOrder(archerTowerCount, length);
 
+            preferredMoneyToSpend = 1200;
+            length = 20;
 
             IScoringPolicy scoringPolicy;
 
             //scoringPolicy = new ExplorePolicy(preferredMoneyToSpend);
             scoringPolicy = new DamagePolicy(preferredMoneyToSpend);
 
-            var bestGene = findBestGeneForTowerPattern(cannons, archers, length, preferredMoneyToSpend,
-                generationPopulation, maximumCountOfGenerations, geneToTroopMean, scoringPolicy, printEvaluationLog: true);
+            var towerStates = JsonConvert.DeserializeObject<List<TowerStateResult>>(
+                await File.ReadAllTextAsync(
+                    @"C:\Projects\AIC2018\BuildingBlocks\output\ThreeTowers-DamagePolicy 600-pathLength 20-2018-20-2--20-38-47.json"));
+            var firstState = towerStates.RandomElement();
+            var secondState = towerStates.RandomElement();
 
-            Console.WriteLine(bestGene.Score);
+            cannons = firstState.TowerState.Cannons.Concat(secondState.TowerState.Cannons).ToArray();
+            archers = firstState.TowerState.Archers.Concat(secondState.TowerState.Archers).ToArray();
 
-            Console.ReadLine();
+            var archersString = towerLocationsToString(archers, length, "a");
+            var cannonsString = towerLocationsToString(cannons, length, "c");
+            Console.WriteLine($"archers: {archersString}");
+            Console.WriteLine($"cannons: {cannonsString}");
+
+            Console.WriteLine();
+
+            var firstGene = combineGenes(length, firstState.Genes.Select(x => x.Gene).ToArray());
+            var secondGenes = combineGenes(length, secondState.Genes.Select(x => x.Gene).ToArray());
+
+            var gene = combineGenes(length, firstGene, secondGenes);
+
+            var testGenesCount = 5;
+
+            var simulator = new Simulator(length, turns, cannons, archers);
+
+            Console.WriteLine($"finding {testGenesCount} best genes for these towers");
+            Console.WriteLine();
+
+            var bestGenes = new List<Gene>
+            {
+                gene
+            };
+
+            for (var i = 0; i < testGenesCount; i++)
+            {
+                var testGene = findBestGeneForTowerPattern(cannons, archers, length, preferredMoneyToSpend,
+                    generationPopulation, maximumCountOfGenerations, geneToTroopMean, scoringPolicy, printEvaluationLog: false);
+
+                bestGenes.Add(testGene);
+                Console.WriteLine($"gene number {i + 1}");
+                logGeneSimulationResultWithGeneAndTowerInfo(testGene, simulator, length, scoringPolicy, preferredMoneyToSpend, geneToTroopMean, archersString, cannonsString, false);
+                Console.WriteLine("=======================================================================================");
+            }
+
+            Console.WriteLine("testing combined gene");
+            Console.WriteLine();
+
+            logGeneSimulationResultWithGeneAndTowerInfo(gene, simulator, length, scoringPolicy, preferredMoneyToSpend, geneToTroopMean, archersString, cannonsString, false);
+
+            Console.WriteLine();
+            Console.WriteLine("enter the gene number to see game play or 0 the see the combined gene's play");
+
+            var command = Console.ReadLine();
+
+            while (int.TryParse(command, out int number))
+            {
+                logGeneSimulationResultWithGeneAndTowerInfo(bestGenes[number], simulator, length, scoringPolicy, preferredMoneyToSpend, geneToTroopMean, archersString, cannonsString, true);
+
+                command = Console.ReadLine();
+            }
+
+        }
+
+        private static void logGeneSimulationResultWithGeneAndTowerInfo(Gene gene, Simulator simulator, int length,
+            IScoringPolicy scoringPolicy, int preferredMoneyToSpend, double geneToTroopMean, string archersString,
+            string cannonsString, bool logGame)
+        {
+            Console.WriteLine($"archers: {archersString}");
+            Console.WriteLine($"cannons: {cannonsString}");
+            var creepGeneString = string.Join(", ", gene.GenomesList.GetRange(0, length).Select(x => MyGeneParser.GeneToTroopCount(x)));
+            var heroGeneString = string.Join(", ", gene.GenomesList.GetRange(length, length).Select(x => MyGeneParser.GeneToTroopCount(x)));
+
+            Console.WriteLine($"creeps: {creepGeneString}");
+            Console.WriteLine($"heros:  {heroGeneString}");
+
+            logGeneSimulationResult(simulator, gene, scoringPolicy, preferredMoneyToSpend, archersString, cannonsString, geneToTroopMean, length, logGame);
         }
 
         private static Gene findBestGeneForTowerPattern(
@@ -129,7 +205,7 @@ namespace Colosseum.Experiment
                     {
                         Console.ReadKey();
                         Console.ReadKey();
-                        logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend, archerString, cannonString, geneToTroopMean, length);
+                        logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend, archerString, cannonString, geneToTroopMean, length, true);
                         Console.ReadKey();
                     }
                 }
@@ -159,7 +235,7 @@ namespace Colosseum.Experiment
                 {
                     if (printEvaluationLog)
                     {
-                        logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend, archerString, cannonString, geneToTroopMean, length);
+                        logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend, archerString, cannonString, geneToTroopMean, length, true);
                     }
                     break;
                 }
@@ -172,7 +248,7 @@ namespace Colosseum.Experiment
                 {
                     if (printEvaluationLog)
                     {
-                        logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend, archerString, cannonString, geneToTroopMean, length);
+                        logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend, archerString, cannonString, geneToTroopMean, length, true);
                     }
                 }
             }
@@ -183,6 +259,21 @@ namespace Colosseum.Experiment
             }
 
             return bestGene;
+        }
+
+        private static Gene combineGenes(int length, params Gene[] genes)
+        {
+            var finalGene = new Gene();
+            finalGene.GenomesList.AddRange(Enumerable.Repeat(0.0, length * 2));
+            foreach (var gene in genes)
+            {
+                for (var i = 0; i < gene.GenomesList.Count; i++)
+                {
+                    finalGene.GenomesList[i] = Math.Max(finalGene.GenomesList[i], gene.GenomesList[i]);
+                }
+            }
+
+            return finalGene;
         }
 
         private static Gene bestGene(List<Gene> generation)
@@ -201,9 +292,10 @@ namespace Colosseum.Experiment
         }
 
         private static void logGeneSimulationResult(Simulator simulator, Gene bestGene, IScoringPolicy scoringPolicy,
-            int preferredMoneyToSpend, string archersString, string cannonsString, double geneToTroopMean, int length)
+            int preferredMoneyToSpend, string archersString, string cannonsString, double geneToTroopMean, int length,
+            bool logGame)
         {
-            var result = simulator.Simulate(new MyGeneParser(bestGene, length), true, archersString, cannonsString);
+            var result = simulator.Simulate(new MyGeneParser(bestGene, length), logGame, archersString, cannonsString);
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine("Results: ");
