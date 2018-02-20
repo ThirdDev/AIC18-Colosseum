@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Colosseum.Experiment
 {
@@ -34,6 +36,7 @@ namespace Colosseum.Experiment
             var towerStates = towerStateMaker.GetTowerStates(pathLength);
 
             List<TowerStateResult> results = new List<TowerStateResult>();
+            Object resultsLock = new Object();
 
             Console.WriteLine($"{towerStateMaker.GetType().Name}\r\n{scoringPolicy.GetType().Name} with preferred amount of {scoringPolicy.GetPreferredMoneyToSpend()}\r\npathLength: {pathLength}");
             Console.WriteLine();
@@ -41,19 +44,33 @@ namespace Colosseum.Experiment
             Console.WriteLine($"Generated {towerStates.Count} states.");
             Console.WriteLine();
 
-            for (int i = 0; i < towerStates.Count; i++)
+
+            TimeSpan reportPeriod = TimeSpan.FromSeconds(0.5);
+            int progress = 0;
+
+            using (new Timer(
+                _ => Console.Write($"\r{progress + 1} / {towerStates.Count}"),
+                null, reportPeriod, reportPeriod))
             {
-                List<List<Gene>> bestGenes = new List<List<Gene>>();
-                for (int j = 0; j < countOfBestGenesToSave; j++)
+                Parallel.For(0, towerStates.Count, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (long i) => 
                 {
-                    bestGenes.Add(FindBestGenes(towerStates[i], pathLength).OrderByDescending(x => x.Score).ToList());
-                }
+                    List<List<Gene>> bestGenes = new List<List<Gene>>();
+                    for (int j = 0; j < countOfBestGenesToSave; j++)
+                    {
+                        bestGenes.Add(FindBestGenes(towerStates[(int)i], pathLength).OrderByDescending(x => x.Score).ToList());
+                    }
 
-                results.Add(GetTowerStateResult(towerStates[i], bestGenes, pathLength));
+                    var result = GetTowerStateResult(towerStates[(int)i], bestGenes, pathLength);
+                    lock (resultsLock)
+                    {
+                        results.Add(result);
+                    }
 
-                Console.Write("\r");
-                Console.Write($"{i + 1} / {towerStates.Count}");
+                    Interlocked.Increment(ref progress);
+                });
             }
+
+            Console.Write($"\r{towerStates.Count} / {towerStates.Count}");
 
             Console.WriteLine();
             Console.WriteLine($"Writing output file '{outputFile}'...");
