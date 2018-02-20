@@ -33,7 +33,7 @@ namespace Colosseum.Experiment
             else if (tower == "TwoDoubleTowers")
                 towerStateMaker = new TwoDoubleTowers();
             else if (tower == "RandomTowers")
-                towerStateMaker = new RandomTowers(5, 40, 200);
+                towerStateMaker = new RandomTowers(5, 20, 500);
             else
                 throw new Exception("Invalid response.");
             
