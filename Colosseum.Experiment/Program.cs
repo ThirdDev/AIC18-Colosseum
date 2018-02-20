@@ -68,6 +68,11 @@ namespace Colosseum.Experiment
 
             var generation = gg.RandomGeneration();
 
+
+            double lastBestScore = default;
+            int bestScoreCount = 0;
+            int bestScoreCountLimit = 10;
+
             var st = new Stopwatch();
             st.Start();
             for (var i = 0; i < maximumCountOfGenerations; i++)
@@ -92,6 +97,34 @@ namespace Colosseum.Experiment
                     Console.ReadKey();
                 }
                 /**/
+
+                if (bestGene.Score != null)
+                {
+                    if (i == 0)
+                    {
+                        lastBestScore = bestGene.Score.Value;
+                        bestScoreCount++;
+                    }
+                    else
+                    {
+                        if (bestGene.Score.Value.Equals(lastBestScore))
+                        {
+                            bestScoreCount++;
+                        }
+                        else
+                        {
+                            lastBestScore = bestGene.Score.Value;
+                            bestScoreCount = 1;
+                        }
+                    }
+                }
+
+                if (bestScoreCount >= bestScoreCountLimit)
+                {
+                    logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend, archerString, cannonString, geneToTroopMean);
+                    break;
+                }
+
                 if (i != maximumCountOfGenerations - 1)
                 {
                     generation = gg.Genetic(generation);
