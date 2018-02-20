@@ -59,19 +59,48 @@ namespace Colosseum.Experiment
             //cannons = randomTowerOrder(canonTowerCount, length);
             //archers = randomTowerOrder(archerTowerCount, length);
 
-            var archerString = towerLocationsToString(archers, length, "a");
-            var cannonString = towerLocationsToString(cannons, length, "c");
-
-            var simulator = new Simulator(length, turns, cannons, archers);
 
             IScoringPolicy scoringPolicy;
 
             scoringPolicy = new ExplorePolicy(preferredMoneyToSpend);
             scoringPolicy = new DamagePolicy(preferredMoneyToSpend);
 
+            var bestGene = findBestGeneForTowerPattern(cannons, archers, length, preferredMoneyToSpend,
+                generationPopulation, maximumCountOfGenerations, geneToTroopMean, scoringPolicy, printEvaluationLog: true);
+
+            Console.WriteLine(bestGene.Score);
+
+            Console.ReadLine();
+        }
+
+        private static Gene findBestGeneForTowerPattern(
+            int[] cannons,
+            int[] archers,
+            int length,
+            int preferredMoneyToSpend,
+            int generationPopulation,
+            int maximumCountOfGenerations,
+            int geneToTroopMean,
+            IScoringPolicy scoringPolicy,
+            bool printEvaluationLog)
+        {
+            Gene bestGene = null;
+
+            var simulator = new Simulator(length, turns, cannons, archers);
+
+            var lengthOfGene = length * 2;
+
             var gg = new GenerationGenerator(generationPopulation, lengthOfGene);
 
             var generation = gg.RandomGeneration();
+
+
+            var archerString = towerLocationsToString(archers, length, "a");
+            var cannonString = towerLocationsToString(cannons, length, "c");
+
+            double lastBestScore = default;
+            int bestScoreCount = 0;
+            int bestScoreCountLimit = 10;
 
             var st = new Stopwatch();
             st.Start();
@@ -83,34 +112,77 @@ namespace Colosseum.Experiment
                     gene.Score = scoringPolicy.CalculateTotalScore(result);
                 }
 
-                /**/
-                var sortedGeneration = generation.OrderBy(x => x.Score).ToList();
-                var bestGene = sortedGeneration.Last();
+                bestGene = Program.bestGene(generation);
 
-                logGenerationStatistics(length, generation, i, sortedGeneration, bestGene, archerString, cannonString, geneToTroopMean);
-
-                if (Console.KeyAvailable)
+                if (printEvaluationLog)
                 {
-                    Console.ReadKey();
-                    Console.ReadKey();
-                    logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend, archerString, cannonString, geneToTroopMean, length);
-                    Console.ReadKey();
+                    var sortedGeneration = generation.OrderBy(x => x.Score).ToList();
+
+                    logGenerationStatistics(length, generation, i, sortedGeneration, bestGene, archerString, cannonString, geneToTroopMean);
+
+                    if (Console.KeyAvailable)
+                    {
+                        Console.ReadKey();
+                        Console.ReadKey();
+                        logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend, archerString, cannonString, geneToTroopMean);
+                        Console.ReadKey();
+                    }
                 }
-                /**/
+
+                if (bestGene.Score != null)
+                {
+                    if (i == 0)
+                    {
+                        lastBestScore = bestGene.Score.Value;
+                        bestScoreCount++;
+                    }
+                    else
+                    {
+                        if (bestGene.Score.Value.Equals(lastBestScore))
+                        {
+                            bestScoreCount++;
+                        }
+                        else
+                        {
+                            lastBestScore = bestGene.Score.Value;
+                            bestScoreCount = 1;
+                        }
+                    }
+                }
+
+                if (bestScoreCount >= bestScoreCountLimit)
+                {
+                    if (printEvaluationLog)
+                    {
+                        logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend, archerString, cannonString, geneToTroopMean, length);
+                    }
+                    break;
+                }
+
                 if (i != maximumCountOfGenerations - 1)
                 {
                     generation = gg.Genetic(generation);
                 }
                 else
                 {
-                    logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend, archerString, cannonString, geneToTroopMean, length);
+                    if (printEvaluationLog)
+                    {
+                        logGeneSimulationResult(simulator, bestGene, scoringPolicy, preferredMoneyToSpend, archerString, cannonString, geneToTroopMean, length);
+                    }
                 }
             }
             st.Stop();
-            Console.WriteLine(st.Elapsed);
+            if (printEvaluationLog)
+            {
+                Console.WriteLine(st.Elapsed);
+            }
 
+            return bestGene;
+        }
 
-            Console.ReadLine();
+        private static Gene bestGene(List<Gene> generation)
+        {
+            return generation.OrderBy(x => x.Score).Last();
         }
 
         private static string towerLocationsToString(int[] towerLocations, int length, string identifier = "x")
