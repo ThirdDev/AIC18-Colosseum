@@ -5,8 +5,10 @@ using System.Text;
 
 namespace Colosseum.Experiment.TowerStateMakers
 {
-    class TwoTowers : ITowerStateMaker
+    class TwoDoubleTowers : ITowerStateMaker
     {
+        const int maximumCount = 3;
+
         public List<TowerState> GetTowerStates(int pathLength)
         {
             List<TowerState> states = new List<TowerState>();
@@ -17,23 +19,23 @@ namespace Colosseum.Experiment.TowerStateMakers
                 {
                     states.Add(new TowerState
                     {
-                        Archers = new int[] { i, j },
+                        Archers = new int[] { i, i, j, j },
                         Cannons = new int[] { },
                     });
                     states.Add(new TowerState
                     {
                         Archers = new int[] { },
-                        Cannons = new int[] { i, j },
+                        Cannons = new int[] { i, i, j, j },
                     });
                     states.Add(new TowerState
                     {
-                        Archers = new int[] { i },
-                        Cannons = new int[] { j },
+                        Archers = new int[] { i, i },
+                        Cannons = new int[] { j, j },
                     });
                     states.Add(new TowerState
                     {
-                        Archers = new int[] { j },
-                        Cannons = new int[] { i },
+                        Archers = new int[] { j, j },
+                        Cannons = new int[] { i, i },
                     });
                 }
             }

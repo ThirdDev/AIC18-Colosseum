@@ -17,7 +17,7 @@ namespace Colosseum.Experiment
     {
         const int maximumTurns = 100;
         const int generationCount = 100;
-        const int countOfBestGenesToSave = 3;
+        const int countOfBestGenesToSave = 1;
         const int maximumGenerations = 300;
 
         private readonly ITowerStateMaker towerStateMaker;

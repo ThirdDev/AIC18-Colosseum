@@ -18,9 +18,11 @@ namespace Colosseum.Experiment
         [SuppressMessage("ReSharper", "JoinDeclarationAndInitializer")]
         public static void Main()
         {
-            SolutionMaker solutionMaker = new SolutionMaker(new TwoTowers(), new DamagePolicy(600));
-            solutionMaker.Make(40);
+            /**/
+            SolutionMaker solutionMaker = new SolutionMaker(new ThreeTowers(), new DamagePolicy(600));
+            solutionMaker.Make(20);
             return;
+            /**/
 
             int[] cannons, archers;
 
@@ -36,16 +38,19 @@ namespace Colosseum.Experiment
             //cannons = new int[] { 2, 2 };
             //archers = new int[] { 5, 7, 9 };
 
-            cannons = new int[] { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6 };
-            archers = new int[] { 7, 7, 8, 8, 9, 9, 10, 10, 11, 11 };
+            //cannons = new int[] { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6 };
+            //archers = new int[] { 7, 7, 8, 8, 9, 9, 10, 10, 11, 11 };
 
             //cannons = new int[] { 1, 1, 3, 3, 5, 5, 7, 7, 9, 9, 11, 11, 13, 13, 15, 15, 17, 17, 19, 19, 21, 21, 23, 23 };
             //archers = new int[] { 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14, 16, 16, 18, 18, 20, 20, 22, 22, 24, 24 };
 
+            cannons = new int[] { 3, 9 };
+            archers = new int[] { 6, 9 };
+
 
 
             var length = 15;
-            var preferredMoneyToSpend = 2000;
+            var preferredMoneyToSpend = 400;
             var generationPopulation = 100;
             var lengthOfGene = length * 2;
             var maximumCountOfGenerations = 1000;
@@ -62,7 +67,7 @@ namespace Colosseum.Experiment
 
             IScoringPolicy scoringPolicy;
 
-            scoringPolicy = new ExplorePolicy(preferredMoneyToSpend);
+            //scoringPolicy = new ExplorePolicy(preferredMoneyToSpend);
             scoringPolicy = new DamagePolicy(preferredMoneyToSpend);
 
             var bestGene = findBestGeneForTowerPattern(cannons, archers, length, preferredMoneyToSpend,
@@ -100,7 +105,7 @@ namespace Colosseum.Experiment
 
             double lastBestScore = default;
             int bestScoreCount = 0;
-            int bestScoreCountLimit = 10;
+            int bestScoreCountLimit = 30;
 
             var st = new Stopwatch();
             st.Start();
