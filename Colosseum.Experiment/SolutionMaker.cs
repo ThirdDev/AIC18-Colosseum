@@ -147,8 +147,7 @@ namespace Colosseum.Experiment
 
             if (bestScores.Count > maximumGenerations)
             {
-                Console.WriteLine("A gene has failed to converge.");
-                Console.WriteLine();
+                Console.WriteLine("\rA gene has failed to converge.");
                 return true;
             }
 
