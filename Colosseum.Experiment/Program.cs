@@ -19,7 +19,38 @@ namespace Colosseum.Experiment
         public static void Main()
         {
             /**/
-            SolutionMaker solutionMaker = new SolutionMaker(new ThreeTowers(), new DamagePolicy(600));
+            ITowerStateMaker towerStateMaker;
+            Console.WriteLine("Tower maker type?");
+            var tower = Console.ReadLine();
+            if (tower == "ThreeTowers")
+                towerStateMaker = new ThreeTowers();
+            else if (tower == "FourTowers")
+                towerStateMaker = new FourTowers();
+            else if (tower == "SingleTower")
+                towerStateMaker = new SingleTower();
+            else if (tower == "TwoTowers")
+                towerStateMaker = new TwoTowers();
+            else if (tower == "TwoDoubleTowers")
+                towerStateMaker = new TwoDoubleTowers();
+            else
+                throw new Exception("Invalid response.");
+            
+            Console.WriteLine("policy?");
+            var policy = Console.ReadLine();
+
+            Console.WriteLine("Money?");
+            int money = int.Parse(Console.ReadLine());
+
+            IScoringPolicy xScoringPolicy;
+
+            if (policy == "Damage")
+                xScoringPolicy = new DamagePolicy(money);
+            else if (policy == "Explore")
+                xScoringPolicy = new ExplorePolicy(money);
+            else
+                throw new Exception("Invalid response.");
+
+            SolutionMaker solutionMaker = new SolutionMaker(towerStateMaker, xScoringPolicy);
             solutionMaker.Make(20);
             return;
             /**/
