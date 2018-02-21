@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Colosseum.Experiment.TowerStateMakers.RandomStateMakers;
 
 namespace Colosseum.Experiment
 {
@@ -19,6 +20,12 @@ namespace Colosseum.Experiment
         public static void Main()
         {
             /**/
+
+            SolutionMaker solutionMaker = new SolutionMaker(new UnifiedGaussianRandomTowers(5, 100, 500), new DamagePolicyByTowerCount());
+            solutionMaker.Make(20);
+            return;
+
+            /**
             ITowerStateMaker towerStateMaker;
             Console.WriteLine("Tower maker type?");
             var tower = Console.ReadLine();
@@ -32,6 +39,8 @@ namespace Colosseum.Experiment
                 towerStateMaker = new TwoTowers();
             else if (tower == "TwoDoubleTowers")
                 towerStateMaker = new TwoDoubleTowers();
+            else if (tower == "RandomTowers")
+                towerStateMaker = new RandomTowers(5, 20, 500);
             else
                 throw new Exception("Invalid response.");
             

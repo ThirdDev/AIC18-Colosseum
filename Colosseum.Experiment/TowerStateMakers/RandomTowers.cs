@@ -6,13 +6,13 @@ namespace Colosseum.Experiment.TowerStateMakers
 {
     class RandomTowers : ITowerStateMaker
     {
-        int minCount, maxCount, totalSamples;
+        int minCount, maxCount, eachCountSamples;
 
-        public RandomTowers(int minCount, int maxCount, int totalSamples)
+        public RandomTowers(int minCount, int maxCount, int eachCountSamples)
         {
             this.minCount = minCount;
             this.maxCount = maxCount;
-            this.totalSamples = totalSamples;
+            this.eachCountSamples = eachCountSamples;
         }
 
         public List<TowerState> GetTowerStates(int pathLength)
@@ -20,35 +20,43 @@ namespace Colosseum.Experiment.TowerStateMakers
             Random rnd = new Random();
             List<TowerState> towerStates = new List<TowerState>();
 
-            for (int i = 0; i < totalSamples; i++)
+            for (int i = minCount; i < maxCount + 1; i++)
             {
-                var towersCount = rnd.Next(minCount, maxCount + 1);
-
-                List<int> archers = new List<int>();
-                List<int> cannons = new List<int>();
-
-                for (int j = 0; j < towersCount; j++)
+                for (int j = 0; j < eachCountSamples; j++)
                 {
-                    if (rnd.NextDouble() < 0.5)
-                    {
-                        archers.Add(rnd.Next(pathLength));
-                    }
-                    else
-                    {
-                        cannons.Add(rnd.Next(pathLength));
-                    }
+                    TowerState towerState = GetTowerState(pathLength, i, rnd);
+
+                    towerStates.Add(towerState);
                 }
-
-                var towerState = new TowerState
-                {
-                    Archers = archers.ToArray(),
-                    Cannons = cannons.ToArray(),
-                };
-
-                towerStates.Add(towerState);
             }
 
+
             return towerStates;
+        }
+
+        private static TowerState GetTowerState(int pathLength, int towersCount, Random rnd)
+        {
+            List<int> archers = new List<int>();
+            List<int> cannons = new List<int>();
+
+            for (int j = 0; j < towersCount; j++)
+            {
+                if (rnd.NextDouble() < 0.5)
+                {
+                    archers.Add(rnd.Next(pathLength));
+                }
+                else
+                {
+                    cannons.Add(rnd.Next(pathLength));
+                }
+            }
+
+            var towerState = new TowerState
+            {
+                Archers = archers.ToArray(),
+                Cannons = cannons.ToArray(),
+            };
+            return towerState;
         }
     }
 }
