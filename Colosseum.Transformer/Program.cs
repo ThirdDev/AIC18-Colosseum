@@ -55,7 +55,7 @@ namespace Colosseum.Transformer
                 }
 
 
-                var outputFile = Path.Combine(path, "java", Path.GetFileNameWithoutExtension(file) + ".java");
+                var outputFile = Path.Combine(path, "datafiles", Path.GetFileNameWithoutExtension(file) + ".sgdf");
 
                 var outputDirectory = Path.GetDirectoryName(outputFile);
                 if (!Directory.Exists(outputDirectory))
