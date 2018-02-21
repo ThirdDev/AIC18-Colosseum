@@ -12,19 +12,19 @@ namespace Colosseum.Experiment.TowerStateMakers.RandomStateMakers
 
         protected override int randomTowerCount(int towersCount)
         {
-            return Math.Abs((int)gaussianRandom(towersCount / 2.0, 1));
+            return randomGaussianNumber(towersCount + 1);
         }
 
         protected override int[] randomTowerOrder(int count, int exclusiveMaxLocation)
         {
             var towers = new List<int>(count);
-            var gaussianTowerCount = (int)gaussianRandom(count / 2.0, 1.2);
+            var gaussianTowerCount = randomGaussianNumber(count + 1);
 
             var margin = _random.Next(exclusiveMaxLocation) - (exclusiveMaxLocation / 2);
 
             for (var i = 0; i < gaussianTowerCount; i++)
             {
-                var location = (int)gaussianRandom(exclusiveMaxLocation / 2.0, 1.2);
+                var location = randomGaussianNumber(exclusiveMaxLocation);
                 location += margin;
                 location = Math.Max(0, location);
                 location = Math.Min(exclusiveMaxLocation - 1, location);
@@ -37,6 +37,14 @@ namespace Colosseum.Experiment.TowerStateMakers.RandomStateMakers
             }
 
             return towers.ToArray();
+        }
+
+        private int randomGaussianNumber(int exclusiveMax)
+        {
+            var num = (int)gaussianRandom(exclusiveMax / 2.0, 1);
+            num = Math.Max(0, num);
+            num = Math.Min(exclusiveMax - 1, num);
+            return num;
         }
     }
 }

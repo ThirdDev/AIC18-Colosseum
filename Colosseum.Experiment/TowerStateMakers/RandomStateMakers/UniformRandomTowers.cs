@@ -35,7 +35,7 @@ namespace Colosseum.Experiment.TowerStateMakers.RandomStateMakers
 
         private TowerState randomTowerState(int towersCount, int pathLength)
         {
-            var archerTowerCount = randomTowerCount(towersCount);
+            var archerTowerCount = Math.Abs(randomTowerCount(towersCount));
             var canonTowerCount = towersCount - archerTowerCount;
 
             return new TowerState
