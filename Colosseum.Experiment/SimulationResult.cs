@@ -11,5 +11,7 @@ namespace Colosseum.Experiment
         public int Length { get; set; }
         public int Turns { get; set; }
         public int TotalPrice { get; set; }
+        public int ArcherTowersCount { get; set; }
+        public int CannonTowersCount { get; set; }
     }
 }

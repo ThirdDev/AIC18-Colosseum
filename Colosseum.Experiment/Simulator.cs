@@ -72,6 +72,8 @@ namespace Colosseum.Experiment
                 Length = _pathLength,
                 Turns = elapsedTurns,
                 TotalPrice = price,
+                ArcherTowersCount = _archers.Length,
+                CannonTowersCount = _cannons.Length
             };
         }
 
