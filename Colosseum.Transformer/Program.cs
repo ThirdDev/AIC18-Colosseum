@@ -49,7 +49,7 @@ namespace Colosseum.Transformer
                         return;
                     }
 
-                    var codeLine = $"data.put(\"{key}\", new byte[][] {{ new byte[] {{{string.Join(',', value.Item1)}}}, new byte[] {{{string.Join(',', value.Item2)}}} }});\r\n";
+                    var codeLine = $"{key}\n{string.Join(',', value.Item1)}\n{string.Join(',', value.Item2)}\n";
 
                     code.Append(codeLine);
                 }
