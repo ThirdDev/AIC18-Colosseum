@@ -22,7 +22,7 @@ namespace Colosseum.Experiment
             /**/
 
             SolutionMaker solutionMaker = new SolutionMaker(new UniformGaussianRandomTowers(1, 4, 10), new DamagePolicyByTowerCount());
-            solutionMaker.Make(300, 15 * 2, 3000);
+            solutionMaker.Make(300, 15 * 2, 10000);
             return;
 
             /**
