@@ -15,7 +15,6 @@ namespace Colosseum.Experiment
 {
     public class SolutionMaker
     {
-        const int maximumTurns = 1000;
         const int generationCount = 100;
         const int countOfBestGenesToSave = 1;
         const int maximumGenerations = 300;
@@ -29,7 +28,7 @@ namespace Colosseum.Experiment
             this.scoringPolicy = scoringPolicy;
         }
 
-        public void Make(int pathLength, int geneLenght)
+        public void Make(int pathLength, int geneLenght, int maximumTurns)
         {
             string outputFile = $"{towerStateMaker.GetType().Name}-{scoringPolicy.GetType().Name} {scoringPolicy.GetPreferredMoneyToSpend()}-pathLength {pathLength}-{DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss")}.json";
             string outputDirectory = "output";
@@ -58,10 +57,10 @@ namespace Colosseum.Experiment
                     List<List<Gene>> bestGenes = new List<List<Gene>>();
                     for (int j = 0; j < countOfBestGenesToSave; j++)
                     {
-                        bestGenes.Add(FindBestGenes(towerStates[(int)i], pathLength, geneLenght).OrderByDescending(x => x.Score).ToList());
+                        bestGenes.Add(FindBestGenes(towerStates[(int)i], pathLength, geneLenght, maximumTurns).OrderByDescending(x => x.Score).ToList());
                     }
 
-                    var result = GetTowerStateResult(towerStates[(int)i], bestGenes, pathLength);
+                    var result = GetTowerStateResult(towerStates[(int)i], bestGenes, pathLength, maximumTurns);
                     lock (resultsLock)
                     {
                         results.Add(result);
@@ -95,7 +94,7 @@ namespace Colosseum.Experiment
             prevProg = progress;
         }
 
-        private TowerStateResult GetTowerStateResult(TowerState towerState, List<List<Gene>> bestGenes, int pathLength)
+        private TowerStateResult GetTowerStateResult(TowerState towerState, List<List<Gene>> bestGenes, int pathLength, int maximumTurns)
         {
             var result = new TowerStateResult
             {
@@ -104,13 +103,13 @@ namespace Colosseum.Experiment
 
             foreach (var item in bestGenes)
             {
-                result.Genes.Add(GetGeneResult(towerState, item[0], pathLength));
+                result.Genes.Add(GetGeneResult(towerState, item[0], pathLength, maximumTurns));
             }
 
             return result;
         }
 
-        private GeneDetailedResult GetGeneResult(TowerState towerState, Gene gene, int pathLength)
+        private GeneDetailedResult GetGeneResult(TowerState towerState, Gene gene, int pathLength, int maximumTurns)
         {
             var simulator = new Simulator(pathLength, maximumTurns, towerState.Cannons, towerState.Archers);
             var result = simulator.Simulate(new MyGeneParser(gene));
@@ -124,7 +123,7 @@ namespace Colosseum.Experiment
         }
 
 
-        private List<Gene> FindBestGenes(TowerState state, int pathLength, int geneLength)
+        private List<Gene> FindBestGenes(TowerState state, int pathLength, int geneLength, int maximumTurns)
         {
             var gg = new GenerationGenerator(generationCount, geneLength);
             var generation = gg.RandomGeneration();
