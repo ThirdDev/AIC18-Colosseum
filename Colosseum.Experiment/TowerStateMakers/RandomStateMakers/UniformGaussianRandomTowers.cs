@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Colosseum.Experiment.TowerStateMakers.RandomStateMakers
 {
-    internal class UnifiedGaussianRandomTowers : UniformRandomTowers
+    internal class UniformGaussianRandomTowers : UniformRandomTowers
     {
-        public UnifiedGaussianRandomTowers(int minCount, int maxCount, int countOfSamplesPerTowerCount) : base(minCount,
+        public UniformGaussianRandomTowers(int minCount, int maxCount, int countOfSamplesPerTowerCount) : base(minCount,
             maxCount, countOfSamplesPerTowerCount)
         { }
 
