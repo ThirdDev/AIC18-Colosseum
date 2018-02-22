@@ -10,11 +10,6 @@ namespace Colosseum.Experiment.TowerStateMakers.RandomStateMakers
             maxCount, countOfSamplesPerTowerCount)
         { }
 
-        protected override int randomTowerCount(int towersCount)
-        {
-            return randomGaussianNumber(towersCount + 1);
-        }
-
         protected override int[] randomTowerOrder(int count, int exclusiveMaxLocation)
         {
             var towers = new List<int>(count);
