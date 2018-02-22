@@ -21,8 +21,8 @@ namespace Colosseum.Experiment
         {
             /**/
 
-            SolutionMaker solutionMaker = new SolutionMaker(new UniformGaussianRandomTowers(1, 20, 500), new DamagePolicyByTowerCount());
-            solutionMaker.Make(100);
+            SolutionMaker solutionMaker = new SolutionMaker(new UniformGaussianRandomTowers(1, 4, 10), new DamagePolicyByTowerCount());
+            solutionMaker.Make(300, 15 * 2);
             return;
 
             /**
@@ -111,7 +111,7 @@ namespace Colosseum.Experiment
             scoringPolicy = new DamagePolicy(preferredMoneyToSpend);
 
             var bestGene = findBestGeneForTowerPattern(cannons, archers, length, preferredMoneyToSpend,
-                generationPopulation, maximumCountOfGenerations, geneToTroopMean, scoringPolicy, printEvaluationLog: true);
+                generationPopulation, maximumCountOfGenerations, geneToTroopMean, 15 * 2, scoringPolicy, printEvaluationLog: true);
 
             Console.WriteLine(bestGene.Score);
 
@@ -126,14 +126,13 @@ namespace Colosseum.Experiment
             int generationPopulation,
             int maximumCountOfGenerations,
             int geneToTroopMean,
+            int lengthOfGene,
             IScoringPolicy scoringPolicy,
             bool printEvaluationLog)
         {
             Gene bestGene = null;
 
             var simulator = new Simulator(length, turns, cannons, archers);
-
-            var lengthOfGene = length * 2;
 
             var gg = new GenerationGenerator(generationPopulation, lengthOfGene);
 
@@ -153,7 +152,7 @@ namespace Colosseum.Experiment
             {
                 foreach (var gene in generation)
                 {
-                    var result = simulator.Simulate(new MyGeneParser(gene, length));
+                    var result = simulator.Simulate(new MyGeneParser(gene));
                     gene.Score = scoringPolicy.CalculateTotalScore(result);
                 }
 
@@ -243,7 +242,7 @@ namespace Colosseum.Experiment
         private static void logGeneSimulationResult(Simulator simulator, Gene bestGene, IScoringPolicy scoringPolicy,
             int preferredMoneyToSpend, string archersString, string cannonsString, double geneToTroopMean, int length)
         {
-            var result = simulator.Simulate(new MyGeneParser(bestGene, length), true, archersString, cannonsString);
+            var result = simulator.Simulate(new MyGeneParser(bestGene), true, archersString, cannonsString);
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine("Results: ");

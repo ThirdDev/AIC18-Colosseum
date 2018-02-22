@@ -8,30 +8,30 @@ namespace Colosseum.Experiment.GeneParsers
     class MyGeneParser : IGeneParser
     {
         public Gene Gene { get; private set; }
-        int len;
 
-        public MyGeneParser(Gene gene, int _len)
+        public MyGeneParser(Gene gene)
         {
             Gene = gene;
-            len = _len;
         }
 
         public AttackAction Parse(int turn)
         {
-            if (turn >= len)
+            if (turn >= Gene.GenomesList.Count)
                 return new AttackAction
                 {
                     CountOfHeros = 0,
                     CountOfCreeps = 0,
                 };
 
-            var a = Gene.GenomesList[turn % len];
-            var b = Gene.GenomesList[(turn % len) + len];
+            var length = Gene.GenomesList.Count / 2;
+
+            var creepGenome = Gene.GenomesList[turn % length];
+            var heroGenome = Gene.GenomesList[(turn % length) + length];
 
             return new AttackAction
             {
-                CountOfCreeps = GeneToTroopCount(a),
-                CountOfHeros = GeneToTroopCount(b),
+                CountOfCreeps = GeneToTroopCount(creepGenome),
+                CountOfHeros = GeneToTroopCount(heroGenome),
             };
         }
 
