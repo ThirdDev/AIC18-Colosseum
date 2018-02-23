@@ -15,9 +15,9 @@ namespace Colosseum.Experiment
 {
     public class SolutionMaker
     {
-        const int generationCount = 100;
+        const int generationCount = 150;
         const int countOfBestGenesToSave = 1;
-        const int maximumGenerations = 300;
+        const int maximumGenerations = 500;
 
         private readonly ITowerStateMaker towerStateMaker;
         private readonly IScoringPolicy scoringPolicy;
@@ -28,7 +28,7 @@ namespace Colosseum.Experiment
             this.scoringPolicy = scoringPolicy;
         }
 
-        public void Make(int pathLength, int geneLenght, int maximumTurns)
+        public void Make(int pathLength, int geneLength, int maximumTurns)
         {
             string outputFile = $"{towerStateMaker.GetType().Name}-{scoringPolicy.GetType().Name} {scoringPolicy.GetPreferredMoneyToSpend()}-pathLength {pathLength}-{DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss")}.json";
             string outputDirectory = "output";
@@ -57,7 +57,7 @@ namespace Colosseum.Experiment
                     List<List<Gene>> bestGenes = new List<List<Gene>>();
                     for (int j = 0; j < countOfBestGenesToSave; j++)
                     {
-                        bestGenes.Add(FindBestGenes(towerStates[(int)i], pathLength, geneLenght, maximumTurns).OrderByDescending(x => x.Score).ToList());
+                        bestGenes.Add(FindBestGenes(towerStates[(int)i], pathLength, geneLength, maximumTurns).OrderByDescending(x => x.Score).ToList());
                     }
 
                     var result = GetTowerStateResult(towerStates[(int)i], bestGenes, pathLength, maximumTurns);
@@ -132,7 +132,7 @@ namespace Colosseum.Experiment
 
             List<double> bestScores = new List<double>();
 
-            while (!EnoughGenerations(bestScores))
+            while (!EnoughGenerations(bestScores, state))
             {
                 foreach (var gene in generation)
                 {
@@ -148,14 +148,16 @@ namespace Colosseum.Experiment
             return generation;
         }
 
-        private bool EnoughGenerations(List<double> bestScores)
+        private bool EnoughGenerations(List<double> bestScores, TowerState state)
         {
             if (bestScores.Count < 11)
                 return false;
 
             if (bestScores.Count > maximumGenerations)
             {
-                Console.WriteLine("\rA gene has failed to converge.");
+                Console.WriteLine("\rA gene has failed to converge for: ");
+                Console.WriteLine("Cannons: <" + String.Join(",", state.Cannons) + ">");
+                Console.WriteLine("Archers: <" + String.Join(",", state.Archers) + ">");
                 return true;
             }
 

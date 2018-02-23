@@ -29,7 +29,7 @@ namespace Colosseum.Experiment.ScoringPolicies
 
         public double CalculateTotalScore(SimulationResult result)
         {
-            var _preferredMoneyToSpend = (result.ArcherTowersCount + result.CannonTowersCount) * 150;
+            var _preferredMoneyToSpend = Math.Max((result.ArcherTowersCount + result.CannonTowersCount) * 150, 300);
 
             return (result.ReachedToTheEnd > 0 ? 1 : 0) * 100.0 +
                 Math.Pow(CalculateDeadScore(result), 1.1) * 10.0 +

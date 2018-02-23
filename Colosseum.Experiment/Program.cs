@@ -41,10 +41,10 @@ namespace Colosseum.Experiment
                 towerStateMaker = new TwoDoubleTowers();
             else if (tower == "RandomTowers")
                 towerStateMaker = new RandomTowers(5, 20, 500);
-            else if (tower == "UnifiedRandom") 
-                towerStateMaker = new UniformRandomTowers(1, 30, 50);
+            else if (tower == "UniformRandom") 
+                towerStateMaker = new UniformRandomTowers(1, 30, 10);
             else if (tower == "GaussianRandom") 
-                towerStateMaker = new UniformGaussianRandomTowers(1, 30, 50);
+                towerStateMaker = new UniformGaussianRandomTowers(1, 30, 10);
             else
                 throw new Exception("Invalid response.");
             
@@ -71,7 +71,7 @@ namespace Colosseum.Experiment
                 throw new Exception("Invalid response.");
 
             SolutionMaker solutionMaker = new SolutionMaker(towerStateMaker, xScoringPolicy);
-            solutionMaker.Make(toolemasir);
+            solutionMaker.Make(toolemasir, 40, 5000);
             return;
             /**/
 

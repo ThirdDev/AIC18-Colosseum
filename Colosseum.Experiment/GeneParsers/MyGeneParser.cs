@@ -37,7 +37,7 @@ namespace Colosseum.Experiment.GeneParsers
 
         public static int GeneToTroopCount(double a)
         {
-            return (int)Math.Max(7, a) - 7;
+            return (int)Math.Max(5, a) - 5;
         }
     }
 }
