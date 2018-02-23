@@ -7,13 +7,13 @@ namespace Colosseum.Experiment.TowerStateMakers.RandomStateMakers
     {
         private readonly int _minCount;
         private readonly int _maxCount;
-        private readonly int _countOfSamplesPerTowerCount;
+        private readonly int _countOfSamplesPerTower;
 
-        internal UniformRandomTowers(int minCount, int maxCount, int countOfSamplesPerTowerCount)
+        internal UniformRandomTowers(int minCount, int maxCount, int countOfSamplesPerTower)
         {
             _minCount = minCount;
             _maxCount = maxCount;
-            _countOfSamplesPerTowerCount = countOfSamplesPerTowerCount;
+            _countOfSamplesPerTower = countOfSamplesPerTower;
         }
 
         public List<TowerState> GetTowerStates(int pathLength)
@@ -22,9 +22,14 @@ namespace Colosseum.Experiment.TowerStateMakers.RandomStateMakers
 
             for (int towersCount = _minCount; towersCount < _maxCount + 1; towersCount++)
             {
-                for (int i = 0; i < _countOfSamplesPerTowerCount; i++)
+                for (int archerTowerCount = 0; archerTowerCount <= towersCount; archerTowerCount++) 
                 {
-                    towerStates.Add(randomTowerState(towersCount, pathLength));
+                    int cannonTowerCount = towersCount - archerTowerCount;
+
+                    for (int i = 0; i < _countOfSamplesPerTower; i++)
+                    {
+                        towerStates.Add(randomTowerState(archerTowerCount, cannonTowerCount, pathLength));
+                    }
                 }
             }
 
@@ -33,14 +38,11 @@ namespace Colosseum.Experiment.TowerStateMakers.RandomStateMakers
 
         protected static readonly Random _random = new Random();
 
-        private TowerState randomTowerState(int towersCount, int pathLength)
+        private TowerState randomTowerState(int archerTowerCount, int cannonTowerCount, int pathLength)
         {
-            var archerTowerCount = Math.Abs(randomTowerCount(towersCount));
-            var canonTowerCount = towersCount - archerTowerCount;
-
             return new TowerState
             {
-                Archers = randomTowerOrder(canonTowerCount, pathLength),
+                Archers = randomTowerOrder(cannonTowerCount, pathLength),
                 Cannons = randomTowerOrder(archerTowerCount, pathLength),
             };
         }
