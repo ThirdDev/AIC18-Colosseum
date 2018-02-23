@@ -193,7 +193,7 @@ namespace Colosseum.Experiment
                     }
                     else
                     {
-                        if (bestGene.Score.Value.Equals(lastBestScore) && bestGene.Score != 0)
+                        if (bestGene.Score.Value.Equals(lastBestScore) && !bestGene.Score.Value.Equals(0))
                         {
                             bestScoreCount++;
                         }
