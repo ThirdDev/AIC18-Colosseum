@@ -4,16 +4,11 @@ using System.Text;
 
 namespace Colosseum.Experiment.TowerStateMakers.RandomStateMakers
 {
-    internal class UnifiedGaussianRandomTowers : UniformRandomTowers
+    internal class UniformGaussianRandomTowers : UniformRandomTowers
     {
-        public UnifiedGaussianRandomTowers(int minCount, int maxCount, int countOfSamplesPerTowerCoefficient) : base(minCount,
+        public UniformGaussianRandomTowers(int minCount, int maxCount, int countOfSamplesPerTowerCoefficient) : base(minCount,
             maxCount, countOfSamplesPerTowerCoefficient)
         { }
-
-        protected override int randomTowerCount(int towersCount)
-        {
-            return randomGaussianNumber(towersCount + 1);
-        }
 
         protected override int[] randomTowerOrder(int count, int exclusiveMaxLocation)
         {

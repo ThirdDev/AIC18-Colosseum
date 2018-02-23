@@ -8,7 +8,9 @@ namespace Colosseum.Experiment.ScoringPolicies
     {
         public double CalculateTotalScore(SimulationResult result)
         {
-            var _preferredMoneyToSpend = (result.ArcherTowersCount + result.CannonTowersCount) * 100;
+            var _preferredMoneyToSpend = (result.ArcherTowersCount + result.CannonTowersCount) * 120;
+
+            _preferredMoneyToSpend = Math.Max(300, _preferredMoneyToSpend);
 
             return (result.DamagesToEnemyBase > 0 ? (Math.Min(result.DamagesToEnemyBase, 50)) : 0) * 30.0 +
                    -Math.Pow(result.TotalPrice / (_preferredMoneyToSpend / 3.0), 4);

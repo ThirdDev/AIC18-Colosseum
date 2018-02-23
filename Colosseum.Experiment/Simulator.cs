@@ -25,9 +25,9 @@ namespace Colosseum.Experiment
 
         public SimulationResult Simulate(IGeneParser parser, bool print = false, string archersString = "", string cannonsString = "")
         {
-            var units = new List<Unit>();
+            var aliveUnits = new List<Unit>();
             var deadUnits = new List<Unit>();
-            var survivorUnits = new List<Unit>();
+            var reachedToTheEndUnits = new List<Unit>();
 
             var elapsedTurns = 0;
 
@@ -38,22 +38,22 @@ namespace Colosseum.Experiment
 
             for (var i = 0; i < _maximumTurns; i++)
             {
-                ProcessTowers(units);
-                deadUnits.AddRange(ProcessDeadUnits(units));
+                ProcessTowers(aliveUnits);
+                deadUnits.AddRange(ProcessDeadUnits(aliveUnits));
 
-                units.ForEach(x => x.GoForward());
-                survivorUnits.AddRange(ProcessSurvivedUnits(units));
+                aliveUnits.ForEach(x => x.GoForward());
+                reachedToTheEndUnits.AddRange(ProcessSurvivedUnits(aliveUnits));
 
                 var action = parser.Parse(i);
                 for (var j = 0; j < action.CountOfCreeps; j++)
-                    units.Add(new Creep());
+                    aliveUnits.Add(new Creep());
                 for (var j = 0; j < action.CountOfHeros; j++)
-                    units.Add(new Hero());
+                    aliveUnits.Add(new Hero());
 
                 if (print)
-                    PrintState(units, survivorUnits.Count, archersString, cannonsString);
+                    PrintState(aliveUnits, reachedToTheEndUnits.Count, archersString, cannonsString);
 
-                if ((units.Count == 0) && (i > parser.Gene.GenomesList.Count / 2))
+                if ((aliveUnits.Count == 0) && (i > parser.Gene.GenomesList.Count / 2))
                     break;
 
                 elapsedTurns++;
@@ -62,12 +62,12 @@ namespace Colosseum.Experiment
             //var creepPrice = new Creep().Price * (units.Count(x => x is Creep) + deadUnits.Count(x => x is Creep) + survivorUnits.Count(x => x is Creep));
             //var heroPrice = new Hero().Price * (units.Count(x => x is Hero) + deadUnits.Count(x => x is Hero) + survivorUnits.Count(x => x is Hero));
 
-            var price = units.Union(deadUnits).Union(survivorUnits).Sum(x => x.Price);
+            var price = aliveUnits.Union(deadUnits).Union(reachedToTheEndUnits).Sum(x => x.Price);
 
             return new SimulationResult
             {
-                ReachedToTheEnd = survivorUnits.Count,
-                DamagesToEnemyBase = survivorUnits.Sum(x => x.DamageToEnemyBase),
+                ReachedToTheEnd = reachedToTheEndUnits.Count,
+                DamagesToEnemyBase = reachedToTheEndUnits.Sum(x => x.DamageToEnemyBase),
                 DeadPositions = deadUnits.Select(x => x.Position).ToArray(),
                 Length = _pathLength,
                 Turns = elapsedTurns,
