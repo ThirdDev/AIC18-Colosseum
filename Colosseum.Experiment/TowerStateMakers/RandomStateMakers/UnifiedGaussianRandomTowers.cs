@@ -6,8 +6,8 @@ namespace Colosseum.Experiment.TowerStateMakers.RandomStateMakers
 {
     internal class UnifiedGaussianRandomTowers : UniformRandomTowers
     {
-        public UnifiedGaussianRandomTowers(int minCount, int maxCount, int countOfSamplesPerTowerCount) : base(minCount,
-            maxCount, countOfSamplesPerTowerCount)
+        public UnifiedGaussianRandomTowers(int minCount, int maxCount, int countOfSamplesPerTowerCoefficient) : base(minCount,
+            maxCount, countOfSamplesPerTowerCoefficient)
         { }
 
         protected override int randomTowerCount(int towersCount)

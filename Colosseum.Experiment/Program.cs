@@ -19,13 +19,13 @@ namespace Colosseum.Experiment
         [SuppressMessage("ReSharper", "JoinDeclarationAndInitializer")]
         public static void Main()
         {
-            /**/
+            /**
 
             SolutionMaker solutionMaker = new SolutionMaker(new UnifiedGaussianRandomTowers(5, 100, 500), new DamagePolicyByTowerCount());
             solutionMaker.Make(20);
             return;
 
-            /**
+            /**/
             ITowerStateMaker towerStateMaker;
             Console.WriteLine("Tower maker type?");
             var tower = Console.ReadLine();
@@ -41,6 +41,10 @@ namespace Colosseum.Experiment
                 towerStateMaker = new TwoDoubleTowers();
             else if (tower == "RandomTowers")
                 towerStateMaker = new RandomTowers(5, 20, 500);
+            else if (tower == "UnifiedRandom") 
+                towerStateMaker = new UniformRandomTowers(1, 30, 50);
+            else if (tower == "GaussianRandom") 
+                towerStateMaker = new UnifiedGaussianRandomTowers(1, 30, 50);
             else
                 throw new Exception("Invalid response.");
             
@@ -49,6 +53,9 @@ namespace Colosseum.Experiment
 
             Console.WriteLine("Money?");
             int money = int.Parse(Console.ReadLine());
+			
+			Console.WriteLine("Length?");
+            int toolemasir = int.Parse(Console.ReadLine());
 
             IScoringPolicy xScoringPolicy;
 
@@ -56,11 +63,15 @@ namespace Colosseum.Experiment
                 xScoringPolicy = new DamagePolicy(money);
             else if (policy == "Explore")
                 xScoringPolicy = new ExplorePolicy(money);
+            else if (policy == "Damage2")
+                xScoringPolicy = new DamagePolicyByTowerCount();
+            else if (policy == "Explore2")
+                xScoringPolicy = new ExplorePolicyByTowerCount();
             else
                 throw new Exception("Invalid response.");
 
             SolutionMaker solutionMaker = new SolutionMaker(towerStateMaker, xScoringPolicy);
-            solutionMaker.Make(20);
+            solutionMaker.Make(toolemasir);
             return;
             /**/
 

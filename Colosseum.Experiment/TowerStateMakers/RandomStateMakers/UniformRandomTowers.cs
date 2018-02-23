@@ -7,13 +7,13 @@ namespace Colosseum.Experiment.TowerStateMakers.RandomStateMakers
     {
         private readonly int _minCount;
         private readonly int _maxCount;
-        private readonly int _countOfSamplesPerTowerCount;
+        private readonly int _countOfSamplesPerTowerCoefficient;
 
-        internal UniformRandomTowers(int minCount, int maxCount, int countOfSamplesPerTowerCount)
+        internal UniformRandomTowers(int minCount, int maxCount, int countOfSamplesPerTowerCoefficient)
         {
             _minCount = minCount;
             _maxCount = maxCount;
-            _countOfSamplesPerTowerCount = countOfSamplesPerTowerCount;
+            _countOfSamplesPerTowerCoefficient = countOfSamplesPerTowerCoefficient;
         }
 
         public List<TowerState> GetTowerStates(int pathLength)
@@ -22,7 +22,7 @@ namespace Colosseum.Experiment.TowerStateMakers.RandomStateMakers
 
             for (int towersCount = _minCount; towersCount < _maxCount + 1; towersCount++)
             {
-                for (int i = 0; i < _countOfSamplesPerTowerCount; i++)
+                for (int i = 0; i < (_countOfSamplesPerTowerCoefficient * towersCount); i++)
                 {
                     towerStates.Add(randomTowerState(towersCount, pathLength));
                 }
