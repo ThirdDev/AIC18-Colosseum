@@ -16,14 +16,14 @@ namespace Colosseum.Experiment.GeneParsers
 
         public AttackAction Parse(int turn)
         {
-            if (turn >= Gene.GenomesList.Count)
+            var length = Gene.GenomesList.Count / 2;
+
+            if (turn >= length)
                 return new AttackAction
                 {
                     CountOfHeros = 0,
                     CountOfCreeps = 0,
                 };
-
-            var length = Gene.GenomesList.Count / 2;
 
             var creepGenome = Gene.GenomesList[turn % length];
             var heroGenome = Gene.GenomesList[(turn % length) + length];
