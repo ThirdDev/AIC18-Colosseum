@@ -46,10 +46,11 @@ namespace Colosseum.Experiment
 
 
             TimeSpan reportPeriod = TimeSpan.FromSeconds(2);
+            DateTime beginTime = DateTime.Now;
             int progress = 0;
 
             using (new Timer(
-                _ => WriteStatus(progress + 1, towerStates.Count, reportPeriod),
+                _ => WriteStatus2(progress + 1, towerStates.Count, DateTime.Now - beginTime),
                 null, reportPeriod, reportPeriod))
             {
                 Parallel.For(0, towerStates.Count, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (long i) =>
@@ -89,6 +90,14 @@ namespace Colosseum.Experiment
         private void WriteStatus(int progress, int totalCount, TimeSpan period)
         {
             double spm = 60.0 * (progress - prevProg) / period.TotalSeconds;
+
+            Console.Write($"\r{progress} / {totalCount} - SPM: {spm.ToString("F1")}");
+            prevProg = progress;
+        }
+
+        private void WriteStatus2(int progress, int totalCount, TimeSpan elapsed)
+        {
+            double spm = 60.0 * (progress) /elapsed.TotalSeconds;
 
             Console.Write($"\r{progress} / {totalCount} - SPM: {spm.ToString("F1")}");
             prevProg = progress;
