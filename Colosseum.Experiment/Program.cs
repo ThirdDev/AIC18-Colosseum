@@ -42,7 +42,18 @@ namespace Colosseum.Experiment
             else if (tower == "RandomTowers")
                 towerStateMaker = new RandomTowers(5, 20, 500);
             else if (tower == "UniformRandom") 
-                towerStateMaker = new UniformRandomTowers(1, 30, 10);
+            {
+                Console.WriteLine("Min tower count?");
+                int minTowerCount = int.Parse(Console.ReadLine());
+
+                Console.WriteLine("Max tower count?");
+                int maxTowerCount = int.Parse(Console.ReadLine());
+
+                Console.WriteLine("How many of each?");
+                int eachCount = int.Parse(Console.ReadLine());
+
+                towerStateMaker = new UniformRandomTowers(minTowerCount, maxTowerCount, eachCount);
+            }
             else if (tower == "GaussianRandom") 
                 towerStateMaker = new UniformGaussianRandomTowers(1, 30, 10);
             else
