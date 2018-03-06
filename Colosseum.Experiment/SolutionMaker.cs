@@ -47,6 +47,7 @@ namespace Colosseum.Experiment
 
             TimeSpan reportPeriod = TimeSpan.FromSeconds(2);
             DateTime beginTime = DateTime.Now;
+            DateTime lastSaveTime = DateTime.Now;
             int progress = 0;
 
             using (new Timer(
@@ -65,6 +66,8 @@ namespace Colosseum.Experiment
                     lock (resultsLock)
                     {
                         results.Add(result);
+
+                        lastSaveTime = SaveIfNecessary(results, lastSaveTime, outputDirectory, outputFile);
                     }
 
                     Interlocked.Increment(ref progress);
@@ -85,6 +88,23 @@ namespace Colosseum.Experiment
             Console.WriteLine("Done.");
             Console.ReadKey();
         }
+
+        private DateTime SaveIfNecessary(List<TowerStateResult> results, DateTime lastSaveTime, string outputDirectory, string outputFile)
+        {
+            if ((DateTime.Now - lastSaveTime) > TimeSpan.FromMinutes(10)) 
+            {
+                var outputString = JsonConvert.SerializeObject(results, Formatting.Indented);
+
+                if (!Directory.Exists(outputDirectory))
+                    Directory.CreateDirectory(outputDirectory);
+                File.WriteAllText(Path.Combine(outputDirectory, outputFile), outputString);
+    
+                return DateTime.Now;
+            }
+
+            return lastSaveTime;
+        }
+
 
         int prevProg = 0;
         private void WriteStatus(int progress, int totalCount, TimeSpan period)
