@@ -15,7 +15,7 @@ namespace Colosseum.Experiment
 {
     public class SolutionMaker
     {
-        const int generationCount = 150;
+        const int generationCount = 100;
         const int countOfBestGenesToSave = 1;
         const int maximumGenerations = 500;
 
