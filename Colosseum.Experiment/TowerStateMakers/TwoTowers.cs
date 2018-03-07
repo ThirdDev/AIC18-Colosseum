@@ -13,7 +13,7 @@ namespace Colosseum.Experiment.TowerStateMakers
 
             for (int i = 0; i < pathLength; i++)
             {
-                for (int j = i + 1; j < pathLength; j++)
+                for (int j = i; j < pathLength; j++)
                 {
                     states.Add(new TowerState
                     {

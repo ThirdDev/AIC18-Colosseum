@@ -17,7 +17,7 @@ namespace Colosseum.Experiment
         const int turns = 1000;
 
         [SuppressMessage("ReSharper", "JoinDeclarationAndInitializer")]
-        public static void Main()
+        public static void Main(string[] args)
         {
             /**
 
@@ -27,60 +27,72 @@ namespace Colosseum.Experiment
 
             /**/
             ITowerStateMaker towerStateMaker;
-            Console.WriteLine("Tower maker type?");
-            var tower = Console.ReadLine();
-            if (tower == "ThreeTowers")
-                towerStateMaker = new ThreeTowers();
-            else if (tower == "FourTowers")
-                towerStateMaker = new FourTowers();
-            else if (tower == "SingleTower")
-                towerStateMaker = new SingleTower();
-            else if (tower == "TwoTowers")
-                towerStateMaker = new TwoTowers();
-            else if (tower == "TwoDoubleTowers")
-                towerStateMaker = new TwoDoubleTowers();
-            else if (tower == "RandomTowers")
-                towerStateMaker = new RandomTowers(5, 20, 500);
-            else if (tower == "UniformRandom") 
-            {
-                Console.WriteLine("Min tower count?");
-                int minTowerCount = int.Parse(Console.ReadLine());
-
-                Console.WriteLine("Max tower count?");
-                int maxTowerCount = int.Parse(Console.ReadLine());
-
-                Console.WriteLine("How many of each?");
-                int eachCount = int.Parse(Console.ReadLine());
-
-                towerStateMaker = new UniformRandomTowers(minTowerCount, maxTowerCount, eachCount);
-            }
-            else if (tower == "GaussianRandom") 
-                towerStateMaker = new UniformGaussianRandomTowers(1, 30, 10);
-            else
-                throw new Exception("Invalid response.");
-            
-            Console.WriteLine("policy?");
-            var policy = Console.ReadLine();
-
-            Console.WriteLine("Money?");
-            int money = int.Parse(Console.ReadLine());
-			
-			Console.WriteLine("Length?");
-            int toolemasir = int.Parse(Console.ReadLine());
-
             IScoringPolicy xScoringPolicy;
+            int toolemasir;
 
-            if (policy == "Damage")
-                xScoringPolicy = new DamagePolicy(money);
-            else if (policy == "Explore")
-                xScoringPolicy = new ExplorePolicy(money);
-            else if (policy == "Damage2")
-                xScoringPolicy = new DamagePolicyByTowerCount();
-            else if (policy == "Explore2")
+
+            if (args.Length > 0) 
+            {
+                towerStateMaker = new UniformRandomTowers(int.Parse(args[0]), int.Parse(args[1]), int.Parse(args[2]));
+                toolemasir = 25;
                 xScoringPolicy = new ExplorePolicyByTowerCount();
+            }
             else
-                throw new Exception("Invalid response.");
+            {
+                Console.WriteLine("Tower maker type?");
+                var tower = Console.ReadLine();
+                if (tower == "ThreeTowers")
+                    towerStateMaker = new ThreeTowers();
+                else if (tower == "FourTowers")
+                    towerStateMaker = new FourTowers();
+                else if (tower == "SingleTower")
+                    towerStateMaker = new SingleTower();
+                else if (tower == "TwoTowers")
+                    towerStateMaker = new TwoTowers();
+                else if (tower == "TwoDoubleTowers")
+                    towerStateMaker = new TwoDoubleTowers();
+                else if (tower == "RandomTowers")
+                    towerStateMaker = new RandomTowers(5, 20, 500);
+                else if (tower == "UniformRandom") 
+                {
+                    Console.WriteLine("Min tower count?");
+                    int minTowerCount = int.Parse(Console.ReadLine());
 
+                    Console.WriteLine("Max tower count?");
+                    int maxTowerCount = int.Parse(Console.ReadLine());
+
+                    Console.WriteLine("How many of each?");
+                    int eachCount = int.Parse(Console.ReadLine());
+
+                    towerStateMaker = new UniformRandomTowers(minTowerCount, maxTowerCount, eachCount);
+                }
+                else if (tower == "GaussianRandom") 
+                    towerStateMaker = new UniformGaussianRandomTowers(1, 30, 10);
+                else
+                    throw new Exception("Invalid response.");
+                
+                Console.WriteLine("policy?");
+                var policy = Console.ReadLine();
+
+                Console.WriteLine("Money?");
+                int money = int.Parse(Console.ReadLine());
+                
+                Console.WriteLine("Length?");
+                toolemasir = int.Parse(Console.ReadLine());
+
+                
+
+                if (policy == "Damage")
+                    xScoringPolicy = new DamagePolicy(money);
+                else if (policy == "Explore")
+                    xScoringPolicy = new ExplorePolicy(money);
+                else if (policy == "Damage2")
+                    xScoringPolicy = new DamagePolicyByTowerCount();
+                else if (policy == "Explore2")
+                    xScoringPolicy = new ExplorePolicyByTowerCount();
+                else
+                    throw new Exception("Invalid response.");
+            }
             SolutionMaker solutionMaker = new SolutionMaker(towerStateMaker, xScoringPolicy);
             solutionMaker.Make(toolemasir, 40, 5000);
             
