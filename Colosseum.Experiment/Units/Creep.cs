@@ -14,7 +14,7 @@ namespace Colosseum.Experiment.Units
 
         public override int DamageByCannon => 10;
 
-        public override int DamageByArcher => 40;
+        public override int DamageByArcher => 60;
 
         public override int DamageToEnemyBase => 1;
     }
