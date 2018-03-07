@@ -30,9 +30,7 @@ namespace Colosseum.Experiment
             IScoringPolicy xScoringPolicy;
             int toolemasir;
 
-            Console.WriteLine($"Affinity: {Process.GetCurrentProcess().ProcessorAffinity.ToInt32()}");
             Process.GetCurrentProcess().ProcessorAffinity = new IntPtr(Environment.ProcessorCount);
-            Console.WriteLine($"Affinity: {Process.GetCurrentProcess().ProcessorAffinity.ToInt32()}");
 
             if (args.Length > 0) 
             {
