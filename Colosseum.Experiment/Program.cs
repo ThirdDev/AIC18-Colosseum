@@ -30,6 +30,7 @@ namespace Colosseum.Experiment
             IScoringPolicy xScoringPolicy;
             int toolemasir;
 
+            Process.GetCurrentProcess().ProcessorAffinity = new IntPtr(Environment.ProcessorCount);
 
             if (args.Length > 0) 
             {
