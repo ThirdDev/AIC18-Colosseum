@@ -54,7 +54,7 @@ namespace Colosseum.Experiment
                 _ => WriteStatus2(progress + 1, towerStates.Count, DateTime.Now - beginTime),
                 null, reportPeriod, reportPeriod))
             {
-                Parallel.For(0, towerStates.Count, new ParallelOptions { MaxDegreeOfParallelism = 64 }, (long i) =>
+                Enumerable.Range(0, towerStates.Count).ForEachAsyncSemaphore(128, (i) =>
                 {
                     List<List<Gene>> bestGenes = new List<List<Gene>>();
                     for (int j = 0; j < countOfBestGenesToSave; j++)
@@ -71,7 +71,9 @@ namespace Colosseum.Experiment
                     }
 
                     Interlocked.Increment(ref progress);
-                });
+
+                    return Task.CompletedTask;
+                }).GetAwaiter().GetResult();
             }
 
             Console.Write($"\r{towerStates.Count} / {towerStates.Count}                                                                         ");
