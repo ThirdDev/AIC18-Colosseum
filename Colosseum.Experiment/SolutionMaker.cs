@@ -2,6 +2,7 @@
 using Colosseum.Experiment.ScoringPolicies;
 using Colosseum.Experiment.TowerStateMakers;
 using Colosseum.GS;
+using Colosseum.Tools.SystemExtensions.Collection.Generic;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -57,10 +58,10 @@ namespace Colosseum.Experiment
                 Parallel.For(0, towerStates.Count, new ParallelOptions { MaxDegreeOfParallelism = 1500 }, (long i) =>
                 {
                     var bestGenes = new List<List<Gene>>();
-                    for (var j = 0; j < countOfBestGenesToSave; j++)
+                    Parallel.For(0, countOfBestGenesToSave, (j) =>
                     {
-                        bestGenes.Add(FindBestGenes(towerStates[(int)i], pathLength, geneLength, maximumTurns).OrderByDescending(x => x.Score).ToList());
-                    }
+                        bestGenes.AddThreadSafe(FindBestGenes(towerStates[(int)i], pathLength, geneLength, maximumTurns).OrderByDescending(x => x.Score).ToList());
+                    });
 
                     var result = GetTowerStateResult(towerStates[(int)i], bestGenes, pathLength, maximumTurns);
                     lock (resultsLock)
@@ -91,14 +92,14 @@ namespace Colosseum.Experiment
 
         private DateTime SaveIfNecessary(List<TowerStateResult> results, DateTime lastSaveTime, string outputDirectory, string outputFile)
         {
-            if ((DateTime.Now - lastSaveTime) > TimeSpan.FromMinutes(10)) 
+            if ((DateTime.Now - lastSaveTime) > TimeSpan.FromMinutes(10))
             {
                 var outputString = JsonConvert.SerializeObject(results, Formatting.Indented);
 
                 if (!Directory.Exists(outputDirectory))
                     Directory.CreateDirectory(outputDirectory);
                 File.WriteAllText(Path.Combine(outputDirectory, outputFile), outputString);
-    
+
                 return DateTime.Now;
             }
 
@@ -117,7 +118,7 @@ namespace Colosseum.Experiment
 
         private void WriteStatus2(int progress, int totalCount, TimeSpan elapsed)
         {
-            var spm = 60.0 * (progress) /elapsed.TotalSeconds;
+            var spm = 60.0 * (progress) / elapsed.TotalSeconds;
 
             Console.Write($"\r{progress} / {totalCount} - SPM: {spm.ToString("F1")}");
             prevProg = progress;
@@ -163,11 +164,11 @@ namespace Colosseum.Experiment
 
             while (!EnoughGenerations(bestScores, state))
             {
-                foreach (var gene in generation)
+                Parallel.ForEach(generation, (gene) =>
                 {
                     var result = simulator.Simulate(new MyGeneParser(gene));
                     gene.Score = scoringPolicy.CalculateTotalScore(result);
-                }
+                });
 
                 bestScores.Add((double)generation.Select(x => x.Score).Max());
 
