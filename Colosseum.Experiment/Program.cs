@@ -83,8 +83,8 @@ namespace Colosseum.Experiment
 
             SolutionMaker solutionMaker = new SolutionMaker(towerStateMaker, xScoringPolicy);
             solutionMaker.Make(toolemasir, 40, 5000);
-            return;
-            /**/
+            
+            /**
 
             int[] cannons, archers;
 
@@ -136,8 +136,8 @@ namespace Colosseum.Experiment
                 generationPopulation, maximumCountOfGenerations, geneToTroopMean, 15 * 2, scoringPolicy, printEvaluationLog: true);
 
             Console.WriteLine(bestGene.Score);
-
             Console.ReadLine();
+            /**/
         }
 
         private static Gene findBestGeneForTowerPattern(
