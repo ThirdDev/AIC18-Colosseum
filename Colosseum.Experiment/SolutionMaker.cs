@@ -30,13 +30,13 @@ namespace Colosseum.Experiment
 
         public void Make(int pathLength, int geneLength, int maximumTurns)
         {
-            string outputFile = $"{towerStateMaker.GetType().Name}-{scoringPolicy.GetType().Name} {scoringPolicy.GetPreferredMoneyToSpend()}-pathLength {pathLength}-{DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss")}.json";
-            string outputDirectory = "output";
+            var outputFile = $"{towerStateMaker.GetType().Name}-{scoringPolicy.GetType().Name} {scoringPolicy.GetPreferredMoneyToSpend()}-pathLength {pathLength}-{DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss")}.json";
+            var outputDirectory = "output";
 
             var towerStates = towerStateMaker.GetTowerStates(pathLength);
 
-            List<TowerStateResult> results = new List<TowerStateResult>();
-            Object resultsLock = new Object();
+            var results = new List<TowerStateResult>();
+            var resultsLock = new Object();
 
             Console.WriteLine($"{towerStateMaker.GetType().Name}\r\n{scoringPolicy.GetType().Name} with preferred amount of {scoringPolicy.GetPreferredMoneyToSpend()}\r\npathLength: {pathLength}");
             Console.WriteLine();
@@ -45,10 +45,10 @@ namespace Colosseum.Experiment
             Console.WriteLine();
 
 
-            TimeSpan reportPeriod = TimeSpan.FromSeconds(2);
-            DateTime beginTime = DateTime.Now;
-            DateTime lastSaveTime = DateTime.Now;
-            int progress = 0;
+            var reportPeriod = TimeSpan.FromSeconds(2);
+            var beginTime = DateTime.Now;
+            var lastSaveTime = DateTime.Now;
+            var progress = 0;
 
             using (new Timer(
                 _ => WriteStatus2(progress + 1, towerStates.Count, DateTime.Now - beginTime),
@@ -56,8 +56,8 @@ namespace Colosseum.Experiment
             {
                 Parallel.For(0, towerStates.Count, new ParallelOptions { MaxDegreeOfParallelism = 1500 }, (long i) =>
                 {
-                    List<List<Gene>> bestGenes = new List<List<Gene>>();
-                    for (int j = 0; j < countOfBestGenesToSave; j++)
+                    var bestGenes = new List<List<Gene>>();
+                    for (var j = 0; j < countOfBestGenesToSave; j++)
                     {
                         bestGenes.Add(FindBestGenes(towerStates[(int)i], pathLength, geneLength, maximumTurns).OrderByDescending(x => x.Score).ToList());
                     }
@@ -109,7 +109,7 @@ namespace Colosseum.Experiment
         int prevProg = 0;
         private void WriteStatus(int progress, int totalCount, TimeSpan period)
         {
-            double spm = 60.0 * (progress - prevProg) / period.TotalSeconds;
+            var spm = 60.0 * (progress - prevProg) / period.TotalSeconds;
 
             Console.Write($"\r{progress} / {totalCount} - SPM: {spm.ToString("F1")}");
             prevProg = progress;
@@ -117,7 +117,7 @@ namespace Colosseum.Experiment
 
         private void WriteStatus2(int progress, int totalCount, TimeSpan elapsed)
         {
-            double spm = 60.0 * (progress) /elapsed.TotalSeconds;
+            var spm = 60.0 * (progress) /elapsed.TotalSeconds;
 
             Console.Write($"\r{progress} / {totalCount} - SPM: {spm.ToString("F1")}");
             prevProg = progress;
@@ -159,7 +159,7 @@ namespace Colosseum.Experiment
 
             var simulator = new Simulator(pathLength, maximumTurns, state.Cannons, state.Archers);
 
-            List<double> bestScores = new List<double>();
+            var bestScores = new List<double>();
 
             while (!EnoughGenerations(bestScores, state))
             {

@@ -12,10 +12,10 @@ namespace Colosseum.Transformer
     {
         static void Main(string[] args)
         {
-            HashSet<String> keys = new HashSet<string>();
+            var keys = new HashSet<string>();
 
             Console.WriteLine("Path?");
-            string path = Console.ReadLine();
+            var path = Console.ReadLine();
 
             var files = Directory.GetFiles(path, "*.json");
 
@@ -26,10 +26,10 @@ namespace Colosseum.Transformer
             {
                 Console.WriteLine($"Processing {Path.GetFileName(file)}...");
 
-                string json = File.ReadAllText(file);
+                var json = File.ReadAllText(file);
                 var data = JsonConvert.DeserializeObject<List<TowerStateResult>>(json);
 
-                StringBuilder code = new StringBuilder();
+                var code = new StringBuilder();
 
                 foreach (var item in data)
                 {
@@ -80,7 +80,7 @@ namespace Colosseum.Transformer
                 a2.RemoveAt(0);
             }
 
-            for (int i = a1.Count - 1; i >= 0; i--)
+            for (var i = a1.Count - 1; i >= 0; i--)
             {
                 if (a1[i] == 0 && a2[i] == 0)
                 {

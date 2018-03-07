@@ -18,15 +18,15 @@ namespace Colosseum.Experiment.TowerStateMakers.RandomStateMakers
 
         public List<TowerState> GetTowerStates(int pathLength)
         {
-            List<TowerState> towerStates = new List<TowerState>();
+            var towerStates = new List<TowerState>();
 
-            for (int towersCount = _minCount; towersCount < _maxCount + 1; towersCount++)
+            for (var towersCount = _minCount; towersCount < _maxCount + 1; towersCount++)
             {
-                for (int archerTowerCount = 0; archerTowerCount <= towersCount; archerTowerCount++) 
+                for (var archerTowerCount = 0; archerTowerCount <= towersCount; archerTowerCount++) 
                 {
-                    int cannonTowerCount = towersCount - archerTowerCount;
+                    var cannonTowerCount = towersCount - archerTowerCount;
 
-                    for (int i = 0; i < _countOfSamplesPerTower; i++)
+                    for (var i = 0; i < _countOfSamplesPerTower; i++)
                     {
                         towerStates.Add(randomTowerState(archerTowerCount, cannonTowerCount, pathLength));
                     }

@@ -9,11 +9,11 @@ namespace Colosseum.Experiment.TowerStateMakers
     {
         public List<TowerState> GetTowerStates(int pathLength)
         {
-            List<TowerState> states = new List<TowerState>();
+            var states = new List<TowerState>();
 
-            for (int i = 0; i < pathLength; i++)
+            for (var i = 0; i < pathLength; i++)
             {
-                for (int j = i; j < pathLength; j++)
+                for (var j = i; j < pathLength; j++)
                 {
                     states.Add(new TowerState
                     {

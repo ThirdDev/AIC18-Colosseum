@@ -17,14 +17,14 @@ namespace Colosseum.Experiment.TowerStateMakers
 
         public List<TowerState> GetTowerStates(int pathLength)
         {
-            Random rnd = new Random();
-            List<TowerState> towerStates = new List<TowerState>();
+            var rnd = new Random();
+            var towerStates = new List<TowerState>();
 
-            for (int i = minCount; i < maxCount + 1; i++)
+            for (var i = minCount; i < maxCount + 1; i++)
             {
-                for (int j = 0; j < eachCountSamples; j++)
+                for (var j = 0; j < eachCountSamples; j++)
                 {
-                    TowerState towerState = GetTowerState(pathLength, i, rnd);
+                    var towerState = GetTowerState(pathLength, i, rnd);
 
                     towerStates.Add(towerState);
                 }
@@ -36,10 +36,10 @@ namespace Colosseum.Experiment.TowerStateMakers
 
         private static TowerState GetTowerState(int pathLength, int towersCount, Random rnd)
         {
-            List<int> archers = new List<int>();
-            List<int> cannons = new List<int>();
+            var archers = new List<int>();
+            var cannons = new List<int>();
 
-            for (int j = 0; j < towersCount; j++)
+            for (var j = 0; j < towersCount; j++)
             {
                 if (rnd.NextDouble() < 0.5)
                 {

@@ -56,13 +56,13 @@ namespace Colosseum.Experiment
                 else if (tower == "UniformRandom") 
                 {
                     Console.WriteLine("Min tower count?");
-                    int minTowerCount = int.Parse(Console.ReadLine());
+                    var minTowerCount = int.Parse(Console.ReadLine());
 
                     Console.WriteLine("Max tower count?");
-                    int maxTowerCount = int.Parse(Console.ReadLine());
+                    var maxTowerCount = int.Parse(Console.ReadLine());
 
                     Console.WriteLine("How many of each?");
-                    int eachCount = int.Parse(Console.ReadLine());
+                    var eachCount = int.Parse(Console.ReadLine());
 
                     towerStateMaker = new UniformRandomTowers(minTowerCount, maxTowerCount, eachCount);
                 }
@@ -75,7 +75,7 @@ namespace Colosseum.Experiment
                 var policy = Console.ReadLine();
 
                 Console.WriteLine("Money?");
-                int money = int.Parse(Console.ReadLine());
+                var money = int.Parse(Console.ReadLine());
                 
                 Console.WriteLine("Length?");
                 toolemasir = int.Parse(Console.ReadLine());
@@ -93,7 +93,7 @@ namespace Colosseum.Experiment
                 else
                     throw new Exception("Invalid response.");
             }
-            SolutionMaker solutionMaker = new SolutionMaker(towerStateMaker, xScoringPolicy);
+            var solutionMaker = new SolutionMaker(towerStateMaker, xScoringPolicy);
             solutionMaker.Make(toolemasir, 40, 5000);
             
             /**
@@ -177,8 +177,8 @@ namespace Colosseum.Experiment
             var cannonString = towerLocationsToString(cannons, length, "c");
 
             double lastBestScore = default;
-            int bestScoreCount = 0;
-            int bestScoreCountLimit = 30;
+            var bestScoreCount = 0;
+            var bestScoreCountLimit = 30;
 
             var st = new Stopwatch();
             st.Start();
